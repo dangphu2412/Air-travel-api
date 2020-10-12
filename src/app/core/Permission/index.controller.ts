@@ -1,19 +1,19 @@
-import { Crud } from '@nestjsx/crud';
-import { ApiTags } from '@nestjs/swagger';
-import { Controller, Get } from '@nestjs/common';
-import { PermissionService } from './index.service';
-import { Permission } from 'src/common/entity';
+import {Crud} from "@nestjsx/crud";
+import {ApiTags} from "@nestjs/swagger";
+import {Controller} from "@nestjs/common";
+import {PermissionService} from "./index.service";
+import {Permission} from "src/common/entity";
 
 @Crud({
   model: {
-    type: Permission,
+    type: Permission
   },
   routes: {
-    exclude: ['createManyBase']
+    exclude: ["createManyBase"]
   }
 })
-@ApiTags('Permissions')
-@Controller('permissions')
+@ApiTags("Permissions")
+@Controller("permissions")
 export class PermissionController {
   constructor(public service: PermissionService) {}
 }

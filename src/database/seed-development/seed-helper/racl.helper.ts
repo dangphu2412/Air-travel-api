@@ -1,6 +1,9 @@
-import * as Racl from '../../../common/enums/racl.enum';
-import {  Permission, Role, Method, Module  } from '../../../common/entity';
-import { TRacl } from 'src/common/type/t.Racl';
+import {ECrudAction, ECrudFeature, ERole} from "../../../common/enums";
+import {Permission, Role} from "../../../common/entity";
+import {TRacl} from "../../../common/type/t.Racl";
+import {enumToArray} from "../../../utils/array";
+import {flatMap, remove} from "lodash";
+import {TCrudAction} from "../../../common/type/t.CrudAction";
 
 export class RaclHelper {
   private _racls: Array<TRacl>;
@@ -9,82 +12,81 @@ export class RaclHelper {
     this._racls = this.getRacls();
   }
 
-  private  getRacls(): Array<TRacl> {
+  private getRacls(): Array<TRacl> {
     return [
       {
-        role: Racl.ERole.ADMIN,
+        role: ERole.SUPER_ADMIN,
         permissions: [
-          {
-            method: Racl.EMethod.GET,
-            module: Racl.EModule.USER,
-          },
-          {
-            method: Racl.EMethod.DELETE,
-            module: Racl.EModule.USER,
-          },
-          {
-            method: Racl.EMethod.SOFT_DELETE,
-            module: Racl.EModule.USER,
-          },
-          {
-            method: Racl.EMethod.PUT,
-            module: Racl.EModule.ROLE,
-          },
-          {
-            method: Racl.EMethod.POST,
-            module: Racl.EModule.ROLE,
-          },
-        ],
+          "ALL"
+        ]
       },
       {
-        role: Racl.ERole.MODERATOR,
-        permissions: [
-          {
-            method: Racl.EMethod.GET,
-            module: Racl.EModule.USER,
-          },
-          {
-            method: Racl.EMethod.SOFT_DELETE,
-            module: Racl.EModule.USER,
-          },
-        ],
+        role: ERole.ADMIN,
+        permissions: flatMap([
+          ...this.createManyPermissionFromFeature(ECrudFeature.USER),
+          ...this.createManyPermissionFromFeature(ECrudFeature.ROLE)
+        ])
       },
       {
-        role: Racl.ERole.USER,
-        permissions: [],
+        role: ERole.MODERATOR,
+        permissions: flatMap([
+          ...this.createManyPermissionFromFeature(ECrudFeature.USER, ["DELETE", "REPLACE"])
+        ])
       },
+      {
+        role: ERole.USER,
+        permissions: [
+        ]
+      }
     ]
   }
-  private findPermissionDefinitionAndCreaete(roleEntities: Role[], permissionEntities: Permission[]) {
-    return Promise.all(roleEntities.map(role => {
-      const { permissions } = this._racls.find(racl => racl.role === role.name);
-      role.permissions = permissions.map(permission => {
-        const requiredPermission = permissionEntities.find(per =>
-          per.method.name === permission.method
-          && per.module.name === permission.module
-        );
-        return requiredPermission;
-      })
-      return role.save();
-    }))
-  }
 
-  private createPermissions(methodEntities: Array<Method>, moduleEntities: Array<Module>) {
-    return Promise.all(methodEntities.map(method => {
-      return Promise.all(moduleEntities.map(module => {
-        const dto = Permission.create();
-
-        dto.method = method;
-        dto.module = module
-        dto.name = `${method.name}_${module.name}`;
+  private createPermissions() {
+    return Promise.all(enumToArray(ECrudFeature).map(feature => {
+      return Promise.all(enumToArray(ECrudAction).map(action => {
+        const permission = this.createPermission(feature, action);
+        const dto = new Permission();
+        dto.name = permission;
         return dto.save();
-      }));
+      }))
     }))
   }
 
-  public async assignPermissionsToRoles(roleEntities: Array<Role>, methodEntities: Array<Method>, moduleEntities: Array<Module>) {
-    await this.createPermissions(methodEntities, moduleEntities);
-    const permissionEntities = await Permission.find();
-    await this.findPermissionDefinitionAndCreaete(roleEntities, permissionEntities);
+  private createSuperPermission() {
+    const dto = new Permission();
+    dto.name = "ALL";
+    return dto.save();
+  }
+
+  public createPermission(feature: string, action: string): string {
+    return `${feature}${action}`;
+  }
+
+  public createManyPermissionFromFeature(feature: string, exclude?: TCrudAction[]): string[] {
+    let action = enumToArray(ECrudAction);
+    if (exclude) {
+      action = remove(action, exclude);
+    }
+    return action.map(action => {
+      return `${feature}${action}`;
+    })
+  }
+
+  public async assignPermissionsToRoles(roleEntities: Array<Role>) {
+    await this.createPermissions();
+    await this.createSuperPermission();
+    const racls = this._racls;
+    await Promise.all(
+      racls.map(async racl => {
+        const roleEntity = roleEntities.find(item => item.name === racl.role);
+        const permissionAllow = await Permission.find({
+          where: {
+            name: racl.permissions
+          }
+        })
+        roleEntity.permissions = permissionAllow;
+        return roleEntity.save();
+      })
+    );
   }
 }

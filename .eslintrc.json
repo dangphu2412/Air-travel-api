@@ -77,8 +77,6 @@
       }
     ],
     "arrow-parens": ["error", "as-needed"],
-    "no-console":"error",
-    "quotes": ["error","single"],
-    "semi": ["error","always"]
+    "no-console": "error"
   }
 }

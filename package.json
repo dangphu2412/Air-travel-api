@@ -23,6 +23,7 @@
     "migrate:latest": "ts-node ./node_modules/typeorm/cli.js migration:run",
     "migrate:rollback": "ts-node ./node_modules/typeorm/cli.js migration:revert",
     "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
+    "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync",
     "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "@nestjs/typeorm": "^7.1.3",
     "@nestjsx/crud": "^4.6.2",
     "@nestjsx/crud-typeorm": "^4.6.2",
+    "bcrypt": "^5.0.0",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "lodash": "^4.17.20",
@@ -63,10 +65,10 @@
     "@types/supertest": "^2.0.8",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
     "@typescript-eslint/parser": "^2.23.0",
-    "bcrypt": "^5.0.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-only-warn": "^1.0.2",
     "jest": "^25.1.0",
     "prettier": "^1.19.1",
     "supertest": "^4.0.2",

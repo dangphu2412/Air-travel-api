@@ -1,10 +1,15 @@
-import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
-import { ApiProperty } from "@nestjs/swagger";
-import { Role } from "./role.entity";
+import {
+  Entity, PrimaryGeneratedColumn, Column,
+  BaseEntity, ManyToOne, CreateDateColumn,
+  UpdateDateColumn, DeleteDateColumn,
+  BeforeInsert, BeforeUpdate} from "typeorm";
+import {ApiProperty} from "@nestjs/swagger";
+import {Role} from "./role.entity";
+import {BcryptService} from "../../global/bcrypt";
 
-@Entity('users')
+@Entity("users")
 export class User extends BaseEntity {
-    @ApiProperty({ readOnly: true })
+    @ApiProperty({readOnly: true})
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -16,14 +21,24 @@ export class User extends BaseEntity {
 
     @CreateDateColumn()
     createdAt: Date;
-  
+
     @UpdateDateColumn()
     updatedAt: Date;
-  
-    @DeleteDateColumn({ nullable: true })
+
+    @DeleteDateColumn({nullable: true})
     deletedAt: Date;
 
+    @BeforeInsert()
+    hashPwd() {
+      this.password = BcryptService.hash(this.password);
+    }
+
+    @BeforeUpdate()
+    hashPwdUpdate() {
+      this.password = BcryptService.hash(this.password);
+    }
+
     // Relations
-    @ManyToOne(() => Role, { eager: true })
+    @ManyToOne(() => Role)
     role: Role
 }

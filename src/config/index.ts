@@ -1,3 +1,3 @@
-export * from './typeorm.config';
+export * from "./typeorm.config";
 
-export * from './secret.config';
+export * from "./secret.config";

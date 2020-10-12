@@ -1,6 +1,6 @@
-import { TUserInfo } from "../type";
+import {TUserInfo} from "../type";
 
 export interface IUserLoginResponse {
-  access_token: string;
+  token: string;
   info: TUserInfo;
 }

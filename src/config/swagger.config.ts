@@ -2,12 +2,12 @@ import {
   DocumentBuilder,
   SwaggerDocumentOptions,
   SwaggerCustomOptions
-} from '@nestjs/swagger';
+} from "@nestjs/swagger";
 
 export const swaggerConfig = new DocumentBuilder()
-  .setTitle('Air Travel API')
-  .setDescription('API description')
-  .setVersion('1.0')
+  .setTitle("Air Travel API")
+  .setDescription("API description")
+  .setVersion("1.0")
   .addBearerAuth()
   .build();
 
