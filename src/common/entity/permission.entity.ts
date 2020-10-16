@@ -1,30 +1,18 @@
 import {
   Entity, PrimaryGeneratedColumn, Column,
-  BaseEntity, ManyToMany, CreateDateColumn,
-  UpdateDateColumn, DeleteDateColumn} from "typeorm";
+  ManyToMany} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
 import {Role} from "./role.entity";
+import {BaseActionDate} from "./base";
 
 @Entity("permissions")
-export class Permission extends BaseEntity {
+export class Permission extends BaseActionDate {
     @ApiProperty({readOnly: true})
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
     name: string;
-
-    @ApiProperty({readOnly: true})
-    @CreateDateColumn()
-    createdAt: Date;
-
-    @ApiProperty({readOnly: true})
-    @UpdateDateColumn()
-    updatedAt: Date;
-
-    @ApiProperty({readOnly: true})
-    @DeleteDateColumn({nullable: true})
-    deletedAt: Date;
 
     // Relations
     @ManyToMany(() => Role, role => role.permissions)

@@ -4,7 +4,7 @@ import {
 } from "bcrypt";
 import {bcryptConfig} from "../config";
 
-export class Service {
+class Service {
   private saltRound: number;
 
   constructor(config: number) {
