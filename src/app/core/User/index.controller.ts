@@ -33,7 +33,7 @@ import {ECrudAction, ECrudFeature} from "src/common/enums";
 export class UserController implements CrudController<User> {
   constructor(public service: UserService) {}
 
-  @Patch("/restore/:id")
+  @Patch("/:id/restore")
   @Action(ECrudAction.RESTORE)
   @GrantAccess()
   restoreUser(
@@ -44,12 +44,12 @@ export class UserController implements CrudController<User> {
   }
 
   @UseInterceptors(CrudRequestInterceptor)
-  @Get("/deleted")
+  @Get("/trashed")
   getDeleted(@ParsedRequest() req: CrudRequest) {
     return this.service.getDeleted(req);
   }
 
-  @Delete("/soft/:id")
+  @Delete("/:id")
   @Action(ECrudAction.SOFT_DEL)
   @GrantAccess("ADMIN", "SUPER_ADMIN")
   softDelete(

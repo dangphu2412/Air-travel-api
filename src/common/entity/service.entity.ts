@@ -1,20 +1,20 @@
-import {SlugHelper} from "src/global/slugify";
+import {SlugHelper} from "../../global/slugify";
 import {
   Entity, PrimaryGeneratedColumn, Column,
   Unique, BeforeInsert, ManyToMany,
-  JoinTable, ManyToOne, JoinColumn, BaseEntity} from "typeorm";
+  JoinTable, ManyToOne, JoinColumn} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
-import {IsOptional, IsString, IsNumber, Min, IsEmpty} from "class-validator";
+import {IsOptional, IsString, IsNumber, IsEmpty} from "class-validator";
 
 import {User} from "./user.entity";
 import {Provider} from "./provider.entity";
 import {ServiceCategory} from "./serviceCategory.entity";
 import {Destination} from "./destination.entity";
+import {BaseActionDate} from "./base";
 
 @Entity("services")
-@Unique(["enSlug"])
-@Unique(["viSlug"])
-export class Service extends BaseEntity {
+@Unique(["enSlug", "viSlug"])
+export class Service extends BaseActionDate {
   @ApiProperty({readOnly: true})
   @PrimaryGeneratedColumn()
   id: number;
@@ -158,12 +158,6 @@ export class Service extends BaseEntity {
   /**
    * Relations
    */
-  @ApiProperty({writeOnly: true, example: [1, 2]})
-  @IsOptional()
-  @IsNumber({}, {each: true})
-  @Min(1, {each: true})
-  serviceCategoryIds: Array<number>;
-
   @ApiProperty({readOnly: true, type: () => ServiceCategory})
   @ManyToMany(() => ServiceCategory, item => item.services, {
     cascade: true,
@@ -182,12 +176,6 @@ export class Service extends BaseEntity {
   })
   serviceCategories: ServiceCategory[];
 
-  @ApiProperty({writeOnly: true, example: [1, 2]})
-  @IsOptional()
-  @IsNumber({}, {each: true})
-  @Min(1, {each: true})
-  destinationIds: Array<number>;
-
   @ApiProperty({readOnly: true, type: () => Destination})
   @ManyToMany(() => Destination, item => item.services, {
     cascade: true,
@@ -205,12 +193,6 @@ export class Service extends BaseEntity {
     }
   })
   destinations: Destination[];
-
-  @ApiProperty({writeOnly: true, example: [1, 2]})
-  @IsOptional()
-  @IsNumber({}, {each: true})
-  @Min(1, {each: true})
-  providerIds: Array<number>;
 
   @ApiProperty({readOnly: true})
   @ManyToMany(() => Provider, provider => provider.services, {

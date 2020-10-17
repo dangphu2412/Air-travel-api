@@ -15,26 +15,31 @@ export class RaclHelper {
   private getRacls(): Array<TRacl> {
     return [
       {
-        role: ERole.SUPER_ADMIN,
+        role: ERole.ADMIN,
         permissions: [
           "ALL"
         ]
       },
       {
-        role: ERole.ADMIN,
+        role: ERole.OPERATOR,
         permissions: flatMap([
-          ...this.createManyPermissionFromFeature(ECrudFeature.USER),
+          ...this.createManyPermissionFromFeature(ECrudFeature.USER, ["DELETE", "REPLACE"]),
           ...this.createManyPermissionFromFeature(ECrudFeature.ROLE)
         ])
       },
       {
-        role: ERole.MODERATOR,
+        role: ERole.SALE,
         permissions: flatMap([
-          ...this.createManyPermissionFromFeature(ECrudFeature.USER, ["DELETE", "REPLACE"])
+          ...this.createManyPermissionFromFeature(ECrudFeature.BILL),
+          ...this.createManyPermissionFromFeature(ECrudFeature.BILL_INFO),
+          ...this.createManyPermissionFromFeature(ECrudFeature.BILL_SERVICE),
+          ...this.createManyPermissionFromFeature(ECrudFeature.CUSTOMER),
+          ...this.createManyPermissionFromFeature(ECrudFeature.PAYMENT),
+          ...this.createManyPermissionFromFeature(ECrudFeature.DESTINATION)
         ])
       },
       {
-        role: ERole.USER,
+        role: ERole.INTERN,
         permissions: [
         ]
       }

@@ -109,8 +109,7 @@ export class Customer extends BaseActionDate {
   note: string;
 
   @ApiProperty({
-    example: UserStatus.ACTIVE,
-    type: () => UserStatus
+    example: UserStatus.ACTIVE
   })
   @IsRequired()
   @IsIn(enumToArray(UserStatus))

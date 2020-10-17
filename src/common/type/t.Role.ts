@@ -1,1 +1,1 @@
-export type TRole = "SUPER_ADMIN" | "ADMIN" | "MODERATOR" | "USER";
+export type TRole = "ADMIN" | "OPERATOR" | "SALE" | "INTERN";
