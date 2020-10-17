@@ -76,24 +76,6 @@ export class ServiceCategory extends BaseActionDate {
   @Column({nullable: true})
   viDescription: string;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  @Column({nullable: true})
-  enContent: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  @Column({nullable: true})
-  viContent: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  @Column({nullable: true})
-  thumbnail: string;
-
   /**
    * Self Relations
    */

@@ -9,7 +9,7 @@ import {User} from "src/common/entity";
 import {UserService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
-import {ECrudAction, ECrudFeature} from "src/common/enums";
+import {ECrudAction, ECrudFeature, ERole} from "src/common/enums";
 
 @Crud({
   model: {
@@ -51,7 +51,7 @@ export class UserController implements CrudController<User> {
 
   @Delete("/:id")
   @Action(ECrudAction.SOFT_DEL)
-  @GrantAccess("ADMIN", "SUPER_ADMIN")
+  @GrantAccess(ERole.ADMIN)
   softDelete(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User

@@ -16,14 +16,14 @@ export class UserHepler {
         role: role.find(item => item.name === ERole.ADMIN)
       }),
       User.create({
-        username: "Moderator",
-        password: "MODERATOR",
-        role: role.find(item => item.name === ERole.MODERATOR)
+        username: "Operator",
+        password: "OPERATOR",
+        role: role.find(item => item.name === ERole.OPERATOR)
       }),
       User.create({
-        username: "Super admin",
-        password: "SUPER_ADMIN",
-        role: role.find(item => item.name === ERole.SUPER_ADMIN)
+        username: "Sale",
+        password: "SALE",
+        role: role.find(item => item.name === ERole.SALE)
       })
     ]
   }

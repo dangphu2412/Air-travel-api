@@ -1,0 +1,25 @@
+﻿id,viName,enName,mpath,parentId,userId
+1,Tour trong nước,Domestic Tour,1,,1
+2,Tour nước ngoài,Outbound Tour,2,,1
+3,Lưu trú,Hospitality,3,,1
+4,Vận chuyển,Transfer,4,,1
+5,Visa,Visa,5,,1
+6,Vé tham quan,Ticket,6,,1
+7,Hoạt động trải nghiệm,Experiences and activities,7,,1
+8,Ẩm thực,Ẩm thực,8,,1
+9,Tour ghép trong nước,Domestic group tour,1.9.,1,1
+10,Tour riêng trong nước,Domestic custom tour,1.10.,1,1
+11,Tour ghép nước ngoài,Foreign group tour,2.11.,2,1
+12,Tour riêng nước ngoài,Foreign custom tour,2.12.,2,1
+13,Resort,Resort,3.13.,3,1
+14,Villa,Villa,3.14.,3,1
+15,Homestay,Homestay,3.15.,3,1
+16,Khách sạn 5 sao,5-star hotel,3.16.,3,1
+17,Khách sạn 4 sao,4-star hotel,3.17.,3,1
+18,Khách sạn 3 sao,3-star hotel,3.18.,3,1
+19,Khách sạn 2 sao,2-star hotel,3.19.,3,1
+20,Khách sạn 1 sao,1-star hotel,3.20.,3,1
+21,Nhà nghỉ,Motel,3.21.,3,1
+22,Thuê xe,Car rental,4.22.,4,1
+23,Vé máy bay,Flight,4.23.,4,1
+24,Vé tàu,Train ticket,4.24.,4,1

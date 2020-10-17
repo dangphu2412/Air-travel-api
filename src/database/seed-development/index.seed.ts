@@ -6,8 +6,12 @@ import * as Entity from "../../common/entity";
 import {RaclHelper} from "./seed-helper/racl.helper";
 import {UserHepler} from "./seed-helper/user.helper";
 import {Role, User} from "../../common/entity";
+import {ServiceCategoryHelper} from "./seed-helper/servicecategory.helper";
+import {CsvHelper} from "../../utils/csv";
+import {resolve} from "path";
 
 export default class Seeding implements Seeder {
+  private serviceCategoryFilePath = resolve(__dirname, "data", "serviceCategory.csv");;
 
   private randomUser(factory: Factory, role: Role) {
     return factory(User)({role, password: "123123"}).createMany(10)
@@ -25,7 +29,6 @@ export default class Seeding implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
     try {
       await this.initRoles(enumToArray(ERole));
-
       const roleEntities = await Entity.Role.find();
 
       const permissionHelper = new RaclHelper();
@@ -33,8 +36,13 @@ export default class Seeding implements Seeder {
 
       const userHelper = new UserHepler(roleEntities);
       await userHelper.initUser();
-      const userRole: Role = roleEntities.find(role => role.name === ERole.USER);
+      const userRole: Role = roleEntities.find(role => role.name === ERole.INTERN);
       await this.randomUser(factory, userRole);
+
+      const serviceCategoryHelper = new ServiceCategoryHelper(
+        new CsvHelper(this.serviceCategoryFilePath)
+      );
+      await serviceCategoryHelper.initServiceCategory();
     } catch (error) {
       throw error;
     }
