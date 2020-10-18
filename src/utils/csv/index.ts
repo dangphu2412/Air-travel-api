@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import * as csv from "csv-parser";
+import {createReadStream} from "fs";
+import csv from "csv-parser";
 
 export class CsvHelper {
   private filePath: string;
@@ -14,7 +14,7 @@ export class CsvHelper {
   public async readCsv(): Promise<Array<any>> {
     return new Promise((resolve, reject)=>{
       const results = [];
-      fs.createReadStream(this.filePath)
+      createReadStream(this.filePath)
         .pipe(csv({
           mapHeaders: ({header}) => header.replace(/"/g, "")
         }))

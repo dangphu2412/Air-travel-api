@@ -50,7 +50,7 @@ export class RolesGuard implements CanActivate {
       role,
       permissions
     } = params;
-    const isSuperAdmin = role === ERole.SUPER_ADMIN;
+    const isSuperAdmin = role === ERole.ADMIN;
     if (isSuperAdmin) {
       return true;
     }

@@ -8,7 +8,7 @@ import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service
 import {UserError} from "src/common/constants";
 import {UpsertUserDto} from "src/common/dto/User/upsert.dto";
 import {User} from "src/common/entity";
-import {ERole} from "src/common/enums";
+import {ERole, ErrorCodeEnum} from "src/common/enums";
 import {Not} from "typeorm";
 import {UserRepository} from "./index.repository";
 
@@ -23,7 +23,7 @@ export class UserService extends TypeOrmCrudService<User> {
 
   private isNotAdmin(user: User): boolean {
     const {role} = user;
-    if (role.name === ERole.ADMIN || role.name === ERole.SUPER_ADMIN) {
+    if (role.name === ERole.ADMIN) {
       return false;
     }
     return true;
@@ -53,9 +53,10 @@ export class UserService extends TypeOrmCrudService<User> {
         deletedAt: Not(null)
       }
     });
-    if (!record) throw new NotFoundException(UserError.NotFound)
-    if (id === currentUser.id) throw new ConflictException(UserError.ConflictRestore);
-    if (record.deletedAt === null) throw new ConflictException(UserError.ConflictRestore);
+    if (!record) throw new NotFoundException(UserError.NotFound, ErrorCodeEnum.NOT_FOUND)
+    if (id === currentUser.id || record.deletedAt === null) {
+      throw new ConflictException(UserError.ConflictRestore, ErrorCodeEnum.ALREADY_EXIST);
+    }
     await this.repository.restore(record);
   }
 
@@ -75,10 +76,19 @@ export class UserService extends TypeOrmCrudService<User> {
     const record = await this.repository.findOne(id, {
       relations: ["role"]
     });
-    if (!record) throw new NotFoundException(UserError.NotFound);
-    if (id === currentUser.id) throw new ConflictException(UserError.ConflictSelf);
-    if (record.deletedAt !== null) throw new ConflictException(UserError.ConflictSoftDeleted);
-    if (this.isNotAdmin(currentUser)) throw new ForbiddenException(UserError.ForbiddenDelete);
+    if (!record) throw new NotFoundException(UserError.NotFound, ErrorCodeEnum.NOT_FOUND);
+    if (id === currentUser.id) {
+      throw new ConflictException(UserError.ConflictSelf, ErrorCodeEnum.NOT_DELETE_YOURSELF);
+    }
+    if (record.deletedAt !== null) {
+      throw new ConflictException(UserError.ConflictSoftDeleted, ErrorCodeEnum.NOT_DELETE_YOURSELF);
+    }
+    if (this.isNotAdmin(currentUser)) {
+      throw new ForbiddenException(
+        UserError.ForbiddenDelete,
+        ErrorCodeEnum.NOT_DELETE_ADMIN_ROLE
+      );
+    }
     await this.repository.softDelete(record);
     return;
   }

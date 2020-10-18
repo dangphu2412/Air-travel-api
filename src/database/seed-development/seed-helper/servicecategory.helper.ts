@@ -1,4 +1,3 @@
-// TODO: Bug in seeding parent because of bulk create
 import {ServiceCategory, User} from "../../../common/entity";
 import {CsvHelper} from "../../../utils/csv";
 import * as faker from "faker";

@@ -6,6 +6,7 @@ import {User} from "src/common/entity";
 import {IUserLoginResponse} from "src/common/interface/t.jwtPayload";
 import {UserService} from "../User/index.service";
 import {BcryptService} from "src/global/bcrypt";
+import {UserError} from "src/common/constants";
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,7 @@ export class AuthService {
       },
       relations: ["role"]
     });
-    if (user && BcryptService.compare(user.password, pass)) {
+    if (user && BcryptService.compare(pass, user.password)) {
       return user;
     }
     return null;
@@ -47,7 +48,7 @@ export class AuthService {
     const {username} = user;
     const isExisted = await this.service.findByUsername(username);
 
-    if (isExisted) throw new ConflictException("User existed");
+    if (isExisted) throw new ConflictException(UserError.ConflictExisted);
 
     return this.service.createOneBase(user);
   }

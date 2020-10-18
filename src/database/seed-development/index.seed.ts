@@ -9,6 +9,9 @@ import {Role, User} from "../../common/entity";
 import {ServiceCategoryHelper} from "./seed-helper/servicecategory.helper";
 import {CsvHelper} from "../../utils/csv";
 import {resolve} from "path";
+import {CityAndDistrictHelper} from "./seed-helper/cityAndDistrict.helper";
+import {DestinationHelper} from "./seed-helper/destination.heper";
+import {ServiceHelper} from "./seed-helper/service.helper";
 
 export default class Seeding implements Seeder {
   private serviceCategoryFilePath = resolve(__dirname, "data", "serviceCategory.csv");;
@@ -38,11 +41,21 @@ export default class Seeding implements Seeder {
       await userHelper.initUser();
       const userRole: Role = roleEntities.find(role => role.name === ERole.INTERN);
       await this.randomUser(factory, userRole);
+      const userCount: number = await userHelper.countUser();
 
       const serviceCategoryHelper = new ServiceCategoryHelper(
         new CsvHelper(this.serviceCategoryFilePath)
       );
       await serviceCategoryHelper.initServiceCategory();
+
+      const cityAndDistrictHelper = new CityAndDistrictHelper();
+      await cityAndDistrictHelper.initCitiesAndDistricts();
+
+      const destinationHelper = new DestinationHelper();
+      await destinationHelper.initDestination(userCount);
+
+      const serviceHelper = new ServiceHelper();
+      await serviceHelper.initService(userCount);
     } catch (error) {
       throw error;
     }

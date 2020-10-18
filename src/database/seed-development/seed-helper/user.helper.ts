@@ -31,4 +31,8 @@ export class UserHepler {
   public initUser(): Promise<User[]> {
     return Promise.all(this._data.map(user => user.save()));
   }
+
+  public countUser(): Promise<number> {
+    return User.count();
+  }
 }

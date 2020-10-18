@@ -1,9 +1,15 @@
-import {map} from "lodash";
-import {TErrorMessage} from "src/common/type/t.Error";
+import {TErrorBody, TErrorResponse} from "src/common/type/t.Error";
 
-export const toError = (...error: TErrorMessage[]): TErrorMessage[] => {
-  return map(error, (item: TErrorMessage) => ({
-    code: item.code,
-    description: item.description
-  }));
+export const toError = (error: TErrorResponse): TErrorBody => {
+  const body: TErrorBody = {
+    statusCode: error.statusCode,
+    message: [
+      {
+        code: error.error,
+        description: error.message
+      }
+    ],
+    error: error.message
+  }
+  return body;
 }

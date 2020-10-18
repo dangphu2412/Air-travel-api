@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import moment from "moment";
 import slug from "slugify";
 import {Logger} from "@nestjs/common";
 import {ISlug} from "src/common/interface/i.slug";
