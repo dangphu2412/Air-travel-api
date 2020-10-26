@@ -4,6 +4,7 @@ import {TRacl} from "../../../common/type/t.Racl";
 import {enumToArray} from "../../../utils/array";
 import {flatMap, remove} from "lodash";
 import {TCrudAction} from "../../../common/type/t.CrudAction";
+import {In} from "typeorm";
 
 export class RaclHelper {
   private _racls: Array<TRacl>;
@@ -86,7 +87,7 @@ export class RaclHelper {
         const roleEntity = roleEntities.find(item => item.name === racl.role);
         const permissionAllow = await Permission.find({
           where: {
-            name: racl.permissions
+            name: racl.permissions.length ? In(racl.permissions) : ""
           }
         })
         roleEntity.permissions = permissionAllow;

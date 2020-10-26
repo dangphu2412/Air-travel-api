@@ -1,14 +1,14 @@
-import {applyDecorators, SetMetadata, UseGuards} from "@nestjs/common";
+import {applyDecorators, UseGuards} from "@nestjs/common";
 import {ApiBearerAuth, ApiUnauthorizedResponse} from "@nestjs/swagger";
 import {JwtAuthGuard} from "../guards/jwt.guard";
 import {RolesGuard} from "../guards/racl.guard";
-import {TRole} from "../type";
+import {TRaclOptions} from "../type";
 
-export function GrantAccess(...roles: TRole[]) {
+export function GrantAccess(options?: TRaclOptions) {
+  const {jwtOnly} = options || {jwtOnly: false};
   return applyDecorators(
-    SetMetadata("roles", roles),
-    UseGuards(JwtAuthGuard, RolesGuard),
+    jwtOnly ? UseGuards(JwtAuthGuard) : UseGuards(JwtAuthGuard, RolesGuard),
     ApiBearerAuth(),
-    ApiUnauthorizedResponse({description: "Unauthorized"}),
+    ApiUnauthorizedResponse({description: "You need to sign in"}),
   );
 }

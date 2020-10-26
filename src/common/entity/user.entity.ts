@@ -1,24 +1,114 @@
+/* eslint-disable max-len */
 import {
   Entity, PrimaryGeneratedColumn, Column,
-  ManyToOne, BeforeInsert, BeforeUpdate, OneToMany
+  ManyToOne, BeforeInsert, BeforeUpdate, OneToMany, Unique
 } from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
 import {Role} from "./role.entity";
 import {BcryptService} from "../../global/bcrypt";
 import {BaseActionDate} from "./base";
 import {Destination, Media, Provider, Service, ServiceCategory} from ".";
+import {IsRequired} from "../decorators/isRequired.decorator";
+import {Exclude} from "class-transformer";
+import {IsMobilePhone, IsOptional, IsString, IsIn, IsDateString, IsBoolean, IsEmail} from "class-validator";
+import {enumToArray} from "../../utils";
+import {Gender, UserStatus} from "../enums";
 
 @Entity("users")
+@Unique(["email"])
 export class User extends BaseActionDate {
     @ApiProperty({readOnly: true})
     @PrimaryGeneratedColumn()
     id: number;
 
+    @ApiProperty({
+      example: "Phu dep trai"
+    })
     @Column()
-    username: string;
+    @IsRequired()
+    fullName: string;
+
+    @ApiProperty({
+      example: "admin@gmail.com"
+    })
+    @IsRequired()
+    @IsEmail()
+    @Column()
+    email: string;
 
     @Column()
+    @IsRequired()
     password: string;
+
+    @ApiProperty({
+      example: "0371627261"
+    })
+    @IsOptional()
+    @IsMobilePhone("vi-VN")
+    @Column()
+    phone: string;
+
+    @ApiProperty({
+      example: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU"
+    })
+    @IsOptional()
+    @IsString()
+    @Column({default: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU"})
+    avatar: string;
+
+    @ApiProperty({
+      example: Gender.MALE
+    })
+    @IsRequired()
+    @IsIn(enumToArray(Gender))
+    @Column({
+      type: "enum",
+      enum: Gender
+    })
+    gender: string;
+
+    @ApiProperty({
+      example: new Date().toISOString()
+    })
+    @IsRequired()
+    @IsDateString()
+    @Column()
+    birthday: Date;
+
+    @ApiProperty({
+      example: "Hello there"
+    })
+    @IsOptional()
+    @IsString()
+    @Column({nullable: true})
+    bio: string;
+
+    @ApiProperty({
+      example: "Note something"
+    })
+    @IsOptional()
+    @IsString()
+    @Column({nullable: true})
+    note: string;
+
+    @ApiProperty({
+      example: UserStatus.ACTIVE
+    })
+    @IsRequired()
+    @IsIn(enumToArray(UserStatus))
+    @Column({
+      type: "enum",
+      enum: UserStatus,
+      default: UserStatus.ACTIVE
+    })
+    status: string;
+
+    @Exclude()
+    @ApiProperty({readOnly: true, writeOnly: true})
+    @IsOptional()
+    @IsBoolean()
+    @Column({default: false})
+    hasExpiredToken: boolean;
 
     @BeforeInsert()
     @BeforeUpdate()
@@ -26,7 +116,9 @@ export class User extends BaseActionDate {
       this.password = BcryptService.hash(this.password);
     }
 
-    // Relations
+    /**
+     * Relations
+     */
     @ManyToOne(() => Role)
     role: Role
 

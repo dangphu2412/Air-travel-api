@@ -4,8 +4,8 @@ import {
   Crud, CrudController, Feature, Action,
   ParsedRequest, CrudRequest, CrudRequestInterceptor
 } from "@nestjsx/crud";
-import {Service, User} from "src/common/entity";
-import {ServiceService} from "./index.service";
+import {Destination, User} from "src/common/entity";
+import {DestinationService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
@@ -13,36 +13,27 @@ import {Lang} from "src/common/constants/lang";
 
 @Crud({
   model: {
-    type: Service
+    type: Destination
   },
   query: {
     join: {
-      serviceCategories: {
-        allow: ["viName", "enName", "enSlug", "viSlug", "thumbnail"],
+      city: {
         eager: true
       },
-      destinations: {
-        exclude: ["enContent", "viContent"],
-        eager: true
-      },
-      "destinations.location": {
-        eager: true
-      },
-      user: {
-        allow: ["id", "fullName", "avatar"],
+      district: {
         eager: true
       }
     }
   },
   routes: {
-    exclude: ["createManyBase"],
+    exclude: ["createManyBase", "replaceOneBase"],
     createOneBase: {
       decorators: [
         Action(ECrudAction.CREATE),
         GrantAccess()
       ]
     },
-    replaceOneBase: {
+    updateOneBase: {
       decorators: [
         Action(ECrudAction.REPLACE),
         GrantAccess()
@@ -50,22 +41,22 @@ import {Lang} from "src/common/constants/lang";
     },
     deleteOneBase: {
       decorators: [
-        Action(ECrudAction.REPLACE),
+        Action(ECrudAction.DELETE),
         GrantAccess()
       ]
     }
   }
 })
-@ApiTags("Services")
-@Feature(ECrudFeature.SERVICE)
-@Controller("services")
-export class ServiceController implements CrudController<Service> {
-  constructor(public service: ServiceService) {}
+@ApiTags("Destinations")
+@Feature(ECrudFeature.DESTINATION)
+@Controller("destinations")
+export class DestinationController implements CrudController<Destination> {
+  constructor(public service: DestinationService) {}
 
   @Patch(":id/restore")
   @Action(ECrudAction.RESTORE)
   @GrantAccess()
-  restoreService(
+  restoreDestination(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User
   ) {
@@ -91,14 +82,14 @@ export class ServiceController implements CrudController<Service> {
   @Get("enslug-:slug")
   getEnglishSlug(
     @Param("slug") slug: string
-  ): Promise<Service> {
+  ): Promise<Destination> {
     return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.EN);
   }
 
   @Get("/viSlug-:slug")
   getVnSlug(
     @Param("slug") slug: string
-  ): Promise<Service> {
+  ): Promise<Destination> {
     return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.VN);
   }
 }

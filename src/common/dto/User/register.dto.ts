@@ -3,13 +3,13 @@ import {IsString} from "class-validator";
 
 export class RegisterDto {
   @ApiProperty({
-    example: "Phu dep trai"
+    example: "admin@gmail.com"
   })
   @IsString()
-  public username: string;
+  public email: string;
 
   @ApiProperty({
-    example: "123123"
+    example: "ADMIN"
   })
   @IsString()
   public password: string;

@@ -6,6 +6,9 @@ import {Module} from "@nestjs/common";
 import {typeOrmConfig} from "./config";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {ServiceModule} from "./app/core/Service/index.module";
+import {DestinationModule} from "./app/core/Destination/index.module";
+import {CityModule} from "./app/core/City/index.module";
+import {DistrictModule} from "./app/core/District/index.module";
 
 @Module({
   imports: [
@@ -14,6 +17,9 @@ import {ServiceModule} from "./app/core/Service/index.module";
     RoleModule,
     PermissionModule,
     ServiceModule,
+    DestinationModule,
+    CityModule,
+    DistrictModule,
     TypeOrmModule.forRoot(typeOrmConfig)
   ]
 })

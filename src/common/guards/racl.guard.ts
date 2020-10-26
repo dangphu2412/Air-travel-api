@@ -2,17 +2,9 @@ import {Injectable, CanActivate, ExecutionContext, ForbiddenException} from "@ne
 import {Reflector} from "@nestjs/core";
 import {getFeature, getAction} from "@nestjsx/crud";
 import {RaclHelper} from "src/database/seed-development/seed-helper/racl.helper";
-import {TRole} from "../type/t.Role";
-import {Permission} from "../entity";
-import {ERole} from "../enums";
+import {ErrorCodeEnum} from "../enums";
 import {TJwtPayload} from "../type";
-
-type TMatchRaclParams = {
-  requiredRoles: TRole[];
-  requiredPermission: string;
-  role: string;
-  permissions: Permission[];
-}
+import {DEFAULT_ERROR} from "../constants";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -21,53 +13,37 @@ export class RolesGuard implements CanActivate {
   ) {}
 
   public canActivate(context: ExecutionContext): boolean {
-    const requiredRoles: TRole[] = this.reflector.get<TRole[]>("roles", context.getHandler());
     const request = context.switchToHttp().getRequest();
     const user: TJwtPayload = request.user;
-    const role: string = user.role;
-    const permissions : Permission[] = user.permissions;
+    const permissions : string[] = user.permissions;
     const handler = context.getHandler();
     const controller = context.getClass();
-
     const feature = getFeature(controller);
     const action = getAction(handler);
     const requiredPermission: string = (new RaclHelper()).createPermission(feature, action);
-    if (!requiredRoles) {
-      return this.isPermissionAllowed(requiredPermission, permissions)
-    }
-    return this.matchRacls({
-      requiredRoles,
-      requiredPermission,
-      permissions,
-      role
-    });
+    return this.matchRacls(requiredPermission, permissions);
   }
 
-  private matchRacls(params: TMatchRaclParams): boolean {
-    const {
-      requiredRoles,
-      requiredPermission,
-      role,
-      permissions
-    } = params;
-    const isSuperAdmin = role === ERole.ADMIN;
-    if (isSuperAdmin) {
+  private matchRacls(requiredPermission: string, permissions: string[]): boolean {
+    if (this.isHighestRole) {
       return true;
     }
-    if (!this.isRoleAccepted(requiredRoles, role)
-    || !this.isPermissionAllowed(requiredPermission, permissions)) {
-      throw new ForbiddenException("You are not allow to access this resourse");
+    if (!this.isPermissionAllowed(requiredPermission, permissions)) {
+      throw new ForbiddenException(
+        DEFAULT_ERROR.Forbidden,
+        ErrorCodeEnum.FORBIDDEN
+      );
     }
     return true;
   }
 
-  private isRoleAccepted(requiredRoles: TRole[], currentRole: string): boolean {
-    return requiredRoles.some(role => role === currentRole);
+  private isHighestRole(permissions: string[]) {
+    return permissions.some(permission => permission === "ALL");
   }
 
   private isPermissionAllowed(
-    requiredPermission: string, currentPermissions: Permission[]
+    requiredPermission: string, currentPermissions: string[]
   ): boolean {
-    return currentPermissions.some(permission => permission.name === requiredPermission);
+    return currentPermissions.some(permission => permission === requiredPermission);
   }
 }

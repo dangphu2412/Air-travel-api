@@ -1,5 +1,15 @@
+export const DEFAULT_ERROR = {
+  NotFound: "Not found",
+  ConflictSelf: "Not allow to delete your self",
+  ConflictSoftDeleted: "Your record has been soft deleted",
+  ConflictExisted: "User existed",
+  Forbidden: "Not allowed to access this resource",
+  ConflictRestore: "Your record has been restore",
+  Unauthorized: "You need to sign in"
+}
+
 export const UserError = {
-  NotFound: "Not found this user",
+  NotFound: "Please delete first",
   ConflictSelf: "Not allow to delete your self",
   ConflictSoftDeleted: "Your record has been soft deleted",
   ConflictExisted: "User existed",
@@ -8,7 +18,25 @@ export const UserError = {
   Unauthorized: "Your username or password is not right"
 }
 
+export const RoleError = {
+  NotFound: "Please delete first",
+  ConflictSelf: "Not allow to delete your self",
+  ConflictSoftDeleted: "Your record has been soft deleted",
+  ConflictExisted: "Role existed",
+  Forbidden: "Must be admin",
+  ConflictRestore: "Your record has been restore"
+}
+
 export const ServiceError = {
+  NotFound: "Not found this service",
+  ConflictAuthor: "You are not author",
+  ConflictSoftDeleted: "Your record has been soft deleted",
+  ForbiddenDelete: "Not allowed to soft delete admin or super admin",
+  ConflictRestore: "Your record has been restore",
+  Unauthorized: "Your username or password is not right"
+}
+
+export const DestinationError = {
   NotFound: "Not found this service",
   ConflictAuthor: "You are not author",
   ConflictSoftDeleted: "Your record has been soft deleted",

@@ -1,12 +1,13 @@
-import {TUserInfo, TJwtPayload} from "../../../common/type";
-import {ConflictException, Injectable} from "@nestjs/common";
+import {TJwtPayload} from "../../../common/type";
+import {ConflictException, Injectable, UnauthorizedException} from "@nestjs/common";
 import {JwtService} from "@nestjs/jwt";
-import {UpsertUserDto} from "src/common/dto/User/upsert.dto";
-import {User} from "src/common/entity";
-import {IUserLoginResponse} from "src/common/interface/t.jwtPayload";
+import {User, Role} from "src/common/entity";
+import {IUserInfo, IUserLoginResponse} from "src/common/interface/t.jwtPayload";
 import {UserService} from "../User/index.service";
 import {BcryptService} from "src/global/bcrypt";
 import {UserError} from "src/common/constants";
+import {LoginDto, RegisterDto} from "src/common/dto/User";
+import {ErrorCodeEnum} from "src/common/enums";
 
 @Injectable()
 export class AuthService {
@@ -15,41 +16,69 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<User | null> {
-    const user: User = await this.service.findOne({
-      where: {
-        username
-      },
-      relations: ["role"]
-    });
-    if (user && BcryptService.compare(pass, user.password)) {
-      return user;
-    }
-    return null;
+  private getPermissions(role: Role): string[] {
+    return role.permissions.map(permission => permission.name);
   }
 
-  login(user: User): IUserLoginResponse {
-    const info: TUserInfo = {
-      username: user.username
+  private getloginResponse(user: User): IUserLoginResponse {
+    const info: IUserInfo = {
+      email: user.email,
+      avatar: user.avatar,
+      fullName: user.fullName,
+      phone: user.phone,
+      role: user.role.name
     }
     const payload: TJwtPayload = {
       userId: user.id,
-      role: user.role.name,
-      permissions: user.role.permissions
+      permissions: this.getPermissions(user.role)
     }
     const loginResponse: IUserLoginResponse = {
       token: this.jwtService.sign(payload),
-      info
+      ...info
     }
     return loginResponse;
   }
 
-  async register(user: UpsertUserDto): Promise<User> {
-    const {username} = user;
-    const isExisted = await this.service.findByUsername(username);
+  async validateUser(email: string, pass: string): Promise<User | null> {
+    const user: User = await this.service.findByEmail(email);
+    if (user && BcryptService.compare(pass, user.password)) {
+      return user;
+    }
+    throw new UnauthorizedException(
+      UserError.Unauthorized,
+      ErrorCodeEnum.INCORRECT_EMAIL_PASSWORD
+    )
+  }
 
-    if (isExisted) throw new ConflictException(UserError.ConflictExisted);
+  async login(dto: LoginDto): Promise<IUserLoginResponse> {
+    const user = await this.validateUser(dto.email, dto.password);
+    return this.getloginResponse(user);
+  }
 
-    return this.service.createOneBase(user);
+  async register(dto: RegisterDto): Promise<IUserLoginResponse> {
+    const {email} = dto;
+    const isExisted = await this.service.findByEmail(email);
+
+    if (isExisted) {
+      throw new ConflictException(
+        UserError.ConflictExisted,
+        ErrorCodeEnum.ALREADY_EXIST
+      );
+    }
+
+    const user = await this.service.createOneBase(dto);
+    return this.getloginResponse(user);
+  }
+
+  getProfile(user: TJwtPayload): Promise<User> {
+    const {userId} = user;
+    return this.service.findOne(userId, {
+      relations: ["role", "role.permissions"],
+      select: [
+        "id", "fullName", "email", "avatar", "bio",
+        "birthday", "gender", "note", "status",
+        "role"
+      ]
+    })
   }
 }

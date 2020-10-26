@@ -12,4 +12,12 @@ export class PermissionService extends TypeOrmCrudService<Permission>{
   ) {
     super(repository);
   }
+
+  getAll() {
+    return this.repository.find();
+  }
+
+  findByIds(ids: number[]): Promise<Permission[]> {
+    return this.repository.findByIds(ids);
+  }
 }

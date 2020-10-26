@@ -2,14 +2,15 @@ import {ApiTags} from "@nestjs/swagger";
 import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
 import {
   Crud, CrudController, Feature, Action,
-  ParsedRequest, CrudRequest, CrudRequestInterceptor
+  ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {UpsertUserDto} from "src/common/dto/User/upsert.dto";
 import {User} from "src/common/entity";
 import {UserService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
-import {ECrudAction, ECrudFeature, ERole} from "src/common/enums";
+import {ECrudAction, ECrudFeature} from "src/common/enums";
+import {RegisterDto} from "src/common/dto/User";
+import {TJwtPayload} from "src/common/type";
 
 @Crud({
   model: {
@@ -18,13 +19,8 @@ import {ECrudAction, ECrudFeature, ERole} from "src/common/enums";
   query: {
     exclude: ["password"]
   },
-  dto: {
-    create: UpsertUserDto,
-    update: UpsertUserDto,
-    replace: UpsertUserDto
-  },
   routes: {
-    exclude: ["createManyBase"]
+    exclude: ["createManyBase", "replaceOneBase"]
   }
 })
 @ApiTags("Users")
@@ -33,12 +29,19 @@ import {ECrudAction, ECrudFeature, ERole} from "src/common/enums";
 export class UserController implements CrudController<User> {
   constructor(public service: UserService) {}
 
+  @Override()
+  createOne(
+    @ParsedBody() dto: RegisterDto,
+  ) {
+    return this.service.createOneBase(dto);
+  }
+
   @Patch("/:id/restore")
   @Action(ECrudAction.RESTORE)
   @GrantAccess()
   restoreUser(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: User
+    @CurrentUser() user: TJwtPayload
   ) {
     return this.service.restore(id, user);
   }
@@ -51,10 +54,10 @@ export class UserController implements CrudController<User> {
 
   @Delete("/:id")
   @Action(ECrudAction.SOFT_DEL)
-  @GrantAccess(ERole.ADMIN)
+  @GrantAccess()
   softDelete(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: User
+    @CurrentUser() user: TJwtPayload
   ) {
     return this.service.softDelete(id, user);
   }

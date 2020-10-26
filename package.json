@@ -24,7 +24,8 @@
     "migrate:rollback": "ts-node ./node_modules/typeorm/cli.js migration:revert",
     "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
     "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync",
-    "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop"
+    "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop",
+    "schema:reset": "npm run schema:drop && npm run schema:sync && npm run seed:run"
   },
   "dependencies": {
     "@nestjs/common": "^7.0.0",

@@ -14,7 +14,8 @@ import {ApiProperty} from "@nestjs/swagger";
 import {
   IsOptional,
   IsString,
-  IsEmpty
+  IsEmpty,
+  IsNumber
 } from "class-validator";
 
 import {IsRequired} from "../decorators/isRequired.decorator";
@@ -90,6 +91,14 @@ export class ServiceCategory extends BaseActionDate {
   @IsEmpty()
   @TreeChildren({cascade: true})
   children: ServiceCategory[];
+
+  @ApiProperty()
+  @IsNumber()
+  parentId: number | string;
+
+  @ApiProperty()
+  @IsNumber()
+  childrenId: number | string;
 
   /**
    * Relations

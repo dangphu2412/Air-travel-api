@@ -2,7 +2,6 @@ import {ServiceCategory, User} from "../../../common/entity";
 import {CsvHelper} from "../../../utils/csv";
 import * as faker from "faker";
 import {SlugHelper} from "../../../global/slugify";
-import {UpsertServiceCategoryDto} from "../../../common/dto/ServiceCategory";
 export class ServiceCategoryHelper {
   private _csvHelper: CsvHelper;
 
@@ -11,7 +10,7 @@ export class ServiceCategoryHelper {
   }
 
   public async initServiceCategory(): Promise<void> {
-    const data = await this._csvHelper.readCsv() as UpsertServiceCategoryDto[];
+    const data = await this._csvHelper.readCsv() as ServiceCategory[];
     const parents = data.filter(item => item.parentId === "");
     await Promise.all(parents.map(async item => {
       const dto = new ServiceCategory();

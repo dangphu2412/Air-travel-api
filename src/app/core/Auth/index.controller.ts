@@ -1,10 +1,11 @@
-import {Body, Controller, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, Post} from "@nestjs/common";
 import {ApiBody, ApiTags} from "@nestjs/swagger";
-import {CurrentUser} from "src/common/decorators";
+import {CurrentUser, GrantAccess} from "src/common/decorators";
+import {LoginDto} from "src/common/dto/User";
 import {RegisterDto} from "src/common/dto/User/register.dto";
-import {UpsertUserDto} from "src/common/dto/User/upsert.dto";
 import {User} from "src/common/entity";
-import {LocalAuthGuard} from "src/common/guards/local.guard";
+import {IUserLoginResponse} from "src/common/interface/t.jwtPayload";
+import {TJwtPayload} from "src/common/type";
 import {AuthService} from "./index.service";
 
 @ApiTags("Auth")
@@ -13,15 +14,22 @@ export class AuthController {
   constructor(private service: AuthService) {}
 
   @Post("/login")
-  @UseGuards(LocalAuthGuard)
-  @ApiBody({type: () => RegisterDto})
-  login(@CurrentUser() user: User) {
+  @ApiBody({type: () => LoginDto})
+  login(@Body() user: LoginDto): Promise<IUserLoginResponse> {
     return this.service.login(user);
   }
 
   @Post("/register")
   @ApiBody({type: () => RegisterDto})
-  register(@Body() dto: UpsertUserDto) {
+  register(@Body() dto: RegisterDto): Promise<IUserLoginResponse> {
     return this.service.register(dto);
+  }
+
+  @GrantAccess({
+    jwtOnly: true
+  })
+  @Get("/me")
+  getProfile(@CurrentUser() user: TJwtPayload): Promise<User> {
+    return this.service.getProfile(user);
   }
 }

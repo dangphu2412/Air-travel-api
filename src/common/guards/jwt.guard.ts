@@ -1,5 +1,21 @@
-import {Injectable} from "@nestjs/common";
+import {DEFAULT_ERROR} from "./../constants/messages";
+import {ExecutionContext, Injectable, UnauthorizedException} from "@nestjs/common";
 import {AuthGuard} from "@nestjs/passport";
+import {ErrorCodeEnum} from "../enums";
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard("jwt") {}
+export class JwtAuthGuard extends AuthGuard("jwt") {
+  canActivate(context: ExecutionContext) {
+    return super.canActivate(context);
+  }
+
+  handleRequest(err, user) {
+    if (err || !user) {
+      throw err || new UnauthorizedException(
+        DEFAULT_ERROR.Unauthorized,
+        ErrorCodeEnum.UNAUTHORIZED
+      );
+    }
+    return user;
+  }
+}

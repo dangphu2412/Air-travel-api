@@ -1,6 +1,11 @@
-import {TUserInfo} from "../type";
+export interface IUserInfo {
+  email: string;
+  fullName: string;
+  phone: string;
+  avatar: string;
+  role: string;
+}
 
-export interface IUserLoginResponse {
+export interface IUserLoginResponse extends IUserInfo {
   token: string;
-  info: TUserInfo;
 }

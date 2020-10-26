@@ -1,15 +1,15 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {IsString} from "class-validator";
 
-export class UpsertUserDto {
+export class LoginDto {
   @ApiProperty({
-    example: "Phu dep trai"
+    example: "admin@gmail.com"
   })
   @IsString()
-  public username: string;
+  public email: string;
 
   @ApiProperty({
-    example: "123123"
+    example: "ADMIN"
   })
   @IsString()
   public password: string;
