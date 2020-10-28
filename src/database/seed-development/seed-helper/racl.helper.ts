@@ -74,7 +74,7 @@ export class RaclHelper {
       action = remove(action, exclude);
     }
     return action.map(action => {
-      return `${feature}${action}`;
+      return this.createPermission(feature, action);
     })
   }
 

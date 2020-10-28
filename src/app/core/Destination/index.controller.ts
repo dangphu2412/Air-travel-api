@@ -4,12 +4,13 @@ import {
   Crud, CrudController, Feature, Action,
   ParsedRequest, CrudRequest, CrudRequestInterceptor
 } from "@nestjsx/crud";
-import {Destination, User} from "src/common/entity";
+import {Destination} from "src/common/entity";
 import {DestinationService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {Lang} from "src/common/constants/lang";
+import {TJwtPayload} from "src/common/type";
 
 @Crud({
   model: {
@@ -58,7 +59,7 @@ export class DestinationController implements CrudController<Destination> {
   @GrantAccess()
   restoreDestination(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: User
+    @CurrentUser() user: TJwtPayload
   ) {
     return this.service.restore(id, user);
   }
@@ -74,7 +75,7 @@ export class DestinationController implements CrudController<Destination> {
   @GrantAccess()
   softDelete(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() currentUser: User
+    @CurrentUser() currentUser: TJwtPayload
   ) {
     return this.service.softDelete(id, currentUser);
   }
@@ -86,7 +87,7 @@ export class DestinationController implements CrudController<Destination> {
     return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.EN);
   }
 
-  @Get("/viSlug-:slug")
+  @Get("vislug-:slug")
   getVnSlug(
     @Param("slug") slug: string
   ): Promise<Destination> {

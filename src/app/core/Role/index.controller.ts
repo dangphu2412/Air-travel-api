@@ -5,7 +5,6 @@ import {
   Feature, Override, ParsedBody, ParsedRequest
 } from "@nestjsx/crud";
 import {RoleService} from "./index.service";
-import {CreateRoleDto} from "src/common/dto/Role";
 import {Role} from "src/common/entity";
 import {CurrentUser, GrantAccess} from "src/common/decorators";
 import {TJwtPayload} from "src/common/type";
@@ -31,9 +30,6 @@ import {ECrudAction, ECrudFeature} from "src/common/enums";
         eager: true
       }
     }
-  },
-  dto: {
-    update: CreateRoleDto
   }
 })
 @Feature(ECrudFeature.ROLE)
@@ -42,25 +38,33 @@ import {ECrudAction, ECrudFeature} from "src/common/enums";
 export class RoleController implements CrudController<Role> {
   constructor(public service: RoleService) {}
 
+  get base(): CrudController<Role> {
+    return this;
+  }
+
   @Action(ECrudAction.CREATE)
   @GrantAccess()
   @Override("createOneBase")
-  createOneOverride(
-    @ParsedBody() dto: CreateRoleDto,
+  async createOneOverride(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: Role,
     @CurrentUser() user: TJwtPayload
   ): Promise<Role> {
-    return this.service.createRole(dto, user);
+    await this.service.authAdmin(dto, user);
+    await this.service.mapRelationKeysToEntities(dto);
+    return this.base.createOneBase(req, dto);
   };
 
   @Action(ECrudAction.UPDATE)
   @GrantAccess()
   @Override("updateOneBase")
-  updateOneOverride(
+  async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: CreateRoleDto,
+    @ParsedBody() dto: Role,
     @CurrentUser() user: TJwtPayload
   ): Promise<Role> {
-    const id = req.parsed.paramsFilter[0].value;
-    return this.service.updateRole(dto, user, id);
+    await this.service.authAdmin(dto, user);
+    await this.service.mapRelationKeysToEntities(dto);
+    return this.base.updateOneBase(req, dto);
   };
 }

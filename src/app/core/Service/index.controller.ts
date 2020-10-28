@@ -2,7 +2,7 @@ import {ApiTags} from "@nestjs/swagger";
 import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
 import {
   Crud, CrudController, Feature, Action,
-  ParsedRequest, CrudRequest, CrudRequestInterceptor
+  ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
 import {Service, User} from "src/common/entity";
 import {ServiceService} from "./index.service";
@@ -10,6 +10,7 @@ import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {Lang} from "src/common/constants/lang";
+import {TJwtPayload} from "src/common/type";
 
 @Crud({
   model: {
@@ -18,7 +19,11 @@ import {Lang} from "src/common/constants/lang";
   query: {
     join: {
       serviceCategories: {
-        allow: ["viName", "enName", "enSlug", "viSlug", "thumbnail"],
+        allow: ["id", "viName", "enName", "enSlug", "viSlug", "thumbnail"],
+        eager: true
+      },
+      provider: {
+        allow: ["id", "fullName", "avatar"],
         eager: true
       },
       destinations: {
@@ -50,7 +55,7 @@ import {Lang} from "src/common/constants/lang";
     },
     deleteOneBase: {
       decorators: [
-        Action(ECrudAction.REPLACE),
+        Action(ECrudAction.DELETE),
         GrantAccess()
       ]
     }
@@ -61,6 +66,38 @@ import {Lang} from "src/common/constants/lang";
 @Controller("services")
 export class ServiceController implements CrudController<Service> {
   constructor(public service: ServiceService) {}
+
+  get base(): CrudController<Service> {
+    return this;
+  }
+
+  @Action(ECrudAction.CREATE)
+  @GrantAccess()
+  @Override("createOneBase")
+  async createOneOverride(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: Service,
+    @CurrentUser() user: TJwtPayload
+  ): Promise<Service> {
+    this.service.getUserId(dto, user);
+    await this.service.authAdmin(dto, user);
+    await this.service.mapRelationKeysToEntities(dto);
+    return this.base.createOneBase(req, dto);
+  };
+
+  @Action(ECrudAction.UPDATE)
+  @GrantAccess()
+  @Override("updateOneBase")
+  async updateOneOverride(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: Service,
+    @CurrentUser() user: TJwtPayload
+  ): Promise<Service> {
+    this.service.getUserId(dto, user);
+    await this.service.authAdmin(dto, user);
+    await this.service.mapRelationKeysToEntities(dto);
+    return this.base.updateOneBase(req, dto);
+  };
 
   @Patch(":id/restore")
   @Action(ECrudAction.RESTORE)
@@ -95,7 +132,7 @@ export class ServiceController implements CrudController<Service> {
     return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.EN);
   }
 
-  @Get("/viSlug-:slug")
+  @Get("vislug-:slug")
   getVnSlug(
     @Param("slug") slug: string
   ): Promise<Service> {

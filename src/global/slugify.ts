@@ -1,9 +1,8 @@
 import moment from "moment";
 import slug from "slugify";
-import {Logger} from "@nestjs/common";
 import {ISlug} from "src/common/interface/i.slug";
 import {TSlugColumnOptions} from "src/common/type/t.colSlug";
-import {each, has} from "lodash";
+import {each} from "lodash";
 
 class Helper implements ISlug {
   public slugify(data: string): string {
@@ -28,11 +27,6 @@ class Helper implements ISlug {
   public slugifyColumns<T>(sourceObject: T, columns: Array<TSlugColumnOptions>): void {
     each(columns, value => {
       const {name, value: currentSlug} = value;
-      if (!has(sourceObject, name)) {
-        Logger.error(`There is no key ${name} in ${sourceObject}`);
-        process.exit(1);
-      }
-      // Assign value with callback slugify object
       sourceObject[name] = currentSlug;
     })
   }

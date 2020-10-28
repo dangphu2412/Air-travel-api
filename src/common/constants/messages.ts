@@ -5,7 +5,8 @@ export const DEFAULT_ERROR = {
   ConflictExisted: "User existed",
   Forbidden: "Not allowed to access this resource",
   ConflictRestore: "Your record has been restore",
-  Unauthorized: "You need to sign in"
+  Unauthorized: "You need to sign in",
+  InternalSignJwt: "Jwt sign goes wrong without saving userId"
 }
 
 export const UserError = {

@@ -5,11 +5,12 @@ import {
   Injectable, NotFoundException
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {CrudRequest, Override} from "@nestjsx/crud";
+import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {DestinationError} from "src/common/constants";
 import {Lang} from "src/common/constants/lang";
-import {City, Destination, District, User} from "src/common/entity";
+import {City, Destination, District} from "src/common/entity";
+import {TJwtPayload} from "src/common/type";
 import {SlugHelper} from "src/global/slugify";
 import {FindOneOptions, Not} from "typeorm";
 import {CityService} from "../City/index.service";
@@ -27,7 +28,10 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     super(repository);
   }
 
-  @Override("createOneBase")
+  public findByIds(ids: number[]) {
+    return this.repository.findByIds(ids);
+  }
+
   public async createOneBase(
     req: CrudRequest,
     dto: Destination
@@ -56,7 +60,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     return dto.save();
   }
 
-  public async restore(id: number, currentUser: User) {
+  public async restore(id: number, currentUser: TJwtPayload) {
     const record = await this.repository.findOne(id, {
       where: {
         deletedAt: Not(null)
@@ -64,7 +68,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
       relations: ["user"]
     });
     if (!record) throw new NotFoundException(DestinationError.NotFound)
-    if (record.user.id === currentUser.id) {
+    if (record.user.id === currentUser.userId) {
       throw new ConflictException(DestinationError.ConflictRestore);
     }
     if (record.deletedAt === null) throw new ConflictException(DestinationError.ConflictRestore);
@@ -82,11 +86,11 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     });
   }
 
-  public async softDelete(id: number, currentUser: User): Promise<void> {
+  public async softDelete(id: number, currentUser: TJwtPayload): Promise<void> {
     const record = await this.repository.findOne(id, {
       relations: ["user"]
     });
-    if (record.user.id !== currentUser.id) throw new ForbiddenException();
+    if (record.user.id !== currentUser.userId) throw new ForbiddenException();
     await this.repository.softDelete(record);
     return;
   }

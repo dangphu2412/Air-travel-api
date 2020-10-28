@@ -1,24 +1,54 @@
 import {
   ConflictException,
   ForbiddenException,
-  Injectable, NotFoundException
+  Injectable, InternalServerErrorException, NotFoundException
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
-import {ServiceError} from "src/common/constants";
+import {DEFAULT_ERROR, ServiceError} from "src/common/constants";
 import {Lang} from "src/common/constants/lang";
 import {Service, User} from "src/common/entity";
+import {ErrorCodeEnum} from "src/common/enums";
+import {TJwtPayload} from "src/common/type";
 import {FindOneOptions, Not} from "typeorm";
+import {DestinationService} from "../Destination/index.service";
+import {ProviderService} from "../Provider/index.service";
+import {ServiceCategoryService} from "../ServiceCategory/index.service";
+import {UserService} from "../User/index.service";
 import {ServiceRepository} from "./index.repository";
 
 @Injectable()
 export class ServiceService extends TypeOrmCrudService<Service> {
   constructor(
     @InjectRepository(Service)
-    private repository: ServiceRepository
+    private repository: ServiceRepository,
+    private userService: UserService,
+    private providerService: ProviderService,
+    private serviceCategoryService: ServiceCategoryService,
+    private destinationService: DestinationService
   ) {
     super(repository);
+  }
+
+  getUserId(dto: Service, user: TJwtPayload) {
+    if (!user.userId) {
+      throw new InternalServerErrorException(
+        DEFAULT_ERROR.InternalSignJwt,
+        ErrorCodeEnum.INTERNAL_SERVER_ERROR
+      )
+    }
+    dto.userId = user.userId;
+  }
+
+  async authAdmin(dto: Service, user: TJwtPayload) {
+    const currentUser = await this.userService.findByIdAndOnlyGetRole(user.userId);
+    if (this.userService.isNotAdmin(currentUser)) {
+      throw new ForbiddenException(
+        DEFAULT_ERROR.Forbidden,
+        ErrorCodeEnum.NOT_CREATE_ADMIN_USER
+      );
+    }
   }
 
   public async restore(id: number, currentUser: User) {
@@ -76,5 +106,13 @@ export class ServiceService extends TypeOrmCrudService<Service> {
         break;
     }
     return this.repository.findOne(conditions);
+  }
+
+  public async mapRelationKeysToEntities(dto: Service): Promise<Service> {
+    const {destinationIds, serviceCategoryIds, providerIds} = dto;
+    dto.destinations = await this.destinationService.findByIds(destinationIds);
+    dto.providers = await this.providerService.findByIds(providerIds);
+    dto.serviceCategories = await this.serviceCategoryService.findByIds(serviceCategoryIds);
+    return dto;
   }
 }

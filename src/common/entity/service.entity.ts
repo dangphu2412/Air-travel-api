@@ -139,21 +139,40 @@ export class Service extends BaseActionDate {
   unit: string;
 
   /**
+  * Map relation keys
+  */
+ @ApiProperty({writeOnly: true, example: [2, 3]})
+ @IsOptional()
+ @IsNumber({}, {each: true})
+ serviceCategoryIds: number[];
+
+ @ApiProperty({writeOnly: true, example: [2, 3]})
+ @IsOptional()
+ @IsNumber({}, {each: true})
+ destinationIds: number[];
+
+ @ApiProperty({writeOnly: true, example: [2, 3]})
+ @IsOptional()
+ @IsNumber({}, {each: true})
+ providerIds: number[];
+
+
+  /**
    * Trigger
    */
   @BeforeInsert()
-  async beforeInsert() {
-    SlugHelper.slugifyColumns(this, [
-      {
-        name: "enSlug",
-        value: SlugHelper.slugify(this.enTitle)
-      },
-      {
-        name: "viSlug",
-        value: SlugHelper.slugify(this.viTitle)
-      }
-    ])
-  }
+ async beforeInsert() {
+   SlugHelper.slugifyColumns(this, [
+     {
+       name: "enSlug",
+       value: SlugHelper.slugify(this.enTitle)
+     },
+     {
+       name: "viSlug",
+       value: SlugHelper.slugify(this.viTitle)
+     }
+   ])
+ }
 
   /**
    * Relations

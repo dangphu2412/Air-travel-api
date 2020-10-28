@@ -113,7 +113,7 @@ export class ServiceCategory extends BaseActionDate {
   userId: number;
 
   @ApiProperty({readOnly: true, type: () => User})
-  @ManyToOne(() => User, item => item.serviceCategories, {eager: true})
+  @ManyToOne(() => User, item => item.serviceCategories)
   @JoinColumn({name: "userId"})
   user: User;
 }
