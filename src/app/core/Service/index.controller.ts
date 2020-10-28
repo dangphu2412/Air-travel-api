@@ -11,6 +11,7 @@ import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {Lang} from "src/common/constants/lang";
 import {TJwtPayload} from "src/common/type";
+import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 @Crud({
   model: {
@@ -41,17 +42,12 @@ import {TJwtPayload} from "src/common/type";
   },
   routes: {
     exclude: ["createManyBase"],
-    createOneBase: {
-      decorators: [
-        Action(ECrudAction.CREATE),
-        GrantAccess()
-      ]
-    },
     replaceOneBase: {
       decorators: [
         Action(ECrudAction.REPLACE),
         GrantAccess()
-      ]
+      ],
+      interceptors: [SqlInterceptor]
     },
     deleteOneBase: {
       decorators: [
@@ -71,6 +67,7 @@ export class ServiceController implements CrudController<Service> {
     return this;
   }
 
+  @UseInterceptors(SqlInterceptor)
   @Action(ECrudAction.CREATE)
   @GrantAccess()
   @Override("createOneBase")

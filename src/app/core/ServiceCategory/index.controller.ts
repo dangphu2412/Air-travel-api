@@ -10,10 +10,34 @@ import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {CurrentUser, GrantAccess} from "src/common/decorators";
 import {TJwtPayload} from "src/common/type";
 import {Lang} from "src/common/constants/lang";
+import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 @Crud({
   model: {
     type: ServiceCategory
+  },
+  routes: {
+    exclude: ["createManyBase"],
+    createOneBase: {
+      decorators: [
+        Action(ECrudAction.CREATE),
+        GrantAccess()
+      ],
+      interceptors: [SqlInterceptor]
+    },
+    replaceOneBase: {
+      decorators: [
+        Action(ECrudAction.REPLACE),
+        GrantAccess()
+      ],
+      interceptors: [SqlInterceptor]
+    },
+    deleteOneBase: {
+      decorators: [
+        Action(ECrudAction.DELETE),
+        GrantAccess()
+      ]
+    }
   },
   query: {
     join: {

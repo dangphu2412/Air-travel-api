@@ -2,19 +2,21 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
-  Injectable, NotFoundException
+  Injectable, InternalServerErrorException, NotFoundException
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
-import {DestinationError} from "src/common/constants";
+import {DEFAULT_ERROR, DestinationError} from "src/common/constants";
 import {Lang} from "src/common/constants/lang";
 import {City, Destination, District} from "src/common/entity";
+import {ErrorCodeEnum} from "src/common/enums";
 import {TJwtPayload} from "src/common/type";
 import {SlugHelper} from "src/global/slugify";
 import {FindOneOptions, Not} from "typeorm";
 import {CityService} from "../City/index.service";
 import {DistrictService} from "../District/index.service";
+import {UserService} from "../User/index.service";
 import {DestinationRepository} from "./index.repository";
 
 @Injectable()
@@ -23,19 +25,37 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     @InjectRepository(Destination)
     private repository: DestinationRepository,
     private readonly cityService: CityService,
-    private readonly districtService: DistrictService
+    private readonly districtService: DistrictService,
+    private readonly userService: UserService
   ) {
     super(repository);
+  }
+
+  getUserId(dto: Destination, user: TJwtPayload) {
+    if (!user.userId) {
+      throw new InternalServerErrorException(
+        DEFAULT_ERROR.InternalSignJwt,
+        ErrorCodeEnum.INTERNAL_SERVER_ERROR
+      )
+    }
+    dto.userId = user.userId;
+  }
+
+  async authAdmin(dto: Destination, user: TJwtPayload) {
+    const currentUser = await this.userService.findByIdAndOnlyGetRole(user.userId);
+    if (this.userService.isNotAdmin(currentUser)) {
+      throw new ForbiddenException(
+        DEFAULT_ERROR.Forbidden,
+        ErrorCodeEnum.NOT_CREATE_ADMIN_USER
+      );
+    }
   }
 
   public findByIds(ids: number[]) {
     return this.repository.findByIds(ids);
   }
 
-  public async createOneBase(
-    req: CrudRequest,
-    dto: Destination
-  ): Promise<Destination> {
+  public async mapRelationKeysToEntities(dto: Destination): Promise<Destination> {
     const citySlug = SlugHelper.slugifyUpperCaseAndRemoveDash(dto.cityName);
     const districtSlug = SlugHelper.slugifyUpperCaseAndRemoveDash(dto.districtName);
 
@@ -57,7 +77,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     });
     dto.city = city;
     dto.district = district;
-    return dto.save();
+    return dto;
   }
 
   public async restore(id: number, currentUser: TJwtPayload) {

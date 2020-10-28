@@ -2,7 +2,7 @@ import {ApiTags} from "@nestjs/swagger";
 import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
 import {
   Crud, CrudController, Feature, Action,
-  ParsedRequest, CrudRequest, CrudRequestInterceptor
+  ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
 import {Destination} from "src/common/entity";
 import {DestinationService} from "./index.service";
@@ -11,6 +11,7 @@ import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {Lang} from "src/common/constants/lang";
 import {TJwtPayload} from "src/common/type";
+import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 @Crud({
   model: {
@@ -28,18 +29,6 @@ import {TJwtPayload} from "src/common/type";
   },
   routes: {
     exclude: ["createManyBase", "replaceOneBase"],
-    createOneBase: {
-      decorators: [
-        Action(ECrudAction.CREATE),
-        GrantAccess()
-      ]
-    },
-    updateOneBase: {
-      decorators: [
-        Action(ECrudAction.REPLACE),
-        GrantAccess()
-      ]
-    },
     deleteOneBase: {
       decorators: [
         Action(ECrudAction.DELETE),
@@ -53,6 +42,40 @@ import {TJwtPayload} from "src/common/type";
 @Controller("destinations")
 export class DestinationController implements CrudController<Destination> {
   constructor(public service: DestinationService) {}
+
+  get base(): CrudController<Destination> {
+    return this;
+  }
+
+  @UseInterceptors(SqlInterceptor)
+  @Action(ECrudAction.CREATE)
+  @GrantAccess()
+  @Override("createOneBase")
+  async createOneOverride(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: Destination,
+    @CurrentUser() user: TJwtPayload
+  ): Promise<Destination> {
+    this.service.getUserId(dto, user);
+    await this.service.authAdmin(dto, user);
+    await this.service.mapRelationKeysToEntities(dto);
+    return this.base.createOneBase(req, dto);
+  };
+
+  @UseInterceptors(SqlInterceptor)
+  @Action(ECrudAction.UPDATE)
+  @GrantAccess()
+  @Override("updateOneBase")
+  async updateOneOverride(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: Destination,
+    @CurrentUser() user: TJwtPayload
+  ): Promise<Destination> {
+    this.service.getUserId(dto, user);
+    await this.service.authAdmin(dto, user);
+    await this.service.mapRelationKeysToEntities(dto);
+    return this.base.updateOneBase(req, dto);
+  };
 
   @Patch(":id/restore")
   @Action(ECrudAction.RESTORE)

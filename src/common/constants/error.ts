@@ -1,0 +1,4 @@
+export const SQL_ERROR_CODE = {
+  VIOLATE_CONSTAINT: "23503",
+  ALREADY_EXIST: "23505"
+}

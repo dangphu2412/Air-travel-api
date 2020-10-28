@@ -125,12 +125,12 @@ export class Destination extends BaseActionDate {
   })
   latitude: number;
 
-  @ApiProperty({writeOnly: true, example: 1})
+  @ApiProperty({writeOnly: true, example: "Hà nội"})
   @IsRequired()
   @IsString()
   cityName: string;
 
-  @ApiProperty({writeOnly: true, example: 1})
+  @ApiProperty({writeOnly: true, example: "Quận ba đình"})
   @IsRequired()
   @IsString()
   districtName: string;
