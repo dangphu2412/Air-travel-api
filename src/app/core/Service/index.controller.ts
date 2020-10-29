@@ -4,13 +4,12 @@ import {
   Crud, CrudController, Feature, Action,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {Service} from "src/common/entity";
+import {Service, User} from "src/common/entity";
 import {ServiceService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {Lang} from "src/common/constants/lang";
-import {TJwtPayload} from "src/common/type";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 @Crud({
@@ -74,7 +73,7 @@ export class ServiceController implements CrudController<Service> {
   async createOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Service,
-    @CurrentUser() user: TJwtPayload
+    @CurrentUser() user: User
   ): Promise<Service> {
     this.service.getUserId(dto, user);
     await this.service.mapRelationKeysToEntities(dto);
@@ -87,7 +86,7 @@ export class ServiceController implements CrudController<Service> {
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Service,
-    @CurrentUser() user: TJwtPayload
+    @CurrentUser() user: User
   ): Promise<Service> {
     this.service.getUserId(dto, user);
     await this.service.mapRelationKeysToEntities(dto);
@@ -102,7 +101,7 @@ export class ServiceController implements CrudController<Service> {
   @GrantAccess()
   restoreService(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: TJwtPayload
+    @CurrentUser() user: User
   ) {
     return this.service.restore(id, user);
   }
@@ -126,7 +125,7 @@ export class ServiceController implements CrudController<Service> {
   @GrantAccess()
   softDelete(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() currentUser: TJwtPayload
+    @CurrentUser() currentUser: User
   ) {
     return this.service.softDelete(id, currentUser);
   }

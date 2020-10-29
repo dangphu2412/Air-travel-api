@@ -3,11 +3,10 @@ import {Controller} from "@nestjs/common";
 import {
   Crud, CrudController, Feature, Action, Override, ParsedBody, ParsedRequest, CrudRequest
 } from "@nestjsx/crud";
-import {Provider} from "src/common/entity";
+import {Provider, User} from "src/common/entity";
 import {ProviderService} from "./index.service";
 import {CurrentUser, GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
-import {TJwtPayload} from "src/common/type";
 
 @Crud({
   model: {
@@ -45,9 +44,9 @@ export class ProviderController implements CrudController<Provider> {
   createOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Provider,
-    @CurrentUser() user: TJwtPayload
+    @CurrentUser() user: User
   ): Promise<Provider> {
-    dto.userId = user.userId;
+    dto.userId = user.id;
     return this.base.createOneBase(req, dto);
   };
 }

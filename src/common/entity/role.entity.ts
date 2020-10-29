@@ -30,6 +30,7 @@ export class Role extends BaseActionDate {
     /**
      * Relations
      */
+    @ApiProperty({readOnly: true})
     @ManyToMany(() => Permission, permission => permission.roles)
     @JoinTable({
       name: "role_permissions",
@@ -44,6 +45,7 @@ export class Role extends BaseActionDate {
     })
     permissions: Permission[]
 
+    @ApiProperty({readOnly: true})
     @OneToMany(() => User, user => user.role)
     users: User[]
 }

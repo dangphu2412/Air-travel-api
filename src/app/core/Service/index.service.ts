@@ -8,9 +8,8 @@ import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {DEFAULT_ERROR, ServiceError} from "src/common/constants";
 import {Lang} from "src/common/constants/lang";
-import {Service} from "src/common/entity";
+import {Service, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
-import {TJwtPayload} from "src/common/type";
 import {FindOneOptions, IsNull, Not} from "typeorm";
 import {DestinationService} from "../Destination/index.service";
 import {ProviderService} from "../Provider/index.service";
@@ -31,28 +30,31 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     super(repository);
   }
 
-  getUserId(dto: Service, user: TJwtPayload) {
-    if (!user.userId) {
+  getUserId(dto: Service, user: User) {
+    if (!user.id) {
       throw new InternalServerErrorException(
         DEFAULT_ERROR.InternalSignJwt,
         ErrorCodeEnum.INTERNAL_SERVER_ERROR
       )
     }
-    dto.userId = user.userId;
+    dto.userId = user.id;
   }
 
-  public async restore(id: number, currentUser: TJwtPayload) {
+  public async restore(id: number, currentUser: User) {
     const record = await this.repository.findOne(id, {
       where: {
         deletedAt: Not(IsNull())
       },
       withDeleted: true,
-      relations: ["user"]
+      relations: ["user", "user.role"]
     });
+    const {user} = record;
     if (!record) throw new NotFoundException(ServiceError.NotFound)
-    if (record.user.id === currentUser.userId) {
-      throw new ConflictException(
-        ServiceError.ConflictRestore,
+    if (this.userService.isNotAdmin(user)
+    && this.userService.isNotAuthor(user, currentUser)
+    ) {
+      throw new ForbiddenException(
+        DEFAULT_ERROR.ConflictSelf,
         ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
       );
     }
@@ -76,24 +78,24 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     });
   }
 
-  public async softDelete(id: number, currentUser: TJwtPayload): Promise<void> {
+  public async softDelete(id: number, currentUser: User): Promise<void> {
     const record = await this.repository.findOne(id, {
-      relations: ["user"]
+      relations: ["user", "user.role"]
     });
-    const user = await this.userService.findByIdAndOnlyGetRole(currentUser.userId);
+    const {user} = record;
     if (!record) {
       throw new NotFoundException(
         ServiceError.NotFound,
         ErrorCodeEnum.NOT_FOUND
       )
     }
-    if (this.userService.isNotAdmin(user)) {
-      if (record.user.id !== currentUser.userId) {
-        throw new ForbiddenException(
-          DEFAULT_ERROR.ConflictSelf,
-          ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
-        );
-      }
+    if (this.userService.isNotAdmin(user)
+    && this.userService.isNotAuthor(user, currentUser)
+    ) {
+      throw new ForbiddenException(
+        DEFAULT_ERROR.ConflictSelf,
+        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
+      );
     }
     await this.repository.softDelete(record.id);
     return;

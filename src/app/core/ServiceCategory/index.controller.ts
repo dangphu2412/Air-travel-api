@@ -2,13 +2,12 @@ import {ApiTags} from "@nestjs/swagger";
 import {Controller, Delete, Get, Param, ParseIntPipe, Patch, UseInterceptors} from "@nestjs/common";
 import {
   Action,
-  Crud, CrudController, CrudRequest, CrudRequestInterceptor, Feature, ParsedRequest
+  Crud, CrudController, CrudRequest, CrudRequestInterceptor, Feature, Override, ParsedRequest
 } from "@nestjsx/crud";
-import {ServiceCategory} from "src/common/entity";
+import {ServiceCategory, User} from "src/common/entity";
 import {ServiceCategoryService} from "./index.service";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {CurrentUser, GrantAccess} from "src/common/decorators";
-import {TJwtPayload} from "src/common/type";
 import {Lang} from "src/common/constants/lang";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
@@ -58,7 +57,7 @@ export class ServiceCategoryController implements CrudController<ServiceCategory
   @GrantAccess()
   restoreDestination(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: TJwtPayload
+    @CurrentUser() user: User
   ) {
     return this.service.restore(id, user);
   }
@@ -69,12 +68,13 @@ export class ServiceCategoryController implements CrudController<ServiceCategory
     return this.service.getDeleted(req);
   }
 
+  @Override("deleteOneBase")
   @Delete(":id")
   @Action(ECrudAction.SOFT_DEL)
   @GrantAccess()
   softDelete(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() currentUser: TJwtPayload
+    @CurrentUser() currentUser: User
   ) {
     return this.service.softDelete(id, currentUser);
   }

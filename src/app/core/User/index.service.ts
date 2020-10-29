@@ -1,15 +1,14 @@
 import {
   ConflictException, ForbiddenException,
-  Injectable, NotFoundException
+  Injectable, NotFoundException, UnauthorizedException
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
-import {UserError} from "src/common/constants";
+import {DEFAULT_ERROR, UserError} from "src/common/constants";
 import {RegisterDto} from "src/common/dto/User";
 import {User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
-import {TJwtPayload} from "src/common/type";
 import {In, IsNull, Not} from "typeorm";
 import {UserRepository} from "./index.repository";
 
@@ -32,6 +31,19 @@ export class UserService extends TypeOrmCrudService<User> {
       return false;
     }
     return true;
+  }
+
+  public isNotAuthor(currentUser: User, compareUser: User) {
+    return currentUser.id !== compareUser.id
+  }
+
+  public isTokenExpired(user: User) {
+    if (!user.hasExpiredToken) {
+      throw new UnauthorizedException(
+        DEFAULT_ERROR.Unauthorized,
+        ErrorCodeEnum.IS_EXPIRED_TOKEN
+      )
+    }
   }
 
   public findByEmail(email: string): Promise<User> {
@@ -59,7 +71,7 @@ export class UserService extends TypeOrmCrudService<User> {
     ).save();
   }
 
-  public async restore(id: number, currentUser: TJwtPayload) {
+  public async restore(id: number, currentUser: User) {
     const record = await this.repository.findOne(id, {
       where: {
         deletedAt: Not(IsNull())
@@ -71,7 +83,7 @@ export class UserService extends TypeOrmCrudService<User> {
         ErrorCodeEnum.NOT_FOUND
       )
     }
-    if (id === currentUser.userId) {
+    if (id === currentUser.id) {
       throw new ConflictException(
         UserError.ConflictRestore,
         ErrorCodeEnum.ALREADY_EXIST
@@ -92,21 +104,21 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
-  public async softDelete(id: number, currentUser: TJwtPayload): Promise<void> {
-    if (id === currentUser.userId) {
+  public async softDelete(id: number, currentUser: User): Promise<void> {
+    if (id === currentUser.id) {
       throw new ConflictException(
         UserError.ConflictSelf,
         ErrorCodeEnum.NOT_DELETE_YOURSELF
       );
     }
     const records = await this.repository.find({
-      where: In([id, currentUser.userId]),
+      where: In([id, currentUser.id]),
       relations: ["role"]
     });
     const currentUserEntity = this.getCurrentUserFromEntities(
-      records, currentUser.userId
+      records, currentUser.id
     );
-    const record = records.find(record => record.id !== currentUser.userId);
+    const record = records.find(record => record.id !== currentUser.id);
     if (!record) throw new NotFoundException(UserError.NotFound, ErrorCodeEnum.NOT_FOUND);
 
     if (record.deletedAt !== null) {
@@ -123,5 +135,17 @@ export class UserService extends TypeOrmCrudService<User> {
     }
     await this.repository.softDelete(record.id);
     return;
+  }
+
+  public getProfile(user: User): Promise<User> {
+    const {id} = user;
+    return this.repository.findOne(id, {
+      relations: ["role", "role.permissions"],
+      select: [
+        "id", "fullName", "email", "avatar", "bio",
+        "birthday", "gender", "note", "status",
+        "role"
+      ]
+    })
   }
 }

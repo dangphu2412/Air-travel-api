@@ -10,7 +10,6 @@ import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {RegisterDto} from "src/common/dto/User";
-import {TJwtPayload} from "src/common/type";
 
 @Crud({
   model: {
@@ -41,7 +40,7 @@ export class UserController implements CrudController<User> {
   @GrantAccess()
   restoreUser(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: TJwtPayload
+    @CurrentUser() user: User
   ) {
     return this.service.restore(id, user);
   }
@@ -57,7 +56,7 @@ export class UserController implements CrudController<User> {
   @GrantAccess()
   softDelete(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: TJwtPayload
+    @CurrentUser() user: User
   ) {
     return this.service.softDelete(id, user);
   }

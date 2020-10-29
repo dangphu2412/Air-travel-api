@@ -39,7 +39,12 @@ export class AuthService {
     return loginResponse;
   }
 
-  async validateUser(email: string, pass: string): Promise<User | null> {
+  private turnoffUserExpired(user: User) {
+    user.hasExpiredToken = false;
+    return user.save();
+  }
+
+  async validateUser(email: string, pass: string): Promise<User> {
     const user: User = await this.service.findByEmail(email);
     if (user && BcryptService.compare(pass, user.password)) {
       return user;
@@ -51,7 +56,10 @@ export class AuthService {
   }
 
   async login(dto: LoginDto): Promise<IUserLoginResponse> {
-    const user = await this.validateUser(dto.email, dto.password);
+    const user: User = await this.validateUser(dto.email, dto.password);
+    if (user.hasExpiredToken) {
+      await this.turnoffUserExpired(user);
+    }
     return this.getloginResponse(user);
   }
 
@@ -70,15 +78,7 @@ export class AuthService {
     return this.getloginResponse(user);
   }
 
-  getProfile(user: TJwtPayload): Promise<User> {
-    const {userId} = user;
-    return this.service.findOne(userId, {
-      relations: ["role", "role.permissions"],
-      select: [
-        "id", "fullName", "email", "avatar", "bio",
-        "birthday", "gender", "note", "status",
-        "role"
-      ]
-    })
+  getProfile(user: User): Promise<User> {
+    return this.service.getProfile(user);
   }
 }

@@ -1,13 +1,13 @@
 import {ApiTags} from "@nestjs/swagger";
-import {Controller} from "@nestjs/common";
+import {Controller, Delete, Get, Param, ParseIntPipe, Patch, UseInterceptors} from "@nestjs/common";
 import {
   Action, Crud, CrudController, CrudRequest,
+  CrudRequestInterceptor,
   Feature, Override, ParsedBody, ParsedRequest
 } from "@nestjsx/crud";
 import {RoleService} from "./index.service";
-import {Role} from "src/common/entity";
+import {Role, User} from "src/common/entity";
 import {CurrentUser, GrantAccess} from "src/common/decorators";
-import {TJwtPayload} from "src/common/type";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 
 @Crud({
@@ -48,7 +48,7 @@ export class RoleController implements CrudController<Role> {
   async createOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Role,
-    @CurrentUser() user: TJwtPayload
+    @CurrentUser() user: User
   ): Promise<Role> {
     await this.service.authAdmin(user);
     await this.service.mapRelationKeysToEntities(dto);
@@ -61,10 +61,39 @@ export class RoleController implements CrudController<Role> {
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Role,
-    @CurrentUser() user: TJwtPayload
+    @CurrentUser() user: User
   ): Promise<Role> {
     await this.service.authAdmin(user);
     await this.service.mapRelationKeysToEntities(dto);
     return this.base.updateOneBase(req, dto);
   };
+
+  @Patch(":id/restore")
+  @Action(ECrudAction.RESTORE)
+  @GrantAccess()
+  async restoreDestination(
+    @Param("id", ParseIntPipe) id: number,
+    @CurrentUser() user: User
+  ) {
+    await this.service.authAdmin(user);
+    return this.service.restore(id);
+  }
+
+  @UseInterceptors(CrudRequestInterceptor)
+  @Get("trashed")
+  getDeleted(@ParsedRequest() req: CrudRequest) {
+    return this.service.getDeleted(req);
+  }
+
+  @Override("deleteOneBase")
+  @Delete(":id")
+  @Action(ECrudAction.SOFT_DEL)
+  @GrantAccess()
+  async softDelete(
+    @Param("id", ParseIntPipe) id: number,
+    @CurrentUser() user: User
+  ) {
+    await this.service.authAdmin(user);
+    return this.service.softDelete(id);
+  }
 }

@@ -5,7 +5,6 @@ import {LoginDto} from "src/common/dto/User";
 import {RegisterDto} from "src/common/dto/User/register.dto";
 import {User} from "src/common/entity";
 import {IUserLoginResponse} from "src/common/interface/t.jwtPayload";
-import {TJwtPayload} from "src/common/type";
 import {AuthService} from "./index.service";
 
 @ApiTags("Auth")
@@ -29,7 +28,7 @@ export class AuthController {
     jwtOnly: true
   })
   @Get("/me")
-  getProfile(@CurrentUser() user: TJwtPayload): Promise<User> {
+  getProfile(@CurrentUser() user: User): Promise<User> {
     return this.service.getProfile(user);
   }
 }
