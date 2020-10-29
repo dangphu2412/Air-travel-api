@@ -4,11 +4,12 @@ import {
   InternalServerErrorException, NotFoundException
 } from "@nestjs/common";
 import {IBaseService} from "src/common/interface/i.base.service";
-import {IsNull, Not, Repository, FindOneOptions} from "typeorm";
+import {IsNull, Not, Repository, FindOneOptions, FindManyOptions} from "typeorm";
 import {EntityId} from "typeorm/repository/EntityId";
 import {ErrorCodeEnum} from "src/common/enums";
 import {UserService} from "../core/User/index.service";
 import {User} from "src/common/entity";
+import {CrudRequest} from "@nestjsx/crud";
 
 @Injectable()
 export class BaseService implements IBaseService {
@@ -16,10 +17,37 @@ export class BaseService implements IBaseService {
     private userService: UserService
   ) {}
 
+  findManySoftDeleted<T>(
+    repository: Repository<T>,
+    req: CrudRequest,
+    options?: FindManyOptions): Promise<T[]> {
+    return repository.find({
+      where: options ?? {
+        deletedAt: Not(IsNull())
+      },
+      withDeleted: true,
+      skip: req.parsed.offset,
+      take: req.parsed.limit
+    });
+  }
+
   findWithRelationUser<T>(repository: Repository<T>, id: number): Promise<T> {
     return repository.findOne(id, {
       relations: ["user"]
     });
+  }
+
+  async findWithRelationUserThrowErr<T>(repository: Repository<T>, id: number): Promise<T> {
+    const record = await repository.findOne(id, {
+      relations: ["user"]
+    });
+    if (!record) {
+      throw new NotFoundException(
+        DEFAULT_ERROR.NotFound,
+        ErrorCodeEnum.NOT_FOUND
+      )
+    }
+    return record;
   }
 
   findByIdSoftDeleted<T>(

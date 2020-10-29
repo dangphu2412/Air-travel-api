@@ -6,7 +6,6 @@ import {ServiceController} from "./index.controller";
 import {ServiceRepository} from "./index.repository";
 import {UserRepository} from "../User/index.repository";
 import {UserModule} from "../User/index.module";
-import {UserService} from "../User/index.service";
 import {ServiceCategoryRepository} from "../ServiceCategory/index.repository";
 import {ProviderRepository} from "../Provider/index.repository";
 import {ServiceCategoryModule} from "../ServiceCategory/index.module";
@@ -19,10 +18,12 @@ import {DestinationService} from "../Destination/index.service";
 import {DistrictModule} from "../District/index.module";
 import {DistrictRepository} from "../District/index.repository";
 import {CityRepository} from "../City/index.repository";
+import {BaseModule} from "src/app/base/index.module";
 
 @Module({
   imports: [
     UserModule,
+    BaseModule,
     ServiceCategoryModule,
     ProviderModule,
     DestinationModule,
@@ -40,9 +41,8 @@ import {CityRepository} from "../City/index.repository";
   ],
   controllers: [ServiceController],
   providers: [
-    ServiceService, UserService,
-    ServiceCategoryService, ProviderService,
-    DestinationService
+    ServiceService, ServiceCategoryService,
+    ProviderService, DestinationService, BaseModule
   ],
   exports: [ServiceService]
 })

@@ -1,10 +1,15 @@
 import {EntityId} from "typeorm/repository/EntityId"
-import {Repository, FindOneOptions} from "typeorm"
+import {Repository, FindOneOptions, FindManyOptions} from "typeorm"
 import {User} from "../entity"
+import {CrudRequest} from "@nestjsx/crud"
 
 export interface IBaseService {
   // Find methods
+  findManySoftDeleted<T>(
+    repository: Repository<T>, req: CrudRequest, options?: FindManyOptions
+  ): Promise<T[]>;
   findWithRelationUser<T>(repository: Repository<T>, id: number): Promise<T>;
+  findWithRelationUserThrowErr<T>(repository: Repository<T>, id: number): Promise<T>;
   findByIdSoftDeleted<T>(
     repository: Repository<T>,
     id: EntityId,

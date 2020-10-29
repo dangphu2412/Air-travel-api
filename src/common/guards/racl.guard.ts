@@ -67,7 +67,7 @@ export class RolesGuard implements CanActivate {
   }
 
   private validateTokenExpired(user: User) {
-    if (!user.hasExpiredToken) {
+    if (user.hasExpiredToken) {
       throw new UnauthorizedException(
         DEFAULT_ERROR.Unauthorized,
         ErrorCodeEnum.IS_EXPIRED_TOKEN

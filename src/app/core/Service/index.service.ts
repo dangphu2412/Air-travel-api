@@ -1,20 +1,16 @@
 import {
-  ConflictException,
-  ForbiddenException,
-  Injectable, InternalServerErrorException, NotFoundException
+  Injectable
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
-import {DEFAULT_ERROR, ServiceError} from "src/common/constants";
+import {BaseService} from "src/app/base/base.service";
 import {Lang} from "src/common/constants/lang";
 import {Service, User} from "src/common/entity";
-import {ErrorCodeEnum} from "src/common/enums";
-import {FindOneOptions, IsNull, Not} from "typeorm";
+import {FindOneOptions} from "typeorm";
 import {DestinationService} from "../Destination/index.service";
 import {ProviderService} from "../Provider/index.service";
 import {ServiceCategoryService} from "../ServiceCategory/index.service";
-import {UserService} from "../User/index.service";
 import {ServiceRepository} from "./index.repository";
 
 @Injectable()
@@ -22,7 +18,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
   constructor(
     @InjectRepository(Service)
     private repository: ServiceRepository,
-    private userService: UserService,
+    private baseService: BaseService,
     private providerService: ProviderService,
     private serviceCategoryService: ServiceCategoryService,
     private destinationService: DestinationService
@@ -31,75 +27,33 @@ export class ServiceService extends TypeOrmCrudService<Service> {
   }
 
   getUserId(dto: Service, user: User) {
-    if (!user.id) {
-      throw new InternalServerErrorException(
-        DEFAULT_ERROR.InternalSignJwt,
-        ErrorCodeEnum.INTERNAL_SERVER_ERROR
-      )
-    }
-    dto.userId = user.id;
+    return this.baseService.fillUserIdToDto(dto, user);
   }
 
   public async restore(id: number, currentUser: User) {
-    const record = await this.repository.findOne(id, {
-      where: {
-        deletedAt: Not(IsNull())
-      },
-      withDeleted: true,
-      relations: ["user"]
-    });
+    const record = await this
+      .baseService
+      .findByIdSoftDeletedAndThrowErr(this.repository, id);
     const {user} = record;
-    if (!record) throw new NotFoundException(
-      ServiceError.NotFound,
-      ErrorCodeEnum.NOT_FOUND
-    )
-    if (this.userService.isNotAdmin(currentUser)
-    && this.userService.isNotAuthor(user, currentUser)
-    ) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.ConflictSelf,
-        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
-      );
-    }
-    if (record.deletedAt === null) {
-      throw new ConflictException(
-        ServiceError.ConflictRestore,
-        ErrorCodeEnum.CONFLICT
-      );
-    }
+
+    this.baseService.isNotAdminAndAuthorAndThrowErr(currentUser, user);
+    this.baseService.isNotSoftDeletedAndThrowErr(record);
     await this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
-    return this.find({
-      where: {
-        deletedAt: Not(IsNull())
-      },
-      withDeleted: true,
-      skip: req.parsed.offset,
-      take: req.parsed.limit
-    });
+    return this.baseService.findManySoftDeleted<Service>(
+      this.repository,
+      req
+    );
   }
 
   public async softDelete(id: number, currentUser: User): Promise<void> {
-    const record = await this.repository.findOne(id, {
-      relations: ["user"]
-    });
+    const record = await this
+      .baseService
+      .findWithRelationUserThrowErr(this.repository, id);
     const {user} = record;
-    if (!record) {
-      throw new NotFoundException(
-        ServiceError.NotFound,
-        ErrorCodeEnum.NOT_FOUND
-      )
-    }
-    if (this.userService.isNotAdmin(currentUser)
-    && this.userService.isNotAuthor(user, currentUser)
-    ) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.ConflictSelf,
-        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
-      );
-    }
+    this.baseService.isNotAdminAndAuthor(currentUser, user);
     await this.repository.softDelete(record.id);
     return;
   }
