@@ -10,7 +10,7 @@ import {RegisterDto} from "src/common/dto/User";
 import {User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
 import {TJwtPayload} from "src/common/type";
-import {In, Not} from "typeorm";
+import {In, IsNull, Not} from "typeorm";
 import {UserRepository} from "./index.repository";
 
 @Injectable()
@@ -62,7 +62,7 @@ export class UserService extends TypeOrmCrudService<User> {
   public async restore(id: number, currentUser: TJwtPayload) {
     const record = await this.repository.findOne(id, {
       where: {
-        deletedAt: Not(null)
+        deletedAt: Not(IsNull())
       }
     });
     if (!record) throw new NotFoundException(UserError.NotFound, ErrorCodeEnum.NOT_FOUND)
@@ -72,13 +72,13 @@ export class UserService extends TypeOrmCrudService<User> {
         ErrorCodeEnum.ALREADY_EXIST
       );
     }
-    await this.repository.restore(record);
+    await this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
     return this.find({
       where: {
-        deletedAt: Not(null)
+        deletedAt: Not(IsNull())
       },
       withDeleted: true,
       cache: req.options.query.cache,
@@ -116,7 +116,7 @@ export class UserService extends TypeOrmCrudService<User> {
         ErrorCodeEnum.NOT_DELETE_ADMIN_ROLE
       );
     }
-    await this.repository.softDelete(record);
+    await this.repository.softDelete(record.id);
     return;
   }
 }

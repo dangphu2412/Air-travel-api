@@ -1,4 +1,4 @@
-import {ApiTags} from "@nestjs/swagger";
+import {ApiOperation, ApiTags} from "@nestjs/swagger";
 import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
 import {
   Crud, CrudController, Feature, Action,
@@ -77,7 +77,6 @@ export class ServiceController implements CrudController<Service> {
     @CurrentUser() user: TJwtPayload
   ): Promise<Service> {
     this.service.getUserId(dto, user);
-    await this.service.authAdmin(dto, user);
     await this.service.mapRelationKeysToEntities(dto);
     return this.base.createOneBase(req, dto);
   };
@@ -91,11 +90,13 @@ export class ServiceController implements CrudController<Service> {
     @CurrentUser() user: TJwtPayload
   ): Promise<Service> {
     this.service.getUserId(dto, user);
-    await this.service.authAdmin(dto, user);
     await this.service.mapRelationKeysToEntities(dto);
     return this.base.updateOneBase(req, dto);
   };
 
+  @ApiOperation({
+    description: "Restore one record"
+  })
   @Patch(":id/restore")
   @Action(ECrudAction.RESTORE)
   @GrantAccess()
@@ -106,22 +107,45 @@ export class ServiceController implements CrudController<Service> {
     return this.service.restore(id, user);
   }
 
+  @ApiOperation({
+    description: "Get trashed records with crud fitler"
+  })
   @UseInterceptors(CrudRequestInterceptor)
   @Get("trashed")
+  @Action(ECrudAction.READ)
+  @GrantAccess()
   getDeleted(@ParsedRequest() req: CrudRequest) {
     return this.service.getDeleted(req);
   }
 
-  @Delete(":id")
+  @ApiOperation({
+    description: "Soft delete one record"
+  })
+  @Override("deleteOneBase")
   @Action(ECrudAction.SOFT_DEL)
   @GrantAccess()
   softDelete(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() currentUser: User
+    @CurrentUser() currentUser: TJwtPayload
   ) {
     return this.service.softDelete(id, currentUser);
   }
 
+  @ApiOperation({
+    description: "Permanently delete one record"
+  })
+  @Delete(":id/permanently")
+  @Action(ECrudAction.DELETE)
+  @GrantAccess()
+  hardDelete(
+    @ParsedRequest() req: CrudRequest,
+  ) {
+    return this.base.deleteOneBase(req);
+  }
+
+  @ApiOperation({
+    description: "Get one record by english slug"
+  })
   @Get("enslug-:slug")
   getEnglishSlug(
     @Param("slug") slug: string
@@ -129,6 +153,9 @@ export class ServiceController implements CrudController<Service> {
     return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.EN);
   }
 
+  @ApiOperation({
+    description: "Get one record by vietnam slug"
+  })
   @Get("vislug-:slug")
   getVnSlug(
     @Param("slug") slug: string

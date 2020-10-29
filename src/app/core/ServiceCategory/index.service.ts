@@ -5,7 +5,7 @@ import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service
 import {ServiceCategory} from "src/common/entity";
 import {TJwtPayload} from "src/common/type";
 import {ServiceCategoryRepository} from "./index.repository";
-import {FindOneOptions, Not} from "typeorm";
+import {FindOneOptions, IsNull, Not} from "typeorm";
 import {ErrorCodeEnum} from "src/common/enums";
 import {CrudRequest} from "@nestjsx/crud";
 import {Lang} from "src/common/constants/lang";
@@ -26,7 +26,7 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
   public async restore(id: number, currentUser: TJwtPayload) {
     const record = await this.repository.findOne(id, {
       where: {
-        deletedAt: Not(null)
+        deletedAt: Not(IsNull())
       },
       relations: ["user"]
     });
@@ -41,13 +41,13 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
       DEFAULT_ERROR.ConflictRestore,
       ErrorCodeEnum.CONFLICT
     );
-    await this.repository.restore(record);
+    await this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
     return this.find({
       where: {
-        deletedAt: Not(null)
+        deletedAt: Not(IsNull())
       },
       withDeleted: true,
       skip: req.parsed.offset,
@@ -65,7 +65,7 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
         ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
       );
     }
-    await this.repository.softDelete(record);
+    await this.repository.softDelete(record.id);
     return;
   }
 

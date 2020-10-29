@@ -179,8 +179,7 @@ export class Service extends BaseActionDate {
    */
   @ApiProperty({readOnly: true, type: () => ServiceCategory})
   @ManyToMany(() => ServiceCategory, item => item.services, {
-    cascade: true,
-    eager: true
+    cascade: true
   })
   @JoinTable({
     name: "service_service_categories",
@@ -197,8 +196,7 @@ export class Service extends BaseActionDate {
 
   @ApiProperty({readOnly: true, type: () => Destination})
   @ManyToMany(() => Destination, item => item.services, {
-    cascade: true,
-    eager: true
+    cascade: true
   })
   @JoinTable({
     name: "service_destinations",
@@ -215,8 +213,7 @@ export class Service extends BaseActionDate {
 
   @ApiProperty({readOnly: true})
   @ManyToMany(() => Provider, provider => provider.services, {
-    cascade: true,
-    eager: true
+    cascade: true
   })
   @JoinTable({
     name: "service_providers",
@@ -237,7 +234,7 @@ export class Service extends BaseActionDate {
   userId: number;
 
   @ApiProperty({readOnly: true, type: () => User})
-  @ManyToOne(() => User, item => item.services, {eager: true})
+  @ManyToOne(() => User, item => item.services)
   @JoinColumn({name: "userId"})
   user: User;
 }

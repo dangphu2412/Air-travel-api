@@ -11,7 +11,7 @@ import {Lang} from "src/common/constants/lang";
 import {Service, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
 import {TJwtPayload} from "src/common/type";
-import {FindOneOptions, Not} from "typeorm";
+import {FindOneOptions, IsNull, Not} from "typeorm";
 import {DestinationService} from "../Destination/index.service";
 import {ProviderService} from "../Provider/index.service";
 import {ServiceCategoryService} from "../ServiceCategory/index.service";
@@ -54,8 +54,9 @@ export class ServiceService extends TypeOrmCrudService<Service> {
   public async restore(id: number, currentUser: User) {
     const record = await this.repository.findOne(id, {
       where: {
-        deletedAt: Not(null)
+        deletedAt: Not(IsNull())
       },
+      withDeleted: true,
       relations: ["user"]
     });
     if (!record) throw new NotFoundException(ServiceError.NotFound)
@@ -63,13 +64,13 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       throw new ConflictException(ServiceError.ConflictRestore);
     }
     if (record.deletedAt === null) throw new ConflictException(ServiceError.ConflictRestore);
-    await this.repository.restore(record);
+    await this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
     return this.find({
       where: {
-        deletedAt: Not(null)
+        deletedAt: Not(IsNull())
       },
       withDeleted: true,
       skip: req.parsed.offset,
@@ -77,12 +78,26 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     });
   }
 
-  public async softDelete(id: number, currentUser: User): Promise<void> {
+  public async softDelete(id: number, currentUser: TJwtPayload): Promise<void> {
     const record = await this.repository.findOne(id, {
       relations: ["user"]
     });
-    if (record.user.id !== currentUser.id) throw new ForbiddenException();
-    await this.repository.softDelete(record);
+    const user = await this.userService.findByIdAndOnlyGetRole(currentUser.userId);
+    if (!record) {
+      throw new NotFoundException(
+        ServiceError.NotFound,
+        ErrorCodeEnum.NOT_FOUND
+      )
+    }
+    if (this.userService.isNotAdmin(user)) {
+      if (record.user.id !== currentUser.userId) {
+        throw new ForbiddenException(
+          DEFAULT_ERROR.ConflictSelf,
+          ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
+        );
+      }
+    }
+    await this.repository.softDelete(record.id);
     return;
   }
 

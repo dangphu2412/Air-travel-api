@@ -13,7 +13,7 @@ import {City, Destination, District} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
 import {TJwtPayload} from "src/common/type";
 import {SlugHelper} from "src/global/slugify";
-import {FindOneOptions, Not} from "typeorm";
+import {FindOneOptions, IsNull, Not} from "typeorm";
 import {CityService} from "../City/index.service";
 import {DistrictService} from "../District/index.service";
 import {UserService} from "../User/index.service";
@@ -83,7 +83,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
   public async restore(id: number, currentUser: TJwtPayload) {
     const record = await this.repository.findOne(id, {
       where: {
-        deletedAt: Not(null)
+        deletedAt: Not(IsNull())
       },
       relations: ["user"]
     });
@@ -92,13 +92,13 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
       throw new ConflictException(DestinationError.ConflictRestore);
     }
     if (record.deletedAt === null) throw new ConflictException(DestinationError.ConflictRestore);
-    await this.repository.restore(record);
+    await this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
     return this.find({
       where: {
-        deletedAt: Not(null)
+        deletedAt: Not(IsNull())
       },
       withDeleted: true,
       skip: req.parsed.offset,
@@ -111,7 +111,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
       relations: ["user"]
     });
     if (record.user.id !== currentUser.userId) throw new ForbiddenException();
-    await this.repository.softDelete(record);
+    await this.repository.softDelete(record.id);
     return;
   }
 
