@@ -64,10 +64,10 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
 
   public async softDelete(id: number, currentUser: User): Promise<void> {
     const record = await this.repository.findOne(id, {
-      relations: ["user", "user.role"]
+      relations: ["user"]
     });
     const {user} = record;
-    if (this.userService.isNotAdmin(user)
+    if (this.userService.isNotAdmin(currentUser)
     && this.userService.isNotAuthor(user, currentUser)
     ) {
       throw new ForbiddenException(

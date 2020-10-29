@@ -77,14 +77,14 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
       where: {
         deletedAt: Not(IsNull())
       },
-      relations: ["user", "user.role"]
+      relations: ["user"]
     });
     const {user} = record;
     if (!record) throw new NotFoundException(
       DestinationError.NotFound,
       ErrorCodeEnum.NOT_FOUND
     )
-    if (this.userService.isNotAdmin(user)
+    if (this.userService.isNotAdmin(currentUser)
     && this.userService.isNotAuthor(user, currentUser)
     ) {
       throw new ForbiddenException(
@@ -114,10 +114,10 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
 
   public async softDelete(id: number, currentUser: User): Promise<void> {
     const record = await this.repository.findOne(id, {
-      relations: ["user", "user.role"]
+      relations: ["user"]
     });
     const {user} = record;
-    if (this.userService.isNotAdmin(user)
+    if (this.userService.isNotAdmin(currentUser)
     && this.userService.isNotAuthor(user, currentUser)
     ) {
       throw new ForbiddenException(

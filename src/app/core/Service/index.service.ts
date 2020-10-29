@@ -80,7 +80,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
 
   public async softDelete(id: number, currentUser: User): Promise<void> {
     const record = await this.repository.findOne(id, {
-      relations: ["user", "user.role"]
+      relations: ["user"]
     });
     const {user} = record;
     if (!record) {
@@ -89,7 +89,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
         ErrorCodeEnum.NOT_FOUND
       )
     }
-    if (this.userService.isNotAdmin(user)
+    if (this.userService.isNotAdmin(currentUser)
     && this.userService.isNotAuthor(user, currentUser)
     ) {
       throw new ForbiddenException(
