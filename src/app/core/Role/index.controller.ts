@@ -50,8 +50,7 @@ export class RoleController implements CrudController<Role> {
     @ParsedBody() dto: Role,
     @CurrentUser() user: User
   ): Promise<Role> {
-    await this.service.authAdmin(user);
-    await this.service.mapRelationKeysToEntities(dto);
+    await this.service.mapRelationKeysToEntities(dto, user);
     return this.base.createOneBase(req, dto);
   };
 
@@ -63,8 +62,7 @@ export class RoleController implements CrudController<Role> {
     @ParsedBody() dto: Role,
     @CurrentUser() user: User
   ): Promise<Role> {
-    await this.service.authAdmin(user);
-    await this.service.mapRelationKeysToEntities(dto);
+    await this.service.mapRelationKeysToEntities(dto, user);
     return this.base.updateOneBase(req, dto);
   };
 
@@ -75,8 +73,7 @@ export class RoleController implements CrudController<Role> {
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User
   ) {
-    await this.service.authAdmin(user);
-    return this.service.restore(id);
+    return this.service.restore(id, user);
   }
 
   @UseInterceptors(CrudRequestInterceptor)
@@ -93,7 +90,6 @@ export class RoleController implements CrudController<Role> {
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User
   ) {
-    await this.service.authAdmin(user);
-    return this.service.softDelete(id);
+    return this.service.softDelete(id, user);
   }
 }

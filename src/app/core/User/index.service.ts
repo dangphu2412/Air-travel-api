@@ -1,15 +1,15 @@
 import {
   ConflictException, ForbiddenException,
-  Injectable, NotFoundException, UnauthorizedException
+  Injectable, NotFoundException
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
-import {DEFAULT_ERROR, UserError} from "src/common/constants";
+import {UserError} from "src/common/constants";
 import {RegisterDto} from "src/common/dto/User";
 import {User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
-import {In, IsNull, Not} from "typeorm";
+import {FindOneOptions, In, IsNull, Not} from "typeorm";
 import {UserRepository} from "./index.repository";
 
 @Injectable()
@@ -37,12 +37,14 @@ export class UserService extends TypeOrmCrudService<User> {
     return currentUser.id !== compareUser.id
   }
 
-  public findByEmail(email: string): Promise<User> {
+  public findByEmail(email: string, options?: FindOneOptions): Promise<User> {
     return this.repository.findOne({
       where: {
         email
       },
-      relations: ["role", "role.permissions"]
+      relations: options?.relations || ["role", "role.permissions"],
+      order: options?.order,
+      withDeleted: options?.withDeleted
     })
   }
 

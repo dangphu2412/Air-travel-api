@@ -9,11 +9,13 @@ import {ServiceModule} from "./app/core/Service/index.module";
 import {DestinationModule} from "./app/core/Destination/index.module";
 import {CityModule} from "./app/core/City/index.module";
 import {DistrictModule} from "./app/core/District/index.module";
+import {BaseModule} from "./app/base/index.module";
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
+    BaseModule,
     RoleModule,
     PermissionModule,
     ServiceModule,

@@ -46,11 +46,14 @@ export class ServiceService extends TypeOrmCrudService<Service> {
         deletedAt: Not(IsNull())
       },
       withDeleted: true,
-      relations: ["user", "user.role"]
+      relations: ["user"]
     });
     const {user} = record;
-    if (!record) throw new NotFoundException(ServiceError.NotFound)
-    if (this.userService.isNotAdmin(user)
+    if (!record) throw new NotFoundException(
+      ServiceError.NotFound,
+      ErrorCodeEnum.NOT_FOUND
+    )
+    if (this.userService.isNotAdmin(currentUser)
     && this.userService.isNotAuthor(user, currentUser)
     ) {
       throw new ForbiddenException(

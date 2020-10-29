@@ -2,7 +2,7 @@ import {ConflictException, ForbiddenException, Injectable, NotFoundException} fr
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
-import {DEFAULT_ERROR, RoleError} from "src/common/constants";
+import {DEFAULT_ERROR} from "src/common/constants";
 import {Permission, Role, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
 import {Not, IsNull} from "typeorm";
@@ -21,25 +21,26 @@ export class RoleService extends TypeOrmCrudService<Role> {
     super(repository);
   }
 
-  async authAdmin(user: User) {
-    const currentUser = await this.userService.findByIdAndOnlyGetRole(user.id);
-    if (this.userService.isNotAdmin(currentUser)) {
+  async mapRelationKeysToEntities(dto: Role, user: User): Promise<Role> {
+    if (this.userService.isNotAdmin(user)) {
       throw new ForbiddenException(
-        RoleError.Forbidden,
-        ErrorCodeEnum.NOT_CREATE_ADMIN_USER
-      );
+        DEFAULT_ERROR.Forbidden,
+        ErrorCodeEnum.FORBIDDEN
+      )
     }
-    return currentUser;
-  }
-
-  async mapRelationKeysToEntities(dto: Role): Promise<Role> {
     const {permissionIds} = dto;
     const permissions: Permission[] = await this.permissionService.findByIds(permissionIds);
     dto.permissions = permissions;
     return dto;
   }
 
-  public async restore(id: number) {
+  public async restore(id: number, user: User) {
+    if (this.userService.isNotAdmin(user)) {
+      throw new ForbiddenException(
+        DEFAULT_ERROR.Forbidden,
+        ErrorCodeEnum.FORBIDDEN
+      )
+    }
     const record = await this.repository.findOne(id, {
       where: {
         deletedAt: Not(IsNull())
@@ -74,7 +75,13 @@ export class RoleService extends TypeOrmCrudService<Role> {
     });
   }
 
-  public async softDelete(id: number): Promise<void> {
+  public async softDelete(id: number, user: User): Promise<void> {
+    if (this.userService.isNotAdmin(user)) {
+      throw new ForbiddenException(
+        DEFAULT_ERROR.Forbidden,
+        ErrorCodeEnum.FORBIDDEN
+      )
+    }
     const record = await this.repository.findOne(id, {
       relations: ["users"]
     });
