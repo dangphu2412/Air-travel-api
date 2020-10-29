@@ -65,7 +65,12 @@ export class UserService extends TypeOrmCrudService<User> {
         deletedAt: Not(IsNull())
       }
     });
-    if (!record) throw new NotFoundException(UserError.NotFound, ErrorCodeEnum.NOT_FOUND)
+    if (!record) {
+      throw new NotFoundException(
+        UserError.NotFound,
+        ErrorCodeEnum.NOT_FOUND
+      )
+    }
     if (id === currentUser.userId) {
       throw new ConflictException(
         UserError.ConflictRestore,

@@ -57,7 +57,6 @@ export class DestinationController implements CrudController<Destination> {
     @CurrentUser() user: TJwtPayload
   ): Promise<Destination> {
     this.service.getUserId(dto, user);
-    await this.service.authAdmin(dto, user);
     await this.service.mapRelationKeysToEntities(dto);
     return this.base.createOneBase(req, dto);
   };
@@ -72,7 +71,6 @@ export class DestinationController implements CrudController<Destination> {
     @CurrentUser() user: TJwtPayload
   ): Promise<Destination> {
     this.service.getUserId(dto, user);
-    await this.service.authAdmin(dto, user);
     await this.service.mapRelationKeysToEntities(dto);
     return this.base.updateOneBase(req, dto);
   };

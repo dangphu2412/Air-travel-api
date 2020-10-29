@@ -50,7 +50,7 @@ export class RoleController implements CrudController<Role> {
     @ParsedBody() dto: Role,
     @CurrentUser() user: TJwtPayload
   ): Promise<Role> {
-    await this.service.authAdmin(dto, user);
+    await this.service.authAdmin(user);
     await this.service.mapRelationKeysToEntities(dto);
     return this.base.createOneBase(req, dto);
   };
@@ -63,7 +63,7 @@ export class RoleController implements CrudController<Role> {
     @ParsedBody() dto: Role,
     @CurrentUser() user: TJwtPayload
   ): Promise<Role> {
-    await this.service.authAdmin(dto, user);
+    await this.service.authAdmin(user);
     await this.service.mapRelationKeysToEntities(dto);
     return this.base.updateOneBase(req, dto);
   };

@@ -4,7 +4,7 @@ import {
   Crud, CrudController, Feature, Action,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {Service, User} from "src/common/entity";
+import {Service} from "src/common/entity";
 import {ServiceService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
@@ -102,7 +102,7 @@ export class ServiceController implements CrudController<Service> {
   @GrantAccess()
   restoreService(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: User
+    @CurrentUser() user: TJwtPayload
   ) {
     return this.service.restore(id, user);
   }

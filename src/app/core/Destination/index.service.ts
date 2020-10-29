@@ -7,7 +7,7 @@ import {
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
-import {DEFAULT_ERROR, DestinationError} from "src/common/constants";
+import {CityError, DEFAULT_ERROR, DestinationError} from "src/common/constants";
 import {Lang} from "src/common/constants/lang";
 import {City, Destination, District} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
@@ -41,16 +41,6 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     dto.userId = user.userId;
   }
 
-  async authAdmin(dto: Destination, user: TJwtPayload) {
-    const currentUser = await this.userService.findByIdAndOnlyGetRole(user.userId);
-    if (this.userService.isNotAdmin(currentUser)) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.Forbidden,
-        ErrorCodeEnum.NOT_CREATE_ADMIN_USER
-      );
-    }
-  }
-
   public findByIds(ids: number[]) {
     return this.repository.findByIds(ids);
   }
@@ -58,21 +48,24 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
   public async mapRelationKeysToEntities(dto: Destination): Promise<Destination> {
     const citySlug = SlugHelper.slugifyUpperCaseAndRemoveDash(dto.cityName);
     const districtSlug = SlugHelper.slugifyUpperCaseAndRemoveDash(dto.districtName);
-
+    const diffCitySlug = `${citySlug}KHAC`;
     const city: City = await this.cityService.findOne({
       where: {
         slug: citySlug
       }
     });
 
-    if (!city) throw new BadRequestException("Not supported this city");
+    if (!city) throw new BadRequestException(
+      CityError.NotFound,
+      ErrorCodeEnum.NOT_FOUND
+    );
     const district: District = await this.districtService.findOne({
       where: {
         slug: districtSlug
       }
     }) || await this.districtService.findOne({
       where: {
-        slug: `${citySlug}KHAC`
+        slug: diffCitySlug
       }
     });
     dto.city = city;
@@ -87,11 +80,22 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
       },
       relations: ["user"]
     });
-    if (!record) throw new NotFoundException(DestinationError.NotFound)
+    if (!record) throw new NotFoundException(
+      DestinationError.NotFound,
+      ErrorCodeEnum.NOT_FOUND
+    )
     if (record.user.id === currentUser.userId) {
-      throw new ConflictException(DestinationError.ConflictRestore);
+      throw new ConflictException(
+        DestinationError.ConflictRestore,
+        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
+      );
     }
-    if (record.deletedAt === null) throw new ConflictException(DestinationError.ConflictRestore);
+    if (record.deletedAt === null) {
+      throw new ConflictException(
+        DestinationError.ConflictRestore,
+        ErrorCodeEnum.CONFLICT
+      );
+    }
     await this.repository.restore(record.id);
   }
 
@@ -110,7 +114,12 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     const record = await this.repository.findOne(id, {
       relations: ["user"]
     });
-    if (record.user.id !== currentUser.userId) throw new ForbiddenException();
+    if (record.user.id !== currentUser.userId) {
+      throw new ForbiddenException(
+        DEFAULT_ERROR.Forbidden,
+        ErrorCodeEnum.FORBIDDEN
+      );
+    }
     await this.repository.softDelete(record.id);
     return;
   }

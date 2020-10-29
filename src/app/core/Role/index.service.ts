@@ -20,7 +20,7 @@ export class RoleService extends TypeOrmCrudService<Role> {
     super(repository);
   }
 
-  async authAdmin(dto: Role, user: TJwtPayload) {
+  async authAdmin(user: TJwtPayload) {
     const currentUser = await this.userService.findByIdAndOnlyGetRole(user.userId);
     if (this.userService.isNotAdmin(currentUser)) {
       throw new ForbiddenException(

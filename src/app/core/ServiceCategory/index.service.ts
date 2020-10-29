@@ -30,7 +30,10 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
       },
       relations: ["user"]
     });
-    if (!record) throw new NotFoundException(DEFAULT_ERROR.NotFound)
+    if (!record) throw new NotFoundException(
+      DEFAULT_ERROR.NotFound,
+      ErrorCodeEnum.NOT_FOUND
+    )
     if (record.user.id === currentUser.userId) {
       throw new ConflictException(
         DEFAULT_ERROR.ConflictSelf,

@@ -8,7 +8,7 @@ import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {DEFAULT_ERROR, ServiceError} from "src/common/constants";
 import {Lang} from "src/common/constants/lang";
-import {Service, User} from "src/common/entity";
+import {Service} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
 import {TJwtPayload} from "src/common/type";
 import {FindOneOptions, IsNull, Not} from "typeorm";
@@ -41,17 +41,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     dto.userId = user.userId;
   }
 
-  async authAdmin(dto: Service, user: TJwtPayload) {
-    const currentUser = await this.userService.findByIdAndOnlyGetRole(user.userId);
-    if (this.userService.isNotAdmin(currentUser)) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.Forbidden,
-        ErrorCodeEnum.NOT_CREATE_ADMIN_USER
-      );
-    }
-  }
-
-  public async restore(id: number, currentUser: User) {
+  public async restore(id: number, currentUser: TJwtPayload) {
     const record = await this.repository.findOne(id, {
       where: {
         deletedAt: Not(IsNull())
@@ -60,10 +50,18 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       relations: ["user"]
     });
     if (!record) throw new NotFoundException(ServiceError.NotFound)
-    if (record.user.id === currentUser.id) {
-      throw new ConflictException(ServiceError.ConflictRestore);
+    if (record.user.id === currentUser.userId) {
+      throw new ConflictException(
+        ServiceError.ConflictRestore,
+        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
+      );
     }
-    if (record.deletedAt === null) throw new ConflictException(ServiceError.ConflictRestore);
+    if (record.deletedAt === null) {
+      throw new ConflictException(
+        ServiceError.ConflictRestore,
+        ErrorCodeEnum.CONFLICT
+      );
+    }
     await this.repository.restore(record.id);
   }
 

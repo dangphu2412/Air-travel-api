@@ -46,3 +46,7 @@ export const DestinationError = {
   ConflictRestore: "Your record has been restore",
   Unauthorized: "Your username or password is not right"
 }
+
+export const CityError = {
+  NotFound: "Not found this city"
+}
