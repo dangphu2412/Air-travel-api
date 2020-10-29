@@ -37,15 +37,6 @@ export class UserService extends TypeOrmCrudService<User> {
     return currentUser.id !== compareUser.id
   }
 
-  public isTokenExpired(user: User) {
-    if (!user.hasExpiredToken) {
-      throw new UnauthorizedException(
-        DEFAULT_ERROR.Unauthorized,
-        ErrorCodeEnum.IS_EXPIRED_TOKEN
-      )
-    }
-  }
-
   public findByEmail(email: string): Promise<User> {
     return this.repository.findOne({
       where: {

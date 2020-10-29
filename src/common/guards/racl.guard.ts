@@ -1,4 +1,7 @@
-import {Injectable, CanActivate, ExecutionContext, ForbiddenException} from "@nestjs/common";
+import {
+  Injectable, CanActivate, ExecutionContext,
+  ForbiddenException, UnauthorizedException
+} from "@nestjs/common";
 import {Reflector} from "@nestjs/core";
 import {getFeature, getAction} from "@nestjsx/crud";
 import {RaclHelper} from "src/database/seed-development/seed-helper/racl.helper";
@@ -32,6 +35,7 @@ export class RolesGuard implements CanActivate {
 
     const requiredPermission: string = (new RaclHelper()).createPermission(feature, action);
     this.assignUserToRequest(request, user);
+    this.validateTokenExpired(user);
     return this.matchRacls(requiredPermission, permissions);
   }
 
@@ -60,5 +64,14 @@ export class RolesGuard implements CanActivate {
 
   private assignUserToRequest(request: any, user: User) {
     request.user = user;
+  }
+
+  private validateTokenExpired(user: User) {
+    if (!user.hasExpiredToken) {
+      throw new UnauthorizedException(
+        DEFAULT_ERROR.Unauthorized,
+        ErrorCodeEnum.IS_EXPIRED_TOKEN
+      )
+    }
   }
 }
