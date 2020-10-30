@@ -1,21 +1,21 @@
-import {DEFAULT_ERROR} from "src/common/constants";
-import {ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
+import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {ServiceCategory, User} from "src/common/entity";
 import {ServiceCategoryRepository} from "./index.repository";
 import {FindOneOptions, IsNull, Not} from "typeorm";
-import {ErrorCodeEnum} from "src/common/enums";
 import {CrudRequest} from "@nestjsx/crud";
 import {Lang} from "src/common/constants/lang";
 import {UserService} from "../User/index.service";
+import {BaseService} from "src/app/base/base.service";
 
 @Injectable()
 export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> {
   constructor(
     @InjectRepository(ServiceCategory)
     private repository: ServiceCategoryRepository,
-    private userService: UserService
+    private userService: UserService,
+    private baseService: BaseService
   ) {
     super(repository);
   }
@@ -25,30 +25,16 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
   }
 
   public async restore(id: number, currentUser: User) {
-    const record = await this.repository.findOne(id, {
-      where: {
-        deletedAt: Not(IsNull())
-      },
-      relations: ["user", "user.role"]
-    });
-    if (!record) throw new NotFoundException(
-      DEFAULT_ERROR.NotFound,
-      ErrorCodeEnum.NOT_FOUND
-    )
-    const {user} = record;
-    if (this.userService.isNotAdmin(user)
-    && this.userService.isNotAuthor(user, currentUser)
-    ) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.ConflictSelf,
-        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
+    const record = await this
+      .baseService
+      .findByIdSoftDeletedAndThrowErr<ServiceCategory>(
+        this.repository,
+        id
       );
-    }
-    if (record.deletedAt === null) throw new ConflictException(
-      DEFAULT_ERROR.ConflictRestore,
-      ErrorCodeEnum.CONFLICT
-    );
-    await this.repository.restore(record.id);
+    const {user} = record;
+    this.baseService.isNotAdminAndAuthorAndThrowErr(user, currentUser);
+    this.baseService.isNotSoftDeletedAndThrowErr(record);
+    return this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
@@ -63,18 +49,14 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
   }
 
   public async softDelete(id: number, currentUser: User): Promise<void> {
-    const record = await this.repository.findOne(id, {
-      relations: ["user"]
-    });
-    const {user} = record;
-    if (this.userService.isNotAdmin(currentUser)
-    && this.userService.isNotAuthor(user, currentUser)
-    ) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.ConflictSelf,
-        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
+    const record = await this
+      .baseService
+      .findWithRelationUserThrowErr(
+        this.repository,
+        id
       );
-    }
+    const {user} = record;
+    this.baseService.isNotAdminAndAuthor(user, currentUser);
     await this.repository.softDelete(record.id);
     return;
   }
