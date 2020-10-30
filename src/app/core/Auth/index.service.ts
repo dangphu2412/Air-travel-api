@@ -2,7 +2,7 @@ import {TJwtPayload} from "../../../common/type";
 import {ConflictException, Injectable, UnauthorizedException} from "@nestjs/common";
 import {JwtService} from "@nestjs/jwt";
 import {User, Role} from "src/common/entity";
-import {IUserInfo, IUserLoginResponse} from "src/common/interface/t.jwtPayload";
+import {IUserInfo, IUserLoginResponse} from "src/common/interface/i.jwtPayload";
 import {UserService} from "../User/index.service";
 import {BcryptService} from "src/global/bcrypt";
 import {UserError} from "src/common/constants";

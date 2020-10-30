@@ -10,6 +10,7 @@ import {DestinationModule} from "./app/core/Destination/index.module";
 import {CityModule} from "./app/core/City/index.module";
 import {DistrictModule} from "./app/core/District/index.module";
 import {BaseModule} from "./app/base/index.module";
+import {MediaModule} from "./app/core/Media/index.module";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import {BaseModule} from "./app/base/index.module";
     DestinationModule,
     CityModule,
     DistrictModule,
+    MediaModule,
     TypeOrmModule.forRoot(typeOrmConfig)
   ]
 })

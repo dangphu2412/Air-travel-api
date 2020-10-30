@@ -4,7 +4,7 @@ import {CurrentUser, GrantAccess} from "src/common/decorators";
 import {LoginDto} from "src/common/dto/User";
 import {RegisterDto} from "src/common/dto/User/register.dto";
 import {User} from "src/common/entity";
-import {IUserLoginResponse} from "src/common/interface/t.jwtPayload";
+import {IUserLoginResponse} from "src/common/interface/i.jwtPayload";
 import {AuthService} from "./index.service";
 
 @ApiTags("Auth")
