@@ -1,7 +1,7 @@
 import {ApiTags} from "@nestjs/swagger";
 import {Controller} from "@nestjs/common";
 import {
-  Crud, CrudController, Feature, Action, Override, ParsedBody, ParsedRequest, CrudRequest
+  Crud, CrudController, Feature, Override, ParsedBody, ParsedRequest, CrudRequest
 } from "@nestjsx/crud";
 import {Provider, User} from "src/common/entity";
 import {ProviderService} from "./index.service";
@@ -16,14 +16,16 @@ import {ECrudAction, ECrudFeature} from "src/common/enums";
     exclude: ["createManyBase"],
     replaceOneBase: {
       decorators: [
-        Action(ECrudAction.REPLACE),
-        GrantAccess()
+        GrantAccess({
+          action: ECrudAction.REPLACE
+        })
       ]
     },
     deleteOneBase: {
       decorators: [
-        Action(ECrudAction.DELETE),
-        GrantAccess()
+        GrantAccess({
+          action: ECrudAction.DELETE
+        })
       ]
     }
   }
@@ -38,8 +40,9 @@ export class ProviderController implements CrudController<Provider> {
     return this;
   }
 
-  @Action(ECrudAction.CREATE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.CREATE
+  })
   @Override("createOneBase")
   createOneOverride(
     @ParsedRequest() req: CrudRequest,

@@ -1,7 +1,7 @@
 import {ApiTags} from "@nestjs/swagger";
 import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
 import {
-  Crud, CrudController, Feature, Action,
+  Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
 import {User} from "src/common/entity";
@@ -36,8 +36,9 @@ export class UserController implements CrudController<User> {
   }
 
   @Patch("/:id/restore")
-  @Action(ECrudAction.RESTORE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.RESTORE
+  })
   restoreUser(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User
@@ -52,8 +53,9 @@ export class UserController implements CrudController<User> {
   }
 
   @Delete("/:id")
-  @Action(ECrudAction.SOFT_DEL)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.SOFT_DEL
+  })
   softDelete(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User

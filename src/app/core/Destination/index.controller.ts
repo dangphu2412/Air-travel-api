@@ -1,7 +1,7 @@
 import {ApiTags} from "@nestjs/swagger";
 import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
 import {
-  Crud, CrudController, Feature, Action,
+  Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
 import {Destination, User} from "src/common/entity";
@@ -30,8 +30,9 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
     exclude: ["createManyBase", "replaceOneBase"],
     deleteOneBase: {
       decorators: [
-        Action(ECrudAction.DELETE),
-        GrantAccess()
+        GrantAccess({
+          action: ECrudAction.DELETE
+        })
       ]
     }
   }
@@ -47,8 +48,9 @@ export class DestinationController implements CrudController<Destination> {
   }
 
   @UseInterceptors(SqlInterceptor)
-  @Action(ECrudAction.CREATE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.CREATE
+  })
   @Override("createOneBase")
   async createOneOverride(
     @ParsedRequest() req: CrudRequest,
@@ -61,8 +63,9 @@ export class DestinationController implements CrudController<Destination> {
   };
 
   @UseInterceptors(SqlInterceptor)
-  @Action(ECrudAction.UPDATE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.UPDATE
+  })
   @Override("updateOneBase")
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
@@ -75,8 +78,9 @@ export class DestinationController implements CrudController<Destination> {
   };
 
   @Patch(":id/restore")
-  @Action(ECrudAction.RESTORE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.RESTORE
+  })
   restoreDestination(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User
@@ -92,8 +96,9 @@ export class DestinationController implements CrudController<Destination> {
 
   @Override("deleteOneBase")
   @Delete(":id")
-  @Action(ECrudAction.SOFT_DEL)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.SOFT_DEL
+  })
   softDelete(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() currentUser: User

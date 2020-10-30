@@ -1,7 +1,7 @@
 import {ApiTags} from "@nestjs/swagger";
 import {Controller, Delete, Get, Param, ParseIntPipe, Patch, UseInterceptors} from "@nestjs/common";
 import {
-  Action, Crud, CrudController, CrudRequest,
+  Crud, CrudController, CrudRequest,
   CrudRequestInterceptor,
   Feature, Override, ParsedBody, ParsedRequest
 } from "@nestjsx/crud";
@@ -17,10 +17,10 @@ import {ECrudAction, ECrudFeature} from "src/common/enums";
   routes: {
     exclude: ["replaceOneBase", "createManyBase"],
     getManyBase: {
-      decorators: [Action(ECrudAction.READ), GrantAccess()]
+      decorators: [GrantAccess({action: ECrudAction.READ})]
     },
     getOneBase: {
-      decorators: [Action(ECrudAction.READ), GrantAccess()]
+      decorators: [GrantAccess({action: ECrudAction.READ})]
     }
   },
   query: {
@@ -42,8 +42,9 @@ export class RoleController implements CrudController<Role> {
     return this;
   }
 
-  @Action(ECrudAction.CREATE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.CREATE
+  })
   @Override("createOneBase")
   async createOneOverride(
     @ParsedRequest() req: CrudRequest,
@@ -54,8 +55,9 @@ export class RoleController implements CrudController<Role> {
     return this.base.createOneBase(req, dto);
   };
 
-  @Action(ECrudAction.UPDATE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.UPDATE
+  })
   @Override("updateOneBase")
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
@@ -67,8 +69,7 @@ export class RoleController implements CrudController<Role> {
   };
 
   @Patch(":id/restore")
-  @Action(ECrudAction.RESTORE)
-  @GrantAccess()
+  @GrantAccess({action: ECrudAction.RESTORE})
   async restoreDestination(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User
@@ -84,8 +85,7 @@ export class RoleController implements CrudController<Role> {
 
   @Override("deleteOneBase")
   @Delete(":id")
-  @Action(ECrudAction.SOFT_DEL)
-  @GrantAccess()
+  @GrantAccess({action: ECrudAction.SOFT_DEL})
   async softDelete(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User

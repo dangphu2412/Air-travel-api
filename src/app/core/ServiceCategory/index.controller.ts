@@ -1,8 +1,8 @@
 import {ApiTags} from "@nestjs/swagger";
 import {Controller, Delete, Get, Param, ParseIntPipe, Patch, UseInterceptors} from "@nestjs/common";
 import {
-  Action,
-  Crud, CrudController, CrudRequest, CrudRequestInterceptor, Feature, Override, ParsedRequest
+  Crud, CrudController, CrudRequest, CrudRequestInterceptor,
+  Feature, Override, ParsedRequest
 } from "@nestjsx/crud";
 import {ServiceCategory, User} from "src/common/entity";
 import {ServiceCategoryService} from "./index.service";
@@ -19,22 +19,25 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
     exclude: ["createManyBase"],
     createOneBase: {
       decorators: [
-        Action(ECrudAction.CREATE),
-        GrantAccess()
+        GrantAccess({
+          action: ECrudAction.CREATE
+        })
       ],
       interceptors: [SqlInterceptor]
     },
     replaceOneBase: {
       decorators: [
-        Action(ECrudAction.REPLACE),
-        GrantAccess()
+        GrantAccess({
+          action: ECrudAction.REPLACE
+        })
       ],
       interceptors: [SqlInterceptor]
     },
     deleteOneBase: {
       decorators: [
-        Action(ECrudAction.DELETE),
-        GrantAccess()
+        GrantAccess({
+          action: ECrudAction.DELETE
+        })
       ]
     }
   },
@@ -53,8 +56,9 @@ export class ServiceCategoryController implements CrudController<ServiceCategory
   constructor(public service: ServiceCategoryService) {}
 
   @Patch(":id/restore")
-  @Action(ECrudAction.RESTORE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.RESTORE
+  })
   restoreDestination(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User
@@ -70,8 +74,9 @@ export class ServiceCategoryController implements CrudController<ServiceCategory
 
   @Override("deleteOneBase")
   @Delete(":id")
-  @Action(ECrudAction.SOFT_DEL)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.SOFT_DEL
+  })
   softDelete(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() currentUser: User

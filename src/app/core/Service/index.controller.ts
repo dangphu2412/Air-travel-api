@@ -1,7 +1,7 @@
 import {ApiOperation, ApiTags} from "@nestjs/swagger";
 import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
 import {
-  Crud, CrudController, Feature, Action,
+  Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
 import {Service, User} from "src/common/entity";
@@ -43,15 +43,17 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
     exclude: ["createManyBase"],
     replaceOneBase: {
       decorators: [
-        Action(ECrudAction.REPLACE),
-        GrantAccess()
+        GrantAccess({
+          action: ECrudAction.REPLACE
+        })
       ],
       interceptors: [SqlInterceptor]
     },
     deleteOneBase: {
       decorators: [
-        Action(ECrudAction.DELETE),
-        GrantAccess()
+        GrantAccess({
+          action: ECrudAction.DELETE
+        })
       ]
     }
   }
@@ -67,8 +69,9 @@ export class ServiceController implements CrudController<Service> {
   }
 
   @UseInterceptors(SqlInterceptor)
-  @Action(ECrudAction.CREATE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.CREATE
+  })
   @Override("createOneBase")
   async createOneOverride(
     @ParsedRequest() req: CrudRequest,
@@ -80,8 +83,9 @@ export class ServiceController implements CrudController<Service> {
     return this.base.createOneBase(req, dto);
   };
 
-  @Action(ECrudAction.UPDATE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.UPDATE
+  })
   @Override("updateOneBase")
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
@@ -97,8 +101,9 @@ export class ServiceController implements CrudController<Service> {
     description: "Restore one record"
   })
   @Patch(":id/restore")
-  @Action(ECrudAction.RESTORE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.RESTORE
+  })
   restoreService(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User
@@ -111,8 +116,9 @@ export class ServiceController implements CrudController<Service> {
   })
   @UseInterceptors(CrudRequestInterceptor)
   @Get("trashed")
-  @Action(ECrudAction.READ)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.READ
+  })
   getDeleted(@ParsedRequest() req: CrudRequest) {
     return this.service.getDeleted(req);
   }
@@ -121,8 +127,9 @@ export class ServiceController implements CrudController<Service> {
     description: "Soft delete one record"
   })
   @Override("deleteOneBase")
-  @Action(ECrudAction.SOFT_DEL)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.SOFT_DEL
+  })
   softDelete(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() currentUser: User
@@ -134,8 +141,9 @@ export class ServiceController implements CrudController<Service> {
     description: "Permanently delete one record"
   })
   @Delete(":id/permanently")
-  @Action(ECrudAction.DELETE)
-  @GrantAccess()
+  @GrantAccess({
+    action: ECrudAction.DELETE
+  })
   hardDelete(
     @ParsedRequest() req: CrudRequest,
   ) {
