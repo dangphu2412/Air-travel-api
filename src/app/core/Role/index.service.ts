@@ -1,7 +1,8 @@
-import {ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
+import {ForbiddenException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
+import {BaseService} from "src/app/base/base.service";
 import {DEFAULT_ERROR} from "src/common/constants";
 import {Permission, Role, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
@@ -16,7 +17,8 @@ export class RoleService extends TypeOrmCrudService<Role> {
     @InjectRepository(Role)
     private repository: RoleRepository,
     private permissionService: PermissionService,
-    private userService: UserService
+    private userService: UserService,
+    private baseService: BaseService
   ) {
     super(repository);
   }
@@ -41,27 +43,17 @@ export class RoleService extends TypeOrmCrudService<Role> {
         ErrorCodeEnum.FORBIDDEN
       )
     }
-    const record = await this.repository.findOne(id, {
-      where: {
-        deletedAt: Not(IsNull())
-      },
-      withDeleted: true,
-      relations: ["users"]
-    });
-    if (!record) throw new NotFoundException(
-      DEFAULT_ERROR.NotFound,
-      ErrorCodeEnum.NOT_FOUND
-    )
-    if (record.deletedAt === null) {
-      throw new ConflictException(
-        DEFAULT_ERROR.ConflictRestore,
-        ErrorCodeEnum.CONFLICT
+    const record = await this
+      .baseService
+      .findByIdSoftDeletedAndThrowErr(
+        this.repository,
+        id
       );
-    }
+    this.baseService.isNotSoftDeletedAndThrowErr(record);
     if (record.users) {
       await this.syncUserToUpdatePermission(record.users);
     }
-    await this.repository.restore(record.id);
+    return this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
@@ -82,15 +74,12 @@ export class RoleService extends TypeOrmCrudService<Role> {
         ErrorCodeEnum.FORBIDDEN
       )
     }
-    const record = await this.repository.findOne(id, {
-      relations: ["users"]
-    });
-    if (!record) {
-      throw new NotFoundException(
-        DEFAULT_ERROR.NotFound,
-        ErrorCodeEnum.NOT_FOUND
-      )
-    }
+    const record = await this
+      .baseService
+      .findWithRelationUserThrowErr(
+        this.repository,
+        id
+      );
     if (record.users) {
       await this.syncUserToUpdatePermission(record.users);
     }

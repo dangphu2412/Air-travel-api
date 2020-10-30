@@ -9,11 +9,14 @@ import {PermissionModule} from "../Permission/index.module";
 import {UserRepository} from "../User/index.repository";
 import {UserModule} from "../User/index.module";
 import {UserService} from "../User/index.service";
+import {BaseModule} from "src/app/base/index.module";
+import {BaseService} from "src/app/base/base.service";
 
 @Module({
   imports: [
     UserModule,
     PermissionModule,
+    BaseModule,
     TypeOrmModule.forFeature(
       [
         RoleRepository,
@@ -22,6 +25,9 @@ import {UserService} from "../User/index.service";
       ])
   ],
   controllers: [RoleController],
-  providers: [RoleService, PermissionService, UserService]
+  providers: [
+    RoleService, PermissionService,
+    UserService, BaseService
+  ]
 })
 export class RoleModule {}
