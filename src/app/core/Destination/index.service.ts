@@ -1,13 +1,12 @@
 import {
   BadRequestException,
-  ConflictException,
-  ForbiddenException,
-  Injectable, InternalServerErrorException, NotFoundException
+  Injectable
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
-import {CityError, DEFAULT_ERROR, DestinationError} from "src/common/constants";
+import {BaseService} from "src/app/base/base.service";
+import {CityError} from "src/common/constants";
 import {Lang} from "src/common/constants/lang";
 import {City, Destination, District, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
@@ -15,7 +14,6 @@ import {SlugHelper} from "src/global/slugify";
 import {FindOneOptions, IsNull, Not} from "typeorm";
 import {CityService} from "../City/index.service";
 import {DistrictService} from "../District/index.service";
-import {UserService} from "../User/index.service";
 import {DestinationRepository} from "./index.repository";
 
 @Injectable()
@@ -23,21 +21,15 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
   constructor(
     @InjectRepository(Destination)
     private repository: DestinationRepository,
+    private baseService: BaseService,
     private readonly cityService: CityService,
-    private readonly districtService: DistrictService,
-    private readonly userService: UserService
+    private readonly districtService: DistrictService
   ) {
     super(repository);
   }
 
   getUserId(dto: Destination, user: User) {
-    if (!user.id) {
-      throw new InternalServerErrorException(
-        DEFAULT_ERROR.InternalSignJwt,
-        ErrorCodeEnum.INTERNAL_SERVER_ERROR
-      )
-    }
-    dto.userId = user.id;
+    return this.baseService.fillUserIdToDto(dto, user);
   }
 
   public findByIds(ids: number[]) {
@@ -73,31 +65,15 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
   }
 
   public async restore(id: number, currentUser: User) {
-    const record = await this.repository.findOne(id, {
-      where: {
-        deletedAt: Not(IsNull())
-      },
-      relations: ["user"]
-    });
+    const record = await this
+      .baseService
+      .findByIdSoftDeletedAndThrowErr<Destination>(
+        this.repository,
+        id
+      );
     const {user} = record;
-    if (!record) throw new NotFoundException(
-      DestinationError.NotFound,
-      ErrorCodeEnum.NOT_FOUND
-    )
-    if (this.userService.isNotAdmin(currentUser)
-    && this.userService.isNotAuthor(user, currentUser)
-    ) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.ConflictSelf,
-        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
-      );
-    }
-    if (record.deletedAt === null) {
-      throw new ConflictException(
-        DestinationError.ConflictRestore,
-        ErrorCodeEnum.CONFLICT
-      );
-    }
+    this.baseService.isNotAdminAndAuthorAndThrowErr(user, currentUser);
+    this.baseService.isNotSoftDeletedAndThrowErr(record);
     await this.repository.restore(record.id);
   }
 
@@ -113,18 +89,11 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
   }
 
   public async softDelete(id: number, currentUser: User): Promise<void> {
-    const record = await this.repository.findOne(id, {
-      relations: ["user"]
-    });
+    const record = await this
+      .baseService
+      .findWithRelationUser(this.repository, id);
     const {user} = record;
-    if (this.userService.isNotAdmin(currentUser)
-    && this.userService.isNotAuthor(user, currentUser)
-    ) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.ConflictSelf,
-        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
-      );
-    }
+    this.baseService.isNotAdminAndAuthorAndThrowErr(user, currentUser);
     await this.repository.softDelete(record.id);
     return;
   }
