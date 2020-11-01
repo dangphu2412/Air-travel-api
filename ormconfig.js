@@ -1,4 +1,4 @@
-const seedingFolderName = process.env.NODE_ENV ? `seed-${process.env.NODE_ENV}` : "seed-development";
+const seedingFolderName = "seed-development";
 module.exports = [
   {
     "name": "default",
