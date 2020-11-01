@@ -133,7 +133,7 @@ export class UserService extends TypeOrmCrudService<User> {
   public getProfile(user: User): Promise<User> {
     const {id} = user;
     return this.repository.findOne(id, {
-      relations: ["role"],
+      relations: ["role", "role.permissions"],
       select: [
         "id", "fullName", "email", "avatar", "bio",
         "birthday", "gender", "note", "status",

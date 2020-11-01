@@ -2,7 +2,7 @@ import {ApiOperation, ApiTags} from "@nestjs/swagger";
 import {Controller, Get, Param, ParseIntPipe, Patch, UseInterceptors} from "@nestjs/common";
 import {
   Crud, CrudController, CrudRequest, CrudRequestInterceptor,
-  Feature, Override, ParsedRequest
+  Feature, Override, ParsedBody, ParsedRequest
 } from "@nestjsx/crud";
 import {ServiceCategory, User} from "src/common/entity";
 import {ServiceCategoryService} from "./index.service";
@@ -57,6 +57,40 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 @Controller("service_categories")
 export class ServiceCategoryController implements CrudController<ServiceCategory> {
   constructor(public service: ServiceCategoryService) {}
+
+  get base(): CrudController<ServiceCategory> {
+    return this;
+  }
+
+  @UseInterceptors(SqlInterceptor)
+  @GrantAccess({
+    action: ECrudAction.CREATE
+  })
+  @Override("createOneBase")
+  async createOneOverride(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: ServiceCategory,
+    @CurrentUser() user: User
+  ): Promise<ServiceCategory> {
+    this.service.getUserId(dto, user);
+    await this.service.mapRelationKeysToEntities(dto);
+    return this.base.createOneBase(req, dto);
+  };
+
+  @UseInterceptors(SqlInterceptor)
+  @GrantAccess({
+    action: ECrudAction.UPDATE
+  })
+  @Override("updateOneBase")
+  async updateOneOverride(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: ServiceCategory,
+    @CurrentUser() user: User
+  ): Promise<ServiceCategory> {
+    this.service.getUserId(dto, user);
+    return this.base.updateOneBase(req, dto);
+  };
+
 
   @ApiOperation({
     summary: "Restore one"

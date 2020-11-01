@@ -20,6 +20,15 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
     super(repository);
   }
 
+  public getUserId(dto: any, user: User) {
+    return this.baseService.fillUserIdToDto(dto, user);
+  }
+
+  public async mapRelationKeysToEntities(dto: ServiceCategory) {
+    dto.parent = await this.repository.findOne(dto.parentId);
+    return dto;
+  }
+
   public findByIds(ids: number[]) {
     return this.repository.findByIds(ids);
   }

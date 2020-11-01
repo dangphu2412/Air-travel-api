@@ -1,6 +1,5 @@
 import {ServiceCategory, User} from "../../../common/entity";
 import {CsvHelper} from "../../../utils/csv";
-import * as faker from "faker";
 import {SlugHelper} from "../../../global/slugify";
 export class ServiceCategoryHelper {
   private _csvHelper: CsvHelper;
@@ -16,8 +15,6 @@ export class ServiceCategoryHelper {
       const dto = new ServiceCategory();
       dto.enName = item.enName || null;
       dto.viName = item.viName || null;
-      dto.enDescription = item.enDescription || faker.lorem.paragraphs(1);
-      dto.viDescription = item.viDescription || faker.lorem.paragraphs(1);
       dto.enSlug = SlugHelper.slugifyWithDateTime(item.enName);
       dto.viSlug = SlugHelper.slugifyWithDateTime(item.viName);
       dto.user = await User.findOne(item.userId) || null;
@@ -28,8 +25,6 @@ export class ServiceCategoryHelper {
         const dto = new ServiceCategory();
         dto.enName = item.enName || null;
         dto.viName = item.viName || null;
-        dto.enDescription = item.enDescription || faker.lorem.paragraphs(1);
-        dto.viDescription = item.viDescription || faker.lorem.paragraphs(1);
         dto.enSlug = SlugHelper.slugifyWithDateTime(item.enName);
         dto.viSlug = SlugHelper.slugifyWithDateTime(item.viName);
         dto.parent = await ServiceCategory.findOne(item.parentId) || null;

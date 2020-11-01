@@ -65,18 +65,6 @@ export class ServiceCategory extends BaseActionDate {
   @Column()
   viSlug: string;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  @Column({nullable: true})
-  enDescription: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  @Column({nullable: true})
-  viDescription: string;
-
   /**
    * Self Relations
    */
@@ -95,10 +83,6 @@ export class ServiceCategory extends BaseActionDate {
   @ApiProperty()
   @IsNumber()
   parentId: number | string;
-
-  @ApiProperty()
-  @IsNumber()
-  childrenId: number | string;
 
   /**
    * Relations
