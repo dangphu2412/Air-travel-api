@@ -1,7 +1,7 @@
 import {
   hashSync,
   compareSync
-} from "bcrypt";
+} from "bcryptjs";
 import {bcryptConfig} from "../config";
 
 class Service {
