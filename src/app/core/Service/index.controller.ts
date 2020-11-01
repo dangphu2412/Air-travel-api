@@ -83,6 +83,7 @@ export class ServiceController implements CrudController<Service> {
     return this.base.createOneBase(req, dto);
   };
 
+  @UseInterceptors(SqlInterceptor)
   @GrantAccess({
     action: ECrudAction.UPDATE
   })
@@ -112,7 +113,7 @@ export class ServiceController implements CrudController<Service> {
   }
 
   @ApiOperation({
-    description: "Get trashed records with crud fitler"
+    summary: "Get trashed records with crud fitler"
   })
   @UseInterceptors(CrudRequestInterceptor)
   @Get("trashed")
@@ -124,7 +125,7 @@ export class ServiceController implements CrudController<Service> {
   }
 
   @ApiOperation({
-    description: "Soft delete one record"
+    summary: "Soft delete one record"
   })
   @Override("deleteOneBase")
   @GrantAccess({
@@ -138,7 +139,7 @@ export class ServiceController implements CrudController<Service> {
   }
 
   @ApiOperation({
-    description: "Permanently delete one record"
+    summary: "Permanently delete one record"
   })
   @Delete(":id/permanently")
   @GrantAccess({
@@ -151,7 +152,7 @@ export class ServiceController implements CrudController<Service> {
   }
 
   @ApiOperation({
-    description: "Get one record by english slug"
+    summary: "Get one record by english slug"
   })
   @Get("enslug-:slug")
   getEnglishSlug(
@@ -161,7 +162,7 @@ export class ServiceController implements CrudController<Service> {
   }
 
   @ApiOperation({
-    description: "Get one record by vietnam slug"
+    summary: "Get one record by vietnam slug"
   })
   @Get("vislug-:slug")
   getVnSlug(

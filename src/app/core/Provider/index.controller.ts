@@ -1,5 +1,5 @@
 import {ApiTags} from "@nestjs/swagger";
-import {Controller} from "@nestjs/common";
+import {Controller, UseInterceptors} from "@nestjs/common";
 import {
   Crud, CrudController, Feature, Override, ParsedBody, ParsedRequest, CrudRequest
 } from "@nestjsx/crud";
@@ -7,6 +7,7 @@ import {Provider, User} from "src/common/entity";
 import {ProviderService} from "./index.service";
 import {CurrentUser, GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
+import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 @Crud({
   model: {
@@ -43,6 +44,7 @@ export class ProviderController implements CrudController<Provider> {
   @GrantAccess({
     action: ECrudAction.CREATE
   })
+  @UseInterceptors(SqlInterceptor)
   @Override("createOneBase")
   createOneOverride(
     @ParsedRequest() req: CrudRequest,

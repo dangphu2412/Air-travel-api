@@ -1,5 +1,5 @@
-import {ApiTags} from "@nestjs/swagger";
-import {Controller, Delete, Get, Param, ParseIntPipe, Patch, UseInterceptors} from "@nestjs/common";
+import {ApiOperation, ApiTags} from "@nestjs/swagger";
+import {Controller, Get, Param, ParseIntPipe, Patch, UseInterceptors} from "@nestjs/common";
 import {
   Crud, CrudController, CrudRequest, CrudRequestInterceptor,
   Feature, Override, ParsedRequest
@@ -45,6 +45,9 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
     join: {
       user: {
         allow: ["id", "fullName", "avatar"]
+      },
+      children: {
+        eager: true
       }
     }
   }
@@ -55,6 +58,9 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 export class ServiceCategoryController implements CrudController<ServiceCategory> {
   constructor(public service: ServiceCategoryService) {}
 
+  @ApiOperation({
+    summary: "Restore one"
+  })
   @Patch(":id/restore")
   @GrantAccess({
     action: ECrudAction.RESTORE
@@ -66,14 +72,19 @@ export class ServiceCategoryController implements CrudController<ServiceCategory
     return this.service.restore(id, user);
   }
 
+  @ApiOperation({
+    summary: "Get trashed"
+  })
   @UseInterceptors(CrudRequestInterceptor)
   @Get("trashed")
   getDeleted(@ParsedRequest() req: CrudRequest) {
     return this.service.getDeleted(req);
   }
 
+  @ApiOperation({
+    summary: "Delete softly"
+  })
   @Override("deleteOneBase")
-  @Delete(":id")
   @GrantAccess({
     action: ECrudAction.SOFT_DEL
   })

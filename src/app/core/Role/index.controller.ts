@@ -9,6 +9,7 @@ import {RoleService} from "./index.service";
 import {Role, User} from "src/common/entity";
 import {CurrentUser, GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
+import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 @Crud({
   model: {
@@ -45,6 +46,7 @@ export class RoleController implements CrudController<Role> {
   @GrantAccess({
     action: ECrudAction.CREATE
   })
+  @UseInterceptors(SqlInterceptor)
   @Override("createOneBase")
   async createOneOverride(
     @ParsedRequest() req: CrudRequest,
@@ -58,6 +60,7 @@ export class RoleController implements CrudController<Role> {
   @GrantAccess({
     action: ECrudAction.UPDATE
   })
+  @UseInterceptors(SqlInterceptor)
   @Override("updateOneBase")
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,

@@ -1,6 +1,5 @@
 <code>
-@Action(ECrudAction.CREATE)
-@GrantAccess()
+@GrantAccess(ECrudAction.CREATE)
 @Override("createOneBase")
 async createOneOverride(
   @ParsedRequest() req: CrudRequest,
@@ -12,8 +11,7 @@ async createOneOverride(
   return this.base.createOneBase(req, dto);
 };
 
-@Action(ECrudAction.UPDATE)
-@GrantAccess()
+@GrantAccess(ECrudAction.UPDATE)
 @Override("updateOneBase")
 async updateOneOverride(
   @ParsedRequest() req: CrudRequest,
@@ -26,8 +24,7 @@ async updateOneOverride(
 };
 
 @Patch(":id/restore")
-@Action(ECrudAction.RESTORE)
-@GrantAccess()
+@GrantAccess(ECrudAction.RESTORE)
 async restoreDestination(
   @Param("id", ParseIntPipe) id: number,
   @CurrentUser() user: User
@@ -42,9 +39,7 @@ getDeleted(@ParsedRequest() req: CrudRequest) {
 }
 
 @Override("deleteOneBase")
-@Delete(":id")
-@Action(ECrudAction.SOFT_DEL)
-@GrantAccess()
+@GrantAccess(ECrudAction.SOFT_DEL)
 async softDelete(
   @Param("id", ParseIntPipe) id: number,
   @CurrentUser() user: User

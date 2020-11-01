@@ -3,6 +3,7 @@ import {INestApplication, Logger, ValidationPipe} from "@nestjs/common";
 import {SwaggerModule} from "@nestjs/swagger";
 import {swaggerConfig, swaggerDocumentOptions, swaggerSetupOptions} from "./swagger.config";
 import {HttpExceptionFilter} from "src/global/httpException.filter";
+import {TransformInterceptor} from "src/common/interceptors/transform.interceptor";
 
 export class BundleApp {
   private readonly app: INestApplication;
@@ -21,6 +22,7 @@ export class BundleApp {
     this.app.setGlobalPrefix("v1");
     this.app.useGlobalPipes(new ValidationPipe());
     this.app.useGlobalInterceptors(new TimeoutInterceptor());
+    this.app.useGlobalInterceptors(new TransformInterceptor());
     this.app.useGlobalFilters(new HttpExceptionFilter());
   }
 
