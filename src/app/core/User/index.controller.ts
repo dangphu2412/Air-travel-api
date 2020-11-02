@@ -16,10 +16,34 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
     type: User
   },
   query: {
-    exclude: ["password"]
+    exclude: ["password", "hasExpiredToken"],
+    join: {
+      "role": {
+        exclude: ["createdAt", "updatedAt", "deletedAt"],
+        eager: true
+      },
+      "role.permissions": {
+        exclude: ["createdAt", "updatedAt", "deletedAt"],
+        eager: true
+      }
+    }
   },
   routes: {
-    exclude: ["createManyBase", "replaceOneBase"]
+    exclude: ["createManyBase", "replaceOneBase"],
+    getManyBase: {
+      decorators: [
+        GrantAccess({
+          action: ECrudAction.READ
+        })
+      ]
+    },
+    getOneBase: {
+      decorators: [
+        GrantAccess({
+          action: ECrudAction.READ
+        })
+      ]
+    }
   }
 })
 @ApiTags("Users")
