@@ -1,46 +1,38 @@
-import {S3, config} from "aws-sdk";
+import AWS, {S3 as AwsS3} from "aws-sdk";
 import {Injectable} from "@nestjs/common";
 import {S3_CONFIG} from "src/common/constants";
-import {TS3Config} from "src/common/type/t.s3";
 
 @Injectable()
 export class S3Service {
-  private s3: S3;
+  public s3: AwsS3;
 
-  private timeout: number;
+  public bucket: string;
 
-  private bucketName: string;
+  public signedUrlExpireSeconds: number;
 
   constructor() {
-    this.s3 = new S3();
-    this.setS3Config();
-  }
-
-  private setS3Config() {
     const accessKeyId = S3_CONFIG.S3_ACCESS_KEY_ID;
     const secretAccessKey = S3_CONFIG.S3_SECRET_ACCESS_KEY;
     const region = S3_CONFIG.S3_REGION;
-    const timeout = S3_CONFIG.S3_SIGNED_URL_TIMEOUT;
-    const bucketName = S3_CONFIG.S3_BUCKET_NAME;
 
-    config.update({
+    AWS.config.update({
       accessKeyId,
       secretAccessKey,
       region
     });
+    this.s3 = new AWS.S3();
 
-    this.bucketName = bucketName;
-    this.timeout = timeout;
+    this.bucket = process.env.S3_BUCKET_NAME;
+    this.signedUrlExpireSeconds = parseInt(process.env.S3_SIGNED_URL_TIMEOUT, 10);
   }
 
-  getPresignedUrl(key: string, type: string) {
-    const config: TS3Config = {
-      Bucket: this.bucketName,
+  getPresignedUrl(key: string, type: string): string {
+    return this.s3.getSignedUrl("putObject", {
+      Bucket: process.env.S3_BUCKET_NAME,
       Key: key,
       ContentType: type,
       ACL: "public-read",
-      Expires: this.timeout
-    }
-    return this.s3.getSignedUrl("putObject", config);
+      Expires: this.signedUrlExpireSeconds
+    });
   }
 }

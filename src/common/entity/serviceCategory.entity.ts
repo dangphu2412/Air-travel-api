@@ -8,7 +8,8 @@ import {
   Unique,
   ManyToMany,
   ManyToOne,
-  JoinColumn
+  JoinColumn,
+  BeforeInsert
 } from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
 import {
@@ -23,6 +24,7 @@ import {IsRequired} from "../decorators/isRequired.decorator";
 import {Service} from "./service.entity";
 import {User} from "./user.entity";
 import {BaseActionDate} from "./base";
+import {SlugHelper} from "src/global/slugify";
 
 @Unique(["enSlug"])
 @Unique(["viSlug"])
@@ -64,6 +66,23 @@ export class ServiceCategory extends BaseActionDate {
   @IsString()
   @Column()
   viSlug: string;
+
+  /**
+   * Trigger
+   */
+  @BeforeInsert()
+  async beforeInsert() {
+    SlugHelper.slugifyColumns(this, [
+      {
+        name: "enSlug",
+        value: SlugHelper.slugify(this.enName)
+      },
+      {
+        name: "viSlug",
+        value: SlugHelper.slugify(this.viName)
+      }
+    ])
+  }
 
   /**
    * Self Relations

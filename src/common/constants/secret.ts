@@ -1,3 +1,7 @@
+import env from "dotenv";
+
+env.config();
+
 export const JWT_CONFIG = {
   SECRET: process.env.JWT_SECRET,
   EXPIRE: process.env.JWT_EXPIRES
