@@ -1,11 +1,19 @@
 import {ExtractJwt, Strategy} from "passport-jwt";
 import {PassportStrategy} from "@nestjs/passport";
-import {Injectable} from "@nestjs/common";
-import {JWT_CONFIG} from "../constants";
+import {Injectable, UnauthorizedException} from "@nestjs/common";
+import {DEFAULT_ERROR, JWT_CONFIG} from "../constants";
+import {CustomerService} from "src/app/core/Customer/index.service";
+import {UserService} from "src/app/core/User/index.service";
+import {TJwtPayload} from "../type";
+import {pickServiceToValidate} from "src/utils";
+import {ErrorCodeEnum} from "../enums";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(
+    private userService: UserService,
+    private customerService: CustomerService
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -13,7 +21,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
-    return payload;
+  async validate(payload: TJwtPayload) {
+    const {type, userId} = payload;
+    const service = pickServiceToValidate(type, this);
+    const user = await service.findOne({
+      where: {
+        id: userId
+      },
+      relations: ["role", "role.permissions"]
+    })
+    if (!user) throw new UnauthorizedException(
+      DEFAULT_ERROR.Unauthorized,
+      ErrorCodeEnum.UNAUTHORIZED
+    )
+    return user;
   }
 }

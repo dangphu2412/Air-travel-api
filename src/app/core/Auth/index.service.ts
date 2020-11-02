@@ -24,7 +24,7 @@ export class AuthService {
     return role.permissions.map(permission => permission.name);
   }
 
-  public getloginResponse(user: User): IUserLoginResponse {
+  public getloginResponse(user: User, type: TValidateUser): IUserLoginResponse {
     const info: IUserInfo = {
       email: user.email,
       avatar: user.avatar,
@@ -34,7 +34,8 @@ export class AuthService {
     }
     const payload: TJwtPayload = {
       userId: user.id,
-      permissions: this.getPermissions(user.role)
+      permissions: this.getPermissions(user.role),
+      type
     }
     const loginResponse: IUserLoginResponse = {
       token: this.jwtService.sign(payload),
@@ -64,7 +65,7 @@ export class AuthService {
     if (user.hasExpiredToken) {
       await this.turnoffUserExpired(user);
     }
-    return this.getloginResponse(user);
+    return this.getloginResponse(user, type);
   }
 
   public async register(dto: RegisterDto): Promise<IUserLoginResponse> {
@@ -80,7 +81,7 @@ export class AuthService {
     }
 
     const user = await service.createOneBase(dto);
-    return this.getloginResponse(user);
+    return this.getloginResponse(user, "CUSTOMER");
   }
 
   getProfile(user: User): Promise<User> {

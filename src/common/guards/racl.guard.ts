@@ -6,11 +6,8 @@ import {Reflector} from "@nestjs/core";
 import {getFeature, getAction} from "@nestjsx/crud";
 import {RaclHelper} from "src/database/seed-development/seed-helper/racl.helper";
 import {ErrorCodeEnum} from "../enums";
-import {TJwtPayload} from "../type";
 import {DEFAULT_ERROR} from "../constants";
 import {Permission} from "../entity";
-import {TValidateUser} from "../type/t.Validate";
-import {pickServiceToValidate} from "src/utils";
 import {UserService} from "src/app/core/User/index.service";
 
 @Injectable()
@@ -22,17 +19,9 @@ export class RolesGuard implements CanActivate {
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     // Get type auth from context
-    const type = this.reflector.get<TValidateUser>("type", context.getHandler());
     const request = context.switchToHttp().getRequest();
-    const payload: TJwtPayload = request.user;
+    const {user} = request;
 
-    const user = await pickServiceToValidate(type, this)
-      .findOne({
-        where: {
-          id: payload.userId
-        },
-        relations: ["role", "role.permissions"]
-      });
     const permissions : Permission[] = user.role.permissions;
 
     const handler = context.getHandler();
