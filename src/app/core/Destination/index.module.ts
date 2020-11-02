@@ -11,8 +11,8 @@ import {CityRepository} from "../City/index.repository";
 import {DistrictRepository} from "../District/index.repository";
 import {UserModule} from "../User/index.module";
 import {UserRepository} from "../User/index.repository";
-import {BaseModule} from "src/app/base/index.module";
 import {BaseService} from "src/app/base/base.service";
+import {BaseModule} from "src/app/base/base.module";
 
 @Module({
   imports: [

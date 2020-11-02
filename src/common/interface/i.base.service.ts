@@ -2,6 +2,7 @@ import {EntityId} from "typeorm/repository/EntityId"
 import {Repository, FindOneOptions, FindManyOptions} from "typeorm"
 import {User} from "../entity"
 import {CrudRequest} from "@nestjsx/crud"
+import {UserService} from "src/app/core/User/index.service"
 
 export interface IBaseService {
   // Find methods
@@ -24,8 +25,11 @@ export interface IBaseService {
   // Validate methods
   isNotSoftDeleted(record: any): boolean;
   isNotSoftDeletedAndThrowErr(record: any): void;
-  isNotAdminAndAuthor(currentUser: User, userBeCompared: User): boolean;
-  isNotAdminAndAuthorAndThrowErr(currentUser: User, userBeCompared: User): void;
+  isNotAdminAndAuthor(service: UserService, currentUser: User, userBeCompared: User): boolean;
+  isNotAdminAndAuthorAndThrowErr(
+    service: UserService, currentUser: User, userBeCompared: User
+  ): void;
+  isNotAdminAndThrowErr(user: User): void;
   // Fill methods
   fillUserIdToDto(dto: any, user: User): void;
 

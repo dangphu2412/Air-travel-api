@@ -1,7 +1,14 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {IsString} from "class-validator";
 
+// Register for customer
 export class RegisterDto {
+  @ApiProperty({
+    example: "phu dep trai"
+  })
+  @IsString()
+  public fullName: string;
+
   @ApiProperty({
     example: "admin@gmail.com"
   })

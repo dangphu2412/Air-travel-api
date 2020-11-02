@@ -4,7 +4,7 @@ import {
 } from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
 import {Permission} from "./permission.entity";
-import {User} from "./user.entity";
+import {User, Customer} from ".";
 import {BaseActionDate} from "./base";
 import {IsRequired} from "../decorators/isRequired.decorator";
 import {IsOptional, IsNumber} from "class-validator";
@@ -48,4 +48,8 @@ export class Role extends BaseActionDate {
     @ApiProperty({readOnly: true})
     @OneToMany(() => User, user => user.role)
     users: User[]
+
+    @ApiProperty({readOnly: true})
+    @OneToMany(() => Customer, customer => customer.role)
+    customers: Customer[]
 }

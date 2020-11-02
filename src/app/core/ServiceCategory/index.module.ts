@@ -6,8 +6,8 @@ import {ServiceCategoryRepository} from "./index.repository";
 import {UserRepository} from "../User/index.repository";
 import {UserModule} from "../User/index.module";
 import {UserService} from "../User/index.service";
-import {BaseModule} from "src/app/base/index.module";
 import {BaseService} from "src/app/base/base.service";
+import {BaseModule} from "src/app/base/base.module";
 
 @Module({
   imports: [

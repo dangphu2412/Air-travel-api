@@ -20,6 +20,11 @@ export const UserError = {
   Unauthorized: "Your username or password is not right"
 }
 
+export const CustomerError = {
+  ConflictExisted: "Your account has been existed",
+  Unauthorized: "Your username or password is not right"
+}
+
 export const RoleError = {
   NotFound: "Please delete first",
   ConflictSelf: "Not allow to delete your self",

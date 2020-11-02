@@ -1,14 +1,11 @@
-import {ForbiddenException, Injectable} from "@nestjs/common";
+import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
 import {BaseService} from "src/app/base/base.service";
-import {DEFAULT_ERROR} from "src/common/constants";
 import {Permission, Role, User} from "src/common/entity";
-import {ErrorCodeEnum} from "src/common/enums";
 import {Not, IsNull} from "typeorm";
 import {PermissionService} from "../Permission/index.service";
-import {UserService} from "../User/index.service";
 import {RoleRepository} from "./index.repository";
 
 @Injectable()
@@ -17,19 +14,13 @@ export class RoleService extends TypeOrmCrudService<Role> {
     @InjectRepository(Role)
     private repository: RoleRepository,
     private permissionService: PermissionService,
-    private userService: UserService,
     private baseService: BaseService
   ) {
     super(repository);
   }
 
   async mapRelationKeysToEntities(dto: Role, user: User): Promise<Role> {
-    if (this.userService.isNotAdmin(user)) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.Forbidden,
-        ErrorCodeEnum.FORBIDDEN
-      )
-    }
+    this.baseService.isNotAdminAndThrowErr(user);
     const {permissionIds} = dto;
     const permissions: Permission[] = await this.permissionService.findByIds(permissionIds);
     dto.permissions = permissions;
@@ -37,12 +28,7 @@ export class RoleService extends TypeOrmCrudService<Role> {
   }
 
   public async restore(id: number, user: User) {
-    if (this.userService.isNotAdmin(user)) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.Forbidden,
-        ErrorCodeEnum.FORBIDDEN
-      )
-    }
+    this.baseService.isNotAdminAndThrowErr(user);
     const record = await this
       .baseService
       .findByIdSoftDeletedAndThrowErr(
@@ -68,12 +54,7 @@ export class RoleService extends TypeOrmCrudService<Role> {
   }
 
   public async softDelete(id: number, user: User): Promise<void> {
-    if (this.userService.isNotAdmin(user)) {
-      throw new ForbiddenException(
-        DEFAULT_ERROR.Forbidden,
-        ErrorCodeEnum.FORBIDDEN
-      )
-    }
+    this.baseService.isNotAdminAndThrowErr(user);
     const record = await this
       .baseService
       .findWithRelationUserThrowErr(

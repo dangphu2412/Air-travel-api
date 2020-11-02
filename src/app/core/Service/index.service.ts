@@ -7,10 +7,11 @@ import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service
 import {BaseService} from "src/app/base/base.service";
 import {Lang} from "src/common/constants/lang";
 import {Service, User} from "src/common/entity";
-import {FindOneOptions, LessThanOrEqual} from "typeorm";
+import {FindOneOptions} from "typeorm";
 import {DestinationService} from "../Destination/index.service";
 import {ProviderService} from "../Provider/index.service";
 import {ServiceCategoryService} from "../ServiceCategory/index.service";
+import {UserService} from "../User/index.service";
 import {ServiceRepository} from "./index.repository";
 
 @Injectable()
@@ -21,7 +22,8 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     private baseService: BaseService,
     private providerService: ProviderService,
     private serviceCategoryService: ServiceCategoryService,
-    private destinationService: DestinationService
+    private destinationService: DestinationService,
+    private userService: UserService
   ) {
     super(repository);
   }
@@ -36,7 +38,10 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       .findByIdSoftDeletedAndThrowErr(this.repository, id);
     const {user} = record;
 
-    this.baseService.isNotAdminAndAuthorAndThrowErr(currentUser, user);
+    this.baseService.isNotAdminAndAuthorAndThrowErr(
+      this.userService,
+      currentUser, user
+    );
     this.baseService.isNotSoftDeletedAndThrowErr(record);
     await this.repository.restore(record.id);
   }
@@ -53,7 +58,10 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       .baseService
       .findWithRelationUserThrowErr(this.repository, id);
     const {user} = record;
-    this.baseService.isNotAdminAndAuthor(currentUser, user);
+    this.baseService.isNotAdminAndAuthor(
+      this.userService,
+      currentUser, user
+    );
     await this.repository.softDelete(record.id);
     return;
   }

@@ -6,8 +6,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {UserError} from "src/common/constants";
-import {RegisterDto} from "src/common/dto/User";
-import {User} from "src/common/entity";
+import {Role, User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
 import {FindOneOptions, In, IsNull, Not} from "typeorm";
 import {UserRepository} from "./index.repository";
@@ -19,6 +18,11 @@ export class UserService extends TypeOrmCrudService<User> {
     private repository: UserRepository
   ) {
     super(repository);
+  }
+
+  public async mapRelationKeysToEntities(dto: User): Promise<User> {
+    dto.role = await Role.getRepository().findOne(dto.roleId);
+    return dto;
   }
 
   public getCurrentUserFromEntities(users: User[], id: number): User {
@@ -53,15 +57,6 @@ export class UserService extends TypeOrmCrudService<User> {
       select: ["id"],
       relations: ["role"]
     })
-  }
-
-  public createOneBase(user: RegisterDto): Promise<User> {
-    return this.repository.create(
-      {
-        email: user.email,
-        password: user.password
-      }
-    ).save();
   }
 
   public async restore(id: number, currentUser: User) {

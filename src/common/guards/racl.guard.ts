@@ -8,8 +8,10 @@ import {RaclHelper} from "src/database/seed-development/seed-helper/racl.helper"
 import {ErrorCodeEnum} from "../enums";
 import {TJwtPayload} from "../type";
 import {DEFAULT_ERROR} from "../constants";
+import {Permission} from "../entity";
+import {TValidateUser} from "../type/t.Validate";
+import {pickServiceToValidate} from "src/utils";
 import {UserService} from "src/app/core/User/index.service";
-import {Permission, User} from "../entity";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -19,12 +21,18 @@ export class RolesGuard implements CanActivate {
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
+    // Get type auth from context
+    const type = this.reflector.get<TValidateUser>("type", context.getHandler());
     const request = context.switchToHttp().getRequest();
     const payload: TJwtPayload = request.user;
 
-    const user: User = await this.userService.findOne(payload.userId, {
-      relations: ["role", "role.permissions"]
-    });
+    const user = await pickServiceToValidate(type, this)
+      .findOne({
+        where: {
+          id: payload.userId
+        },
+        relations: ["role", "role.permissions"]
+      });
     const permissions : Permission[] = user.role.permissions;
 
     const handler = context.getHandler();
@@ -62,11 +70,11 @@ export class RolesGuard implements CanActivate {
     return currentPermissions.some(permission => permission.name === requiredPermission);
   }
 
-  private assignUserToRequest(request: any, user: User) {
+  private assignUserToRequest(request: any, user: any): void {
     request.user = user;
   }
 
-  private validateTokenExpired(user: User) {
+  private validateTokenExpired(user: any) {
     if (user.hasExpiredToken) {
       throw new UnauthorizedException(
         DEFAULT_ERROR.Unauthorized,

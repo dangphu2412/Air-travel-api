@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+import {IsNumber} from "class-validator";
 import {
   Entity, PrimaryGeneratedColumn, Column,
   ManyToOne, BeforeInsert, BeforeUpdate, OneToMany, Unique
@@ -10,7 +10,9 @@ import {BaseActionDate} from "./base";
 import {Destination, Media, Provider, Service, ServiceCategory} from ".";
 import {IsRequired} from "../decorators/isRequired.decorator";
 import {Exclude} from "class-transformer";
-import {IsMobilePhone, IsOptional, IsString, IsIn, IsDateString, IsBoolean, IsEmail} from "class-validator";
+import {
+  IsMobilePhone, IsOptional, IsString, IsIn,
+  IsDateString, IsBoolean, IsEmail} from "class-validator";
 import {enumToArray} from "../../utils";
 import {Gender, UserStatus} from "../enums";
 
@@ -49,11 +51,13 @@ export class User extends BaseActionDate {
     phone: string;
 
     @ApiProperty({
-      example: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU"
+      example: "https://encrypted-tbn0.gstatic.com/images?" +
+      "q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU"
     })
     @IsOptional()
     @IsString()
-    @Column({default: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU"})
+    @Column({default: "https://encrypted-tbn0.gstatic.com/images?" +
+    "q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU"})
     avatar: string;
 
     @ApiProperty({
@@ -115,6 +119,15 @@ export class User extends BaseActionDate {
     hashPwd() {
       this.password = BcryptService.hash(this.password);
     }
+
+    /**
+     * Key relations
+     */
+
+    @ApiProperty({writeOnly: true, type: () => Role})
+    @IsRequired()
+    @IsNumber()
+    roleId: number;
 
     /**
      * Relations

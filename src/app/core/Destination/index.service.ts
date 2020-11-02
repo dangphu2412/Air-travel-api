@@ -14,6 +14,7 @@ import {SlugHelper} from "src/global/slugify";
 import {FindOneOptions, IsNull, Not} from "typeorm";
 import {CityService} from "../City/index.service";
 import {DistrictService} from "../District/index.service";
+import {UserService} from "../User/index.service";
 import {DestinationRepository} from "./index.repository";
 
 @Injectable()
@@ -23,7 +24,8 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     private repository: DestinationRepository,
     private baseService: BaseService,
     private readonly cityService: CityService,
-    private readonly districtService: DistrictService
+    private readonly districtService: DistrictService,
+    private userService: UserService
   ) {
     super(repository);
   }
@@ -72,7 +74,10 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
         id
       );
     const {user} = record;
-    this.baseService.isNotAdminAndAuthorAndThrowErr(user, currentUser);
+    this.baseService.isNotAdminAndAuthorAndThrowErr(
+      this.userService,
+      user, currentUser
+    );
     this.baseService.isNotSoftDeletedAndThrowErr(record);
     await this.repository.restore(record.id);
   }
@@ -93,7 +98,10 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
       .baseService
       .findWithRelationUser(this.repository, id);
     const {user} = record;
-    this.baseService.isNotAdminAndAuthorAndThrowErr(user, currentUser);
+    this.baseService.isNotAdminAndAuthorAndThrowErr(
+      this.userService,
+      user, currentUser
+    );
     await this.repository.softDelete(record.id);
     return;
   }

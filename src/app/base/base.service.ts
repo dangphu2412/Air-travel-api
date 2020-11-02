@@ -6,17 +6,13 @@ import {
 import {IBaseService} from "src/common/interface/i.base.service";
 import {IsNull, Not, Repository, FindOneOptions, FindManyOptions} from "typeorm";
 import {EntityId} from "typeorm/repository/EntityId";
-import {ErrorCodeEnum} from "src/common/enums";
-import {UserService} from "../core/User/index.service";
+import {ERole, ErrorCodeEnum} from "src/common/enums";
 import {User} from "src/common/entity";
 import {CrudRequest} from "@nestjsx/crud";
+import {UserService} from "../core/User/index.service";
 
 @Injectable()
 export class BaseService implements IBaseService {
-  constructor(
-    private userService: UserService
-  ) {}
-
   findManySoftDeleted<T>(
     repository: Repository<T>,
     req: CrudRequest,
@@ -99,19 +95,37 @@ export class BaseService implements IBaseService {
     }
   }
 
-  isNotAdminAndAuthor(currentUser: User, userBeCompared: User): boolean {
-    return this.userService.isNotAdmin(currentUser)
-    && this.userService.isNotAuthor(currentUser, userBeCompared)
+  isNotAdminAndAuthor(
+    service: UserService,
+    currentUser: User,
+    userBeCompared: User
+  ): boolean {
+    return service.isNotAdmin(currentUser)
+    && service.isNotAuthor(currentUser, userBeCompared)
   }
 
-  isNotAdminAndAuthorAndThrowErr(currentUser: User, userBeCompared: User): void {
-    if (this.userService.isNotAdmin(currentUser)
-    && this.userService.isNotAuthor(currentUser, userBeCompared)
+  isNotAdminAndAuthorAndThrowErr(
+    service: UserService,
+    currentUser: User,
+    userBeCompared: User
+  ): void {
+    if (service.isNotAdmin(currentUser)
+    && service.isNotAuthor(currentUser, userBeCompared)
     ) {
       throw new ForbiddenException(
         DEFAULT_ERROR.ConflictSelf,
         ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
       );
+    }
+  }
+
+  isNotAdminAndThrowErr(user: User): void {
+    const {role} = user;
+    if (role.name === ERole.ADMIN) {
+      throw new ForbiddenException(
+        DEFAULT_ERROR.Forbidden,
+        ErrorCodeEnum.FORBIDDEN
+      )
     }
   }
 

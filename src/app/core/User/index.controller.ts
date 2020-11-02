@@ -9,7 +9,7 @@ import {UserService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
-import {RegisterDto} from "src/common/dto/User";
+import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 @Crud({
   model: {
@@ -28,12 +28,35 @@ import {RegisterDto} from "src/common/dto/User";
 export class UserController implements CrudController<User> {
   constructor(public service: UserService) {}
 
-  @Override()
-  createOne(
-    @ParsedBody() dto: RegisterDto,
-  ) {
-    return this.service.createOneBase(dto);
+  get base(): CrudController<User> {
+    return this;
   }
+
+  @UseInterceptors(SqlInterceptor)
+  @GrantAccess({
+    action: ECrudAction.CREATE
+  })
+  @Override("updateOneBase")
+  async createOneOverride(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: User,
+  ): Promise<User> {
+    await this.service.mapRelationKeysToEntities(dto);
+    return this.base.createOneBase(req, dto);
+  };
+
+  @UseInterceptors(SqlInterceptor)
+  @GrantAccess({
+    action: ECrudAction.UPDATE
+  })
+  @Override("updateOneBase")
+  async updateOneOverride(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: User,
+  ): Promise<User> {
+    await this.service.mapRelationKeysToEntities(dto);
+    return this.base.updateOneBase(req, dto);
+  };
 
   @Patch("/:id/restore")
   @GrantAccess({

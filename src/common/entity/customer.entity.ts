@@ -3,11 +3,11 @@ import {ApiProperty} from "@nestjs/swagger";
 import {
   Entity, PrimaryGeneratedColumn, Column,
   OneToMany, Unique, BeforeInsert, BeforeUpdate,
-  ManyToOne, JoinColumn
+  ManyToOne
 } from "typeorm";
 import {
   IsString, IsEmail, IsMobilePhone,
-  IsOptional, IsIn, IsDateString, IsBoolean
+  IsOptional, IsIn, IsDateString, IsBoolean, IsNumber
 } from "class-validator";
 
 import {Exclude} from "class-transformer";
@@ -131,22 +131,19 @@ export class Customer extends BaseActionDate {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    this.password = await BcryptService.hash(this.password);
+    this.password = BcryptService.hash(this.password);
   }
   /**
    * Relations
    */
 
-  @ApiProperty({readOnly: true, type: () => Role})
-  @Column({
-    default: 5
-  })
+  @ApiProperty({writeOnly: true, type: () => Role})
+  @IsRequired()
+  @IsNumber()
   roleId: number;
 
   @ApiProperty({readOnly: true, type: () => Role})
-  // @ManyToOne(() => Role, item => item.users, { eager: true, onDelete: 'CASCADE' })
-  @ManyToOne(() => Role, item => item.users, {eager: true})
-  @JoinColumn({name: "roleId"})
+  @ManyToOne(() => Role, item => item.users)
   role: Role;
 
   @ApiProperty({readOnly: true, type: () => Bill})

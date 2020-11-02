@@ -9,21 +9,25 @@ import {ServiceModule} from "./app/core/Service/index.module";
 import {DestinationModule} from "./app/core/Destination/index.module";
 import {CityModule} from "./app/core/City/index.module";
 import {DistrictModule} from "./app/core/District/index.module";
-import {BaseModule} from "./app/base/index.module";
 import {MediaModule} from "./app/core/Media/index.module";
+import {CustomerModule} from "./app/core/Customer/index.module";
+import {ServiceCategoryModule} from "./app/core/ServiceCategory/index.module";
+import {ProviderModule} from "./app/core/Provider/index.module";
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
-    BaseModule,
     RoleModule,
     PermissionModule,
     ServiceModule,
+    ServiceCategoryModule,
+    ProviderModule,
     DestinationModule,
     CityModule,
     DistrictModule,
     MediaModule,
+    CustomerModule,
     TypeOrmModule.forRoot(typeOrmConfig)
   ]
 })

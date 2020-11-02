@@ -15,12 +15,18 @@ export class AuthController {
   @Post("/login")
   @ApiBody({type: () => LoginDto})
   login(@Body() user: LoginDto): Promise<IUserLoginResponse> {
-    return this.service.login(user);
+    return this.service.login(user, "USER");
   }
 
-  @Post("/register")
+  @Post("/login/customer")
+  @ApiBody({type: () => LoginDto})
+  loginCustomer(@Body() user: LoginDto): Promise<IUserLoginResponse> {
+    return this.service.login(user, "CUSTOMER");
+  }
+
+  @Post("/register/customer")
   @ApiBody({type: () => RegisterDto})
-  register(@Body() dto: RegisterDto): Promise<IUserLoginResponse> {
+  registerCustomer(@Body() dto: RegisterDto): Promise<IUserLoginResponse> {
     return this.service.register(dto);
   }
 

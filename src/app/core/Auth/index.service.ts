@@ -5,22 +5,26 @@ import {User, Role} from "src/common/entity";
 import {IUserInfo, IUserLoginResponse} from "src/common/interface/i.jwtPayload";
 import {UserService} from "../User/index.service";
 import {BcryptService} from "src/global/bcrypt";
-import {UserError} from "src/common/constants";
+import {CustomerError, UserError} from "src/common/constants";
 import {LoginDto, RegisterDto} from "src/common/dto/User";
 import {ErrorCodeEnum} from "src/common/enums";
+import {CustomerService} from "../Customer/index.service";
+import {TValidateUser} from "src/common/type/t.Validate";
+import {pickServiceToValidate} from "src/utils";
 
 @Injectable()
 export class AuthService {
   constructor(
-    private service: UserService,
+    private userService: UserService,
+    private customerService: CustomerService,
     private jwtService: JwtService
   ) {}
 
-  private getPermissions(role: Role): string[] {
+  public getPermissions(role: Role): string[] {
     return role.permissions.map(permission => permission.name);
   }
 
-  private getloginResponse(user: User): IUserLoginResponse {
+  public getloginResponse(user: User): IUserLoginResponse {
     const info: IUserInfo = {
       email: user.email,
       avatar: user.avatar,
@@ -39,13 +43,13 @@ export class AuthService {
     return loginResponse;
   }
 
-  private turnoffUserExpired(user: User) {
+  public turnoffUserExpired(user: any) {
     user.hasExpiredToken = false;
     return user.save();
   }
 
-  async validateUser(email: string, pass: string): Promise<User> {
-    const user: User = await this.service.findByEmail(email);
+  public async validateUser(email: string, pass: string, type: TValidateUser): Promise<User> {
+    const user: User = await pickServiceToValidate(type, this).findByEmail(email);
     if (user && BcryptService.compare(pass, user.password)) {
       return user;
     }
@@ -55,30 +59,31 @@ export class AuthService {
     )
   }
 
-  async login(dto: LoginDto): Promise<IUserLoginResponse> {
-    const user: User = await this.validateUser(dto.email, dto.password);
+  public async login(dto: LoginDto, type: TValidateUser): Promise<IUserLoginResponse> {
+    const user = await this.validateUser(dto.email, dto.password, type);
     if (user.hasExpiredToken) {
       await this.turnoffUserExpired(user);
     }
     return this.getloginResponse(user);
   }
 
-  async register(dto: RegisterDto): Promise<IUserLoginResponse> {
+  public async register(dto: RegisterDto): Promise<IUserLoginResponse> {
     const {email} = dto;
-    const isExisted = await this.service.findByEmail(email);
+    const service = pickServiceToValidate("CUSTOMER", this);
+    const isExisted = await service.findByEmail(email);
 
     if (isExisted) {
       throw new ConflictException(
-        UserError.ConflictExisted,
+        CustomerError.ConflictExisted,
         ErrorCodeEnum.ALREADY_EXIST
       );
     }
 
-    const user = await this.service.createOneBase(dto);
+    const user = await service.createOneBase(dto);
     return this.getloginResponse(user);
   }
 
   getProfile(user: User): Promise<User> {
-    return this.service.getProfile(user);
+    return this.userService.getProfile(user);
   }
 }
