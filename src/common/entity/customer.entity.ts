@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import {ApiProperty} from "@nestjs/swagger";
 import {
   Entity, PrimaryGeneratedColumn, Column,
@@ -61,15 +60,22 @@ export class Customer extends BaseActionDate {
   })
   @IsRequired()
   @IsMobilePhone("vi-VN")
-  @Column()
+  @Column({
+    nullable: true
+  })
   phone: string;
 
   @ApiProperty({
-    example: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU"
+    example: "https://encrypted-tbn0.gstatic.com/images?" +
+    "q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU"
   })
   @IsOptional()
   @IsString()
-  @Column({default: "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU"})
+  @Column({
+    default: "https://encrypted-tbn0.gstatic.com/images?" +
+  "q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU",
+    nullable: true
+  })
   avatar: string;
 
   @ApiProperty({
@@ -79,7 +85,8 @@ export class Customer extends BaseActionDate {
   @IsIn(enumToArray(Gender))
   @Column({
     type: "enum",
-    enum: Gender
+    enum: Gender,
+    default: Gender.MALE
   })
   gender: string;
 
@@ -88,7 +95,9 @@ export class Customer extends BaseActionDate {
   })
   @IsRequired()
   @IsDateString()
-  @Column()
+  @Column({
+    nullable: true
+  })
   birthday: Date;
 
   @ApiProperty({
@@ -97,7 +106,9 @@ export class Customer extends BaseActionDate {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  @Column({nullable: true})
+  @Column({
+    nullable: true
+  })
   bio: string;
 
   @ApiProperty({
@@ -105,7 +116,9 @@ export class Customer extends BaseActionDate {
   })
   @IsOptional()
   @IsString()
-  @Column({nullable: true})
+  @Column({
+    nullable: true
+  })
   note: string;
 
   @ApiProperty({

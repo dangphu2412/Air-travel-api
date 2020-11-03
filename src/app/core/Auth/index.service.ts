@@ -21,7 +21,7 @@ export class AuthService {
   ) {}
 
   public getPermissions(role: Role): string[] {
-    return role.permissions.map(permission => permission.name);
+    return role?.permissions.map(permission => permission.name) || [];
   }
 
   public getloginResponse(user: User, type: TValidateUser): IUserLoginResponse {
@@ -72,14 +72,12 @@ export class AuthService {
     const {email} = dto;
     const service = pickServiceToValidate("CUSTOMER", this);
     const isExisted = await service.findByEmail(email);
-
     if (isExisted) {
       throw new ConflictException(
         CustomerError.ConflictExisted,
         ErrorCodeEnum.ALREADY_EXIST
       );
     }
-
     const user = await service.createOneBase(dto);
     return this.getloginResponse(user, "CUSTOMER");
   }
