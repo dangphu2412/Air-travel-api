@@ -8,13 +8,11 @@ import {RaclHelper} from "src/database/seed-development/seed-helper/racl.helper"
 import {ErrorCodeEnum} from "../enums";
 import {DEFAULT_ERROR} from "../constants";
 import {Permission} from "../entity";
-import {UserService} from "src/app/core/User/index.service";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private userService: UserService
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
