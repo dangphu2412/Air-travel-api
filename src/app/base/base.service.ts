@@ -29,13 +29,13 @@ export class BaseService implements IBaseService {
 
   findWithRelationUser<T>(repository: Repository<T>, id: number): Promise<T> {
     return repository.findOne(id, {
-      relations: ["user"]
+      relations: ["user", "user.role"]
     });
   }
 
   async findWithRelationUserThrowErr<T>(repository: Repository<T>, id: number): Promise<T> {
     const record = await repository.findOne(id, {
-      relations: ["user"]
+      relations: ["user", "user.role"]
     });
     if (!record) {
       throw new NotFoundException(

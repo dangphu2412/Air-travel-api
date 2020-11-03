@@ -7,7 +7,7 @@ import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service
 import {BaseService} from "src/app/base/base.service";
 import {Lang} from "src/common/constants/lang";
 import {Service, User} from "src/common/entity";
-import {FindOneOptions} from "typeorm";
+import {FindOneOptions, UpdateResult} from "typeorm";
 import {DestinationService} from "../Destination/index.service";
 import {ProviderService} from "../Provider/index.service";
 import {ServiceCategoryService} from "../ServiceCategory/index.service";
@@ -43,7 +43,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       currentUser, user
     );
     this.baseService.isNotSoftDeletedAndThrowErr(record);
-    await this.repository.restore(record.id);
+    return this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
@@ -53,7 +53,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     );
   }
 
-  public async softDelete(id: number, currentUser: User): Promise<void> {
+  public async softDelete(id: number, currentUser: User): Promise<UpdateResult> {
     const record = await this
       .baseService
       .findWithRelationUserThrowErr(this.repository, id);
@@ -62,8 +62,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       this.userService,
       currentUser, user
     );
-    await this.repository.softDelete(record.id);
-    return;
+    return this.repository.softDelete(record.id);
   }
 
   public getBySlugWithMutilpleLanguagues(value: string, lang: string) {

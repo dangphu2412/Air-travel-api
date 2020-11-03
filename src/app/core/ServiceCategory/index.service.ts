@@ -3,7 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {ServiceCategory, User} from "src/common/entity";
 import {ServiceCategoryRepository} from "./index.repository";
-import {FindOneOptions, IsNull, Not} from "typeorm";
+import {FindOneOptions, IsNull, Not, UpdateResult} from "typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {Lang} from "src/common/constants/lang";
 import {UserService} from "../User/index.service";
@@ -60,7 +60,7 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
     });
   }
 
-  public async softDelete(id: number, currentUser: User): Promise<void> {
+  public async softDelete(id: number, currentUser: User): Promise<UpdateResult> {
     const record = await this
       .baseService
       .findWithRelationUserThrowErr(
@@ -72,8 +72,7 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
       this.userService,
       user, currentUser
     );
-    await this.repository.softDelete(record.id);
-    return;
+    return this.repository.softDelete(record.id);
   }
 
   public getBySlugWithMutilpleLanguagues(value: string, lang: string) {

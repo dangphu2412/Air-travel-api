@@ -11,7 +11,7 @@ import {Lang} from "src/common/constants/lang";
 import {City, Destination, District, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
 import {SlugHelper} from "src/global/slugify";
-import {FindOneOptions, IsNull, Not} from "typeorm";
+import {FindOneOptions, IsNull, Not, UpdateResult} from "typeorm";
 import {CityService} from "../City/index.service";
 import {DistrictService} from "../District/index.service";
 import {UserService} from "../User/index.service";
@@ -79,7 +79,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
       user, currentUser
     );
     this.baseService.isNotSoftDeletedAndThrowErr(record);
-    await this.repository.restore(record.id);
+    return this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
@@ -93,7 +93,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     });
   }
 
-  public async softDelete(id: number, currentUser: User): Promise<void> {
+  public async softDelete(id: number, currentUser: User): Promise<UpdateResult> {
     const record = await this
       .baseService
       .findWithRelationUser(this.repository, id);
@@ -102,8 +102,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
       this.userService,
       user, currentUser
     );
-    await this.repository.softDelete(record.id);
-    return;
+    return this.repository.softDelete(record.id);
   }
 
   public getBySlugWithMutilpleLanguagues(value: string, lang: string) {
