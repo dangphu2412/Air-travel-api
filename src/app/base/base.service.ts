@@ -18,7 +18,7 @@ export class BaseService implements IBaseService {
     req: CrudRequest,
     options?: FindManyOptions): Promise<T[]> {
     return repository.find({
-      where: options ?? {
+      where: options?.where ?? {
         deletedAt: Not(IsNull())
       },
       withDeleted: true,
@@ -46,6 +46,20 @@ export class BaseService implements IBaseService {
     return record;
   }
 
+  async findChildsThrowErr<T>(repository: Repository<T>, id: number, options: FindManyOptions) {
+    const relations: string[] = ["children", ...options.relations];
+    const record = await repository.findOne(id, {
+      relations
+    });
+    if (!record) {
+      throw new NotFoundException(
+        DEFAULT_ERROR.NotFound,
+        ErrorCodeEnum.NOT_FOUND
+      )
+    }
+    return record;
+  }
+
   findByIdSoftDeleted<T>(
     repository: Repository<T>,
     id: EntityId,
@@ -56,7 +70,7 @@ export class BaseService implements IBaseService {
         deletedAt: Not(IsNull())
       },
       withDeleted: true,
-      relations: options.relations ?? ["user"]
+      relations: options?.relations ?? ["user", "user.role"]
     });
   }
 
@@ -70,7 +84,7 @@ export class BaseService implements IBaseService {
         deletedAt: Not(IsNull())
       },
       withDeleted: true,
-      relations: options.relations ?? ["user"]
+      relations: options?.relations ?? ["user", "user.role"]
     });
 
     if (!record) {

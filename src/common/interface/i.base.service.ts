@@ -21,6 +21,9 @@ export interface IBaseService {
     id: EntityId,
     options? :FindOneOptions
   ): Promise<T>;
+  findChildsThrowErr<T>(
+    repository: Repository<T>, id: number, options: FindManyOptions
+  ): Promise<T>;
 
   // Validate methods
   isNotSoftDeleted(record: any): boolean;

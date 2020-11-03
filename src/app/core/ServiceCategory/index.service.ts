@@ -8,6 +8,7 @@ import {CrudRequest} from "@nestjsx/crud";
 import {Lang} from "src/common/constants/lang";
 import {UserService} from "../User/index.service";
 import {BaseService} from "src/app/base/base.service";
+import {mapToIds} from "src/utils";
 
 @Injectable()
 export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> {
@@ -38,7 +39,10 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
       .baseService
       .findByIdSoftDeletedAndThrowErr<ServiceCategory>(
         this.repository,
-        id
+        id,
+        {
+          relations: ["children", "user", "user.role"]
+        }
       );
     const {user} = record;
     this.baseService.isNotAdminAndAuthorAndThrowErr(
@@ -46,7 +50,8 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
       user, currentUser
     );
     this.baseService.isNotSoftDeletedAndThrowErr(record);
-    return this.repository.restore(record.id);
+    const restoreIds = [...mapToIds(record.children), record.id];
+    return this.repository.restore(restoreIds);
   }
 
   public getDeleted(req: CrudRequest) {
@@ -63,16 +68,20 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
   public async softDelete(id: number, currentUser: User): Promise<UpdateResult> {
     const record = await this
       .baseService
-      .findWithRelationUserThrowErr(
+      .findChildsThrowErr(
         this.repository,
-        id
+        id,
+        {
+          relations: ["user", "user.role"]
+        }
       );
     const {user} = record;
     this.baseService.isNotAdminAndAuthor(
       this.userService,
       user, currentUser
     );
-    return this.repository.softDelete(record.id);
+    const softDeleteIds = [...mapToIds(record.children), record.id];
+    return this.repository.softDelete(softDeleteIds);
   }
 
   public getBySlugWithMutilpleLanguagues(value: string, lang: string) {
