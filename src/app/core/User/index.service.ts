@@ -8,7 +8,7 @@ import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service
 import {UserError} from "src/common/constants";
 import {Role, User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
-import {FindOneOptions, In, IsNull, Not} from "typeorm";
+import {FindOneOptions, In, IsNull, Not, UpdateResult} from "typeorm";
 import {UserRepository} from "./index.repository";
 
 @Injectable()
@@ -52,14 +52,7 @@ export class UserService extends TypeOrmCrudService<User> {
     })
   }
 
-  public findByIdAndOnlyGetRole(id: number) {
-    return this.repository.findOne(id, {
-      select: ["id"],
-      relations: ["role"]
-    })
-  }
-
-  public async restore(id: number, currentUser: User) {
+  public async restore(id: number, currentUser: User): Promise<UpdateResult> {
     const record = await this.repository.findOne(id, {
       where: {
         deletedAt: Not(IsNull())
@@ -77,7 +70,7 @@ export class UserService extends TypeOrmCrudService<User> {
         ErrorCodeEnum.ALREADY_EXIST
       );
     }
-    await this.repository.restore(record.id);
+    return this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
@@ -92,7 +85,7 @@ export class UserService extends TypeOrmCrudService<User> {
     });
   }
 
-  public async softDelete(id: number, currentUser: User): Promise<void> {
+  public async softDelete(id: number, currentUser: User): Promise<UpdateResult> {
     if (id === currentUser.id) {
       throw new ConflictException(
         UserError.ConflictSelf,
@@ -121,8 +114,7 @@ export class UserService extends TypeOrmCrudService<User> {
         ErrorCodeEnum.NOT_DELETE_ADMIN_ROLE
       );
     }
-    await this.repository.softDelete(record.id);
-    return;
+    return this.repository.softDelete(record.id);
   }
 
   public getProfile(user: User): Promise<User> {

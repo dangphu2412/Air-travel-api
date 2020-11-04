@@ -9,7 +9,6 @@ import {CustomerService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
-import {Lang} from "src/common/constants/lang";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 /**
@@ -24,18 +23,11 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
     type: Customer
   },
   routes: {
-    exclude: ["createOneBase", "createManyBase"],
-    replaceOneBase: {
-      decorators: [
-        GrantAccess({
-          jwtOnly: true
-        })
-      ],
-      interceptors: [SqlInterceptor]
-    },
+    exclude: ["createOneBase", "createManyBase", "replaceOneBase"],
     deleteOneBase: {
       decorators: [
         GrantAccess({
+          type: "CUSTOMER",
           action: ECrudAction.DELETE
         })
       ]
@@ -60,9 +52,11 @@ export class CustomerController implements CrudController<Customer> {
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Customer,
-    @CurrentUser() user: User
+    @CurrentUser() user: Customer
   ): Promise<Customer> {
+    const userId: number = req.parsed.paramsFilter[0].value;
     await this.service.mapRelationKeysToEntities(dto);
+    this.service.validateAuthor(userId, user);
     return this.base.updateOneBase(req, dto);
   };
 
@@ -75,9 +69,10 @@ export class CustomerController implements CrudController<Customer> {
   })
   restoreCustomer(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: User
+    @CurrentUser() user: Customer
   ) {
-    return this.service.restore(id, user);
+    this.service.validateAuthor(id, user);
+    return this.service.restore(id);
   }
 
   @ApiOperation({
@@ -101,9 +96,10 @@ export class CustomerController implements CrudController<Customer> {
   })
   softDelete(
     @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() currentUser: User
+    @CurrentUser() currentUser: Customer
   ) {
-    return this.service.softDelete(id, currentUser);
+    this.service.validateAuthor(id, currentUser);
+    return this.service.softDelete(id);
   }
 
   @ApiOperation({
@@ -115,27 +111,10 @@ export class CustomerController implements CrudController<Customer> {
   })
   hardDelete(
     @ParsedRequest() req: CrudRequest,
+    @CurrentUser() user: Customer
   ) {
+    const userId: number = req.parsed.paramsFilter[0].value;
+    this.service.validateAuthor(userId, user);
     return this.base.deleteOneBase(req);
-  }
-
-  @ApiOperation({
-    summary: "Get one record by english slug"
-  })
-  @Get("enslug-:slug")
-  getEnglishSlug(
-    @Param("slug") slug: string
-  ): Promise<Customer> {
-    return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.EN);
-  }
-
-  @ApiOperation({
-    summary: "Get one record by vietnam slug"
-  })
-  @Get("vislug-:slug")
-  getVnSlug(
-    @Param("slug") slug: string
-  ): Promise<Customer> {
-    return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.VN);
   }
 }
