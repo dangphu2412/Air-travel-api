@@ -49,6 +49,11 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
       children: {
         eager: true
       }
+    },
+    filter: {
+      "children.deletedAt": {
+        $ne: null
+      }
     }
   }
 })

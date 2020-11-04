@@ -79,7 +79,12 @@ export class ServiceCategory extends BaseActionDate {
     ])
   }
 
-  @ApiProperty()
+  @ApiProperty({
+    description: null
+  })
+  @Column({
+    default: null
+  })
   parentId: number | string;
 
   /**

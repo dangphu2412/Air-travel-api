@@ -156,7 +156,6 @@ export class Service extends BaseActionDate {
  @IsNumber({}, {each: true})
  providerIds: number[];
 
-
   /**
    * Trigger
    */

@@ -26,7 +26,9 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
   }
 
   public async mapRelationKeysToEntities(dto: ServiceCategory) {
-    dto.parent = await this.repository.findOne(dto.parentId);
+    if (dto.parentId) {
+      dto.parent = await this.repository.findOne(dto.parentId);
+    }
     return dto;
   }
 
