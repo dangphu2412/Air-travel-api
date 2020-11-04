@@ -4,19 +4,12 @@ import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {Customer, User} from "src/common/entity";
+import {Customer} from "src/common/entity";
 import {CustomerService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
-
-/**
- * TODO: Get me customer
- * soft delete and restore auth
- * update profile customer
- * register customer in auth
- */
 
 @Crud({
   model: {
