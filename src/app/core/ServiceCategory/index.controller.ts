@@ -43,9 +43,6 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
   },
   query: {
     join: {
-      user: {
-        allow: ["id", "fullName", "avatar"]
-      },
       children: {
         eager: true
       }
@@ -148,7 +145,7 @@ export class ServiceCategoryController implements CrudController<ServiceCategory
     return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.VN);
   }
 
-  @Get("roots")
+  @Get("trees")
   getRoots(): Promise<ServiceCategory[]> {
     return this.service.getRoots();
   }

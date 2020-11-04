@@ -109,7 +109,7 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
   }
 
   public getRoots() {
-    return this.repository.findRoots();
+    return this.repository.findTrees();
   }
 
   public async getChildrens(id: number): Promise<ServiceCategory> {
