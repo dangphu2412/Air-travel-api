@@ -1,6 +1,6 @@
 import AWS, {S3 as AwsS3} from "aws-sdk";
 import {Injectable} from "@nestjs/common";
-import {S3_CONFIG} from "src/common/constants";
+import {S3_CONFIG} from "src/env";
 
 @Injectable()
 export class S3Service {

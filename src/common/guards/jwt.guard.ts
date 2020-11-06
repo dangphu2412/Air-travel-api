@@ -1,5 +1,5 @@
 import {DEFAULT_ERROR} from "./../constants/messages";
-import {ExecutionContext, Injectable, UnauthorizedException} from "@nestjs/common";
+import {ExecutionContext, HttpException, Injectable, UnauthorizedException} from "@nestjs/common";
 import {AuthGuard} from "@nestjs/passport";
 import {ErrorCodeEnum} from "../enums";
 
@@ -9,7 +9,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
     return super.canActivate(context);
   }
 
-  handleRequest(err, user) {
+  handleRequest(err: HttpException, user: any) {
     if (err || !user) {
       throw err || new UnauthorizedException(
         DEFAULT_ERROR.Unauthorized,

@@ -1,7 +1,8 @@
+import {JWT_CONFIG} from "src/env";
 import {ExtractJwt, Strategy} from "passport-jwt";
 import {PassportStrategy} from "@nestjs/passport";
 import {Injectable, UnauthorizedException} from "@nestjs/common";
-import {DEFAULT_ERROR, JWT_CONFIG} from "../constants";
+import {DEFAULT_ERROR} from "../constants";
 import {CustomerService} from "src/app/core/Customer/index.service";
 import {UserService} from "src/app/core/User/index.service";
 import {TJwtPayload} from "../type";
