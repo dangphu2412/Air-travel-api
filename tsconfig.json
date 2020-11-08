@@ -21,6 +21,6 @@
   "include": [
     "src/**/*",
     "**/test/**/*.ts",
-    "ormconfig.js"
+    "ormconfig.ts"
   ],
 }

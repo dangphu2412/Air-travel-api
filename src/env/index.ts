@@ -2,6 +2,8 @@ import env from "dotenv";
 
 env.config();
 
+export const ENV = process.env.NODE_ENV || "development";
+
 export const DB_URI = process.env.DB_URI;
 export const DB_LOGGING = process.env.NODE_ENV === "production" ? false : true;
 

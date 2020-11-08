@@ -1,5 +1,8 @@
-const seedingFolderName = "seed-development";
-module.exports = [
+import {ENV} from "./src/env";
+
+const seedingFolderName = ENV === "production" ? ENV : "development";
+
+export = [
   {
     "name": "default",
     "type": "postgres",
