@@ -1,16 +1,12 @@
-<code>
 
 import {ApiOperation, ApiTags} from "@nestjs/swagger";
-import {
-  Controller, Patch, Param, ParseIntPipe,
-  Get, UseInterceptors, Delete, UseInterceptors
-} from "@nestjs/common";
+import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {T} from "src/common/entity";
-import {TService} from "./index.service";
+import {Bill, User} from "src/common/entity";
+import {BillService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
@@ -18,55 +14,54 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 @Crud({
   model: {
-    type: Customer
+    type: Bill
   },
   routes: {
     exclude: ["createOneBase", "createManyBase", "replaceOneBase"],
     deleteOneBase: {
       decorators: [
         GrantAccess({
-          type: "CUSTOMER",
           action: ECrudAction.DELETE
         })
       ]
     }
   }
 })
-@ApiTags("Ts")
-@Feature(ECrudFeature.CUSTOMER)
-@Controller("Ts")
-export class TController implements CrudController<T> {
-  constructor(public service: TService) {}
+@ApiTags("Bills")
+@Feature(ECrudFeature.BILL)
+@Controller("Bills")
+export class BillController implements CrudController<Bill> {
+  constructor(public service: BillService) {}
 
-  get base(): CrudController<T> {
+  get base(): CrudController<Bill> {
     return this;
   }
 
   @GrantAccess({
     action: ECrudAction.CREATE
   })
-  @Override("createOneBase")
   @UseInterceptors(SqlInterceptor)
+  @Override("createOneBase")
   async createOneOverride(
     @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Role,
+    @ParsedBody() dto: Bill,
     @CurrentUser() user: User
-  ): Promise<T> {
+  ): Promise<Bill> {
     this.service.getUserId(dto, user);
     await this.service.mapRelationKeysToEntities(dto, user);
     return this.base.createOneBase(req, dto);
   };
 
+  @Override("updateOneBase")
   @GrantAccess({
     action: ECrudAction.UPDATE
   })
-  @Override("updateOneBase")
   @UseInterceptors(SqlInterceptor)
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: T,
+    @ParsedBody() dto: Bill,
     @CurrentUser() user: User
-  ): Promise<T> {
+  ): Promise<Bill> {
     this.service.getUserId(dto, user);
     await this.service.mapRelationKeysToEntities(dto, user);
     return this.base.updateOneBase(req, dto);
@@ -100,4 +95,3 @@ export class TController implements CrudController<T> {
     return this.service.softDelete(id, user);
   }
 }
-</code>
