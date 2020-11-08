@@ -1,11 +1,11 @@
 
-import {ApiOperation, ApiTags} from "@nestjs/swagger";
-import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
+import {ApiTags} from "@nestjs/swagger";
+import {Controller, Get, UseInterceptors} from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {Bill, User} from "src/common/entity";
+import {Bill, Customer} from "src/common/entity";
 import {BillService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
@@ -17,11 +17,12 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
     type: Bill
   },
   routes: {
-    exclude: ["createOneBase", "createManyBase", "replaceOneBase"],
+    exclude: ["replaceOneBase"],
     deleteOneBase: {
       decorators: [
         GrantAccess({
-          action: ECrudAction.DELETE
+          action: ECrudAction.DELETE,
+          type: "CUSTOMER"
         })
       ]
     }
@@ -29,7 +30,7 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 })
 @ApiTags("Bills")
 @Feature(ECrudFeature.BILL)
-@Controller("Bills")
+@Controller("bills")
 export class BillController implements CrudController<Bill> {
   constructor(public service: BillService) {}
 
@@ -38,60 +39,42 @@ export class BillController implements CrudController<Bill> {
   }
 
   @GrantAccess({
-    action: ECrudAction.CREATE
+    action: ECrudAction.CREATE,
+    type: "CUSTOMER"
   })
   @UseInterceptors(SqlInterceptor)
   @Override("createOneBase")
   async createOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Bill,
-    @CurrentUser() user: User
+    @CurrentUser() user: Customer
   ): Promise<Bill> {
     this.service.getUserId(dto, user);
-    await this.service.mapRelationKeysToEntities(dto, user);
     return this.base.createOneBase(req, dto);
   };
 
   @Override("updateOneBase")
   @GrantAccess({
-    action: ECrudAction.UPDATE
+    action: ECrudAction.UPDATE,
+    type: "CUSTOMER"
   })
   @UseInterceptors(SqlInterceptor)
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Bill,
-    @CurrentUser() user: User
+    @CurrentUser() user: Customer
   ): Promise<Bill> {
     this.service.getUserId(dto, user);
-    await this.service.mapRelationKeysToEntities(dto, user);
     return this.base.updateOneBase(req, dto);
   };
 
-  @Patch(":id/restore")
-  @GrantAccess({
-    action: ECrudAction.RESTORE
-  })
-  async restoreDestination(
-    @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: User
-  ) {
-    return this.service.restore(id, user);
-  }
-
   @UseInterceptors(CrudRequestInterceptor)
   @Get("trashed")
+  @GrantAccess({
+    action: ECrudAction.READ,
+    type: "CUSTOMER"
+  })
   getDeleted(@ParsedRequest() req: CrudRequest) {
     return this.service.getDeleted(req);
-  }
-
-  @Override("deleteOneBase")
-  @GrantAccess({
-    action: ECrudAction.SOFT_DEL
-  })
-  async softDelete(
-    @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() user: User
-  ) {
-    return this.service.softDelete(id, user);
   }
 }

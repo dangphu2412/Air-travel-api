@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn} from "typeorm";
 import {IsString, IsNumber, IsIn} from "class-validator";
 import {ApiProperty} from "@nestjs/swagger";
 
@@ -60,6 +60,9 @@ export class Bill extends BaseActionDate {
    */
   @ApiProperty({readOnly: true, type: () => Customer})
   @ManyToOne(() => Customer, customer => customer.bills)
+  @JoinColumn({
+    name: "userId"
+  })
   customer: Customer
 
   @ApiProperty({readOnly: true, type: () => Payment})

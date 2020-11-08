@@ -7,7 +7,7 @@ import {IBaseService} from "src/common/interface/i.base.service";
 import {IsNull, Not, Repository, FindOneOptions, FindManyOptions} from "typeorm";
 import {EntityId} from "typeorm/repository/EntityId";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
-import {User} from "src/common/entity";
+import {Customer, User} from "src/common/entity";
 import {CrudRequest} from "@nestjsx/crud";
 import {UserService} from "../core/User/index.service";
 
@@ -143,7 +143,7 @@ export class BaseService implements IBaseService {
     }
   }
 
-  fillUserIdToDto(dto: any, user: User): void {
+  fillUserIdToDto(dto: any, user: User | Customer): void {
     if (!user.id) {
       throw new InternalServerErrorException(
         DEFAULT_ERROR.InternalSignJwt,
