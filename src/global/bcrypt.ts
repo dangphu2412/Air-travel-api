@@ -2,7 +2,7 @@ import {
   hashSync,
   compareSync
 } from "bcryptjs";
-import {SALT_ROUNDS} from "src/env";
+import {SALT_ROUNDS} from "../env";
 
 class Service {
   private saltRound: number;
