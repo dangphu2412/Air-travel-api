@@ -43,13 +43,13 @@ export class BillInfo extends BaseActionDate {
    */
   @ApiProperty({readOnly: true, type: () => Customer})
   @ManyToOne(() => Customer, customer => customer.billInfos)
-  customer: Customer
+  customer: Customer;
 
   @ApiProperty({readOnly: true, type: () => Provider})
   @ManyToOne(() => Provider, provider => provider.billInfos)
-  provider: Provider
+  provider: Provider;
 
   @ApiProperty({readOnly: true, type: () => Payment})
   @OneToMany(() => Payment, payment => payment.billInfo)
-  payments: Payment[]
+  payments: Payment[];
 }

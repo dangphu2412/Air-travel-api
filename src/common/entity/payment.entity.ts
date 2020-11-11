@@ -1,7 +1,7 @@
 import {EPayment} from "../enums/paymentStatus.enum";
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
-import {IsString, IsIn} from "class-validator";
+import {IsString, IsIn, IsNumber} from "class-validator";
 
 import {IsRequired} from "../decorators/isRequired.decorator";
 
@@ -33,6 +33,12 @@ export class Payment extends BaseActionDate {
     type: "text"
   })
   description: string;
+
+  @ApiProperty()
+  @IsRequired()
+  @IsNumber()
+  @Column()
+  amount: number;
 
   /**
    * Relations

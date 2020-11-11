@@ -27,6 +27,30 @@ export class Bill extends BaseActionDate {
   totalPrice: number;
 
   @ApiProperty({
+    example: 100000
+  })
+  @IsRequired()
+  @IsNumber()
+  @Column()
+  totalNetPrice: number;
+
+  @ApiProperty({
+    example: 100000
+  })
+  @IsRequired()
+  @IsNumber()
+  @Column()
+  providerRemain: number;
+
+  @ApiProperty({
+    example: 100000
+  })
+  @IsRequired()
+  @IsNumber()
+  @Column()
+  customerRemain: number;
+
+  @ApiProperty({
     example: "Note something"
   })
   @IsRequired()
@@ -35,16 +59,6 @@ export class Bill extends BaseActionDate {
     type: "text"
   })
   note: string;
-
-  @ApiProperty({
-    example: new Date().toISOString()
-  })
-  @IsRequired()
-  @ApiProperty({readOnly: true})
-  @Column({
-    type: "date"
-  })
-  deadline: Date;
 
   @ApiProperty({readOnly: true})
   @IsRequired()
