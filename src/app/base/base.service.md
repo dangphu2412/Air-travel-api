@@ -1,3 +1,4 @@
+<code>
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import { CrudRequest } from "@nestjsx/crud";
@@ -8,21 +9,6 @@ import {Provider,User} from "src/common/entity";
 import { Not, IsNull } from "typeorm";
 import {UserService} from "../User/index.service";
 import {ProviderRepository} from "./index.repository";
-
-@Injectable()
-export class ProviderService extends TypeOrmCrudService<Provider> {
-  constructor(
-    @InjectRepository(Provider)
-    private repository: ProviderRepository,
-    private baseService: BaseService,
-    private userService: UserService
-  ) {
-    super(repository);
-  }
-
-  public findByIds(ids: number[]) {
-    return this.repository.findByIds(ids);
-  }
 
   public async restore(id: number, currentUser: User) {
     const record = await this
@@ -63,4 +49,4 @@ export class ProviderService extends TypeOrmCrudService<Provider> {
     );
     return this.repository.softDelete(record.id);
   }
-}
+</code>

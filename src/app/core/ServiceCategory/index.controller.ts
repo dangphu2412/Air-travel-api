@@ -131,6 +131,9 @@ export class ServiceCategoryController implements CrudController<ServiceCategory
     return this.service.softDelete(id, currentUser);
   }
 
+  @ApiOperation({
+    summary: "Get by english slug"
+  })
   @Get("enslug-:slug")
   getEnglishSlug(
     @Param("slug") slug: string
@@ -138,6 +141,9 @@ export class ServiceCategoryController implements CrudController<ServiceCategory
     return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.EN);
   }
 
+  @ApiOperation({
+    summary: "Get by vi slug"
+  })
   @Get("vislug-:slug")
   getVnSlug(
     @Param("slug") slug: string
@@ -145,16 +151,25 @@ export class ServiceCategoryController implements CrudController<ServiceCategory
     return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.VN);
   }
 
+  @ApiOperation({
+    summary: "Get all trees"
+  })
   @Get("trees")
   getRoots(): Promise<ServiceCategory[]> {
     return this.service.getRoots();
   }
 
+  @ApiOperation({
+    summary: "Get children by parent id"
+  })
   @Get(":id/children")
   getChildrens(@Param("id", ParseIntPipe) id: number): Promise<ServiceCategory> {
     return this.service.getChildrens(id);
   }
 
+  @ApiOperation({
+    summary: "Get parent by children id"
+  })
   @Get(":id/parents")
   getParent(@Param("id", ParseIntPipe) id: number): Promise<ServiceCategory> {
     return this.service.getParent(id);

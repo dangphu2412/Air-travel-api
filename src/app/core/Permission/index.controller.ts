@@ -8,7 +8,7 @@ export class PermissionController {
   constructor(public service: PermissionService) {}
 
   @ApiOperation({
-    description: "Fetch all permissions"
+    summary: "Fetch all permissions"
   })
   @Get("/")
   getAll() {

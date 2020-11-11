@@ -54,7 +54,7 @@ export class CustomerController implements CrudController<Customer> {
   };
 
   @ApiOperation({
-    description: "Restore one record"
+    summary: "Restore one record"
   })
   @Patch(":id/restore")
   @GrantAccess({

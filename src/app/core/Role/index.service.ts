@@ -4,7 +4,7 @@ import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
 import {BaseService} from "src/app/base/base.service";
 import {Permission, Role, User} from "src/common/entity";
-import {Not, IsNull} from "typeorm";
+import {Not, IsNull, UpdateResult} from "typeorm";
 import {PermissionService} from "../Permission/index.service";
 import {RoleRepository} from "./index.repository";
 
@@ -53,7 +53,7 @@ export class RoleService extends TypeOrmCrudService<Role> {
     });
   }
 
-  public async softDelete(id: number, user: User): Promise<void> {
+  public async softDelete(id: number, user: User): Promise<UpdateResult> {
     this.baseService.isNotAdminAndThrowErr(user);
     const record = await this
       .baseService
@@ -64,7 +64,7 @@ export class RoleService extends TypeOrmCrudService<Role> {
     if (record.users) {
       await this.syncUserToUpdatePermission(record.users);
     }
-    await this.repository.softDelete(record.id);
+    return await this.repository.softDelete(record.id);
   }
 
   public syncUserToUpdatePermission(users: User[]): Promise<User[]> {

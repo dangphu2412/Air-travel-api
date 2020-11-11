@@ -6,9 +6,13 @@ import {ProviderRepository} from "./index.repository";
 import {UserRepository} from "../User/index.repository";
 import {UserModule} from "../User/index.module";
 import {UserService} from "../User/index.service";
+import {BaseModule} from "src/app/base/base.module";
+import {BaseService} from "src/app/base/base.service";
 
 @Module({
   imports: [
+    UserModule,
+    BaseModule,
     UserModule,
     TypeOrmModule.forFeature([
       ProviderRepository,
@@ -16,7 +20,7 @@ import {UserService} from "../User/index.service";
     ])
   ],
   controllers: [ProviderController],
-  providers: [ProviderService, UserService],
+  providers: [ProviderService, UserService, BaseService, UserService],
   exports: [ProviderService]
 })
 export class ProviderModule {}

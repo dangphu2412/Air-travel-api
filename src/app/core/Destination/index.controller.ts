@@ -1,4 +1,4 @@
-import {ApiTags} from "@nestjs/swagger";
+import {ApiOperation, ApiTags} from "@nestjs/swagger";
 import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
@@ -77,6 +77,9 @@ export class DestinationController implements CrudController<Destination> {
     return this.base.updateOneBase(req, dto);
   };
 
+  @ApiOperation({
+    summary: "Restore one destination"
+  })
   @Patch(":id/restore")
   @GrantAccess({
     action: ECrudAction.RESTORE
@@ -88,12 +91,18 @@ export class DestinationController implements CrudController<Destination> {
     return this.service.restore(id, user);
   }
 
+  @ApiOperation({
+    summary: "Get soft deleted"
+  })
   @UseInterceptors(CrudRequestInterceptor)
   @Get("trashed")
   getDeleted(@ParsedRequest() req: CrudRequest) {
     return this.service.getDeleted(req);
   }
 
+  @ApiOperation({
+    summary: "Soft deleted"
+  })
   @Override("deleteOneBase")
   @Delete(":id")
   @GrantAccess({

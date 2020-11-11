@@ -88,7 +88,7 @@ export class Provider extends BaseActionDate {
   userId: number;
 
   @ApiProperty({readOnly: true, type: () => User})
-  @ManyToOne(() => User, item => item.services, {eager: true})
+  @ManyToOne(() => User, item => item.services)
   @JoinColumn({name: "userId"})
   user: User;
 }
