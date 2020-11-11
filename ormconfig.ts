@@ -10,7 +10,7 @@ export = [
     "migrations": ["src/database/migrations/*.ts"],
     "entities": ["src/**/*.entity{.ts,.js}"],
     "factories": ["src/database/factories/**/*.factory{.ts,.js}"],
-    "seeds": [`src/database/${seedingFolderName}/**/*.seed{.ts,.js}`],
+    "seeds": [`src/database/seed-${seedingFolderName}/**/*.seed{.ts,.js}`],
     "cli": {
       migrationsDir: "src/database/migrations"
     }

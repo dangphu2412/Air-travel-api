@@ -40,8 +40,11 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
 
   public async mapRelationKeysToEntities(dto: Destination): Promise<Destination> {
     const citySlug = SlugHelper.slugifyUpperCaseAndRemoveDash(dto.cityName);
+
     const districtSlug = SlugHelper.slugifyUpperCaseAndRemoveDash(dto.districtName);
-    const diffCitySlug = `${citySlug}KHAC`;
+
+    const DEFAULT_CITY_SLUG = `${citySlug}KHAC`;
+
     const city: City = await this.cityService.findOne({
       where: {
         slug: citySlug
@@ -52,15 +55,18 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
       CityError.NotFound,
       ErrorCodeEnum.NOT_FOUND
     );
+
+    // Find not found default with DEFAULT_CITY_SLUG
     const district: District = await this.districtService.findOne({
       where: {
         slug: districtSlug
       }
     }) || await this.districtService.findOne({
       where: {
-        slug: diffCitySlug
+        slug: DEFAULT_CITY_SLUG
       }
     });
+
     dto.city = city;
     dto.district = district;
     return dto;

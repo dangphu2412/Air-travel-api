@@ -16,7 +16,8 @@ class Helper implements ISlug {
   }
 
   public slugifyUpperCaseAndRemoveDash(data: string) {
-    return slug(data).toUpperCase().split("-").join("");
+    const locale = "vi";
+    return slug(data, {locale}).toUpperCase().split("-").join("");
   }
 
   /**

@@ -65,7 +65,7 @@ export class RaclHelper {
   }
 
   public createPermission(feature: string, action: string): string {
-    return `${feature}${action}`;
+    return `${feature}_${action}`;
   }
 
   public createManyPermissionFromFeature(feature: string, exclude?: TCrudAction[]): string[] {
