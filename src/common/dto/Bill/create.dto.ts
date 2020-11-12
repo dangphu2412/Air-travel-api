@@ -1,5 +1,5 @@
 import {ApiProperty} from "@nestjs/swagger";
-import {IsString, IsNumber} from "class-validator";
+import {IsString, IsNumber, ValidateNested} from "class-validator";
 import {IsRequired} from "src/common/decorators/isRequired.decorator";
 import {BillStatus} from "src/common/enums";
 import {Column} from "typeorm";
@@ -25,6 +25,6 @@ export class CreateBilLDto {
     @Column()
     customerId: number;
 
-    @IsRequired()
+    @ValidateNested()
     billServices: CreateBillServiceDto[];
 }
