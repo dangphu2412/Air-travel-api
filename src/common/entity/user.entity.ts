@@ -137,26 +137,26 @@ export class User extends BaseActionDate {
     role: Role
 
     @ApiProperty({readOnly: true, writeOnly: true, type: () => Media})
-    @OneToMany(() => Media, item => item.userId, {eager: false})
+    @OneToMany(() => Media, item => item.userId)
     medias: Media[];
 
     @ApiProperty({readOnly: true, writeOnly: true, type: () => Destination})
-    @OneToMany(() => Destination, item => item.userId, {eager: false})
+    @OneToMany(() => Destination, item => item.userId)
     destinations: Destination[];
 
     @ApiProperty({readOnly: true, writeOnly: true, type: () => ServiceCategory})
-    @OneToMany(() => ServiceCategory, item => item.userId, {eager: false})
+    @OneToMany(() => ServiceCategory, item => item.userId)
     serviceCategories: ServiceCategory[];
 
     @ApiProperty({readOnly: true, writeOnly: true, type: () => Service})
-    @OneToMany(() => Service, item => item.userId, {eager: false})
+    @OneToMany(() => Service, item => item.userId)
     services: Service[];
 
     @ApiProperty({readOnly: true, writeOnly: true, type: () => Provider})
-    @OneToMany(() => Provider, item => item.userId, {eager: false})
+    @OneToMany(() => Provider, item => item.userId)
     providers: Provider[];
 
     @ApiProperty({readOnly: true, writeOnly: true, type: () => Bill})
-    @OneToMany(() => Bill, item => item.userId, {eager: false})
+    @OneToMany(() => Bill, item => item.userId)
     bills: Provider[];
 }

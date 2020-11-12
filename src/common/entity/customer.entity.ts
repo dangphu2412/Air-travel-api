@@ -6,15 +6,11 @@ import {
 } from "typeorm";
 import {
   IsString, IsEmail, IsMobilePhone,
-  IsOptional, IsIn, IsDateString, IsBoolean, IsNumber
+  IsOptional, IsIn, IsDateString, IsBoolean
 } from "class-validator";
-
 import {Exclude} from "class-transformer";
 import {Gender} from "../enums/gender.enum";
-import {UserStatus} from "../enums/userStatus.enum";
-
 import {IsRequired} from "../decorators/isRequired.decorator";
-
 import {BaseActionDate} from "./base";
 import {Bill} from "./bill.entity";
 import {BillInfo} from "./billInfo.entity";
@@ -121,18 +117,6 @@ export class Customer extends BaseActionDate {
   })
   note: string;
 
-  @ApiProperty({
-    example: UserStatus.ACTIVE
-  })
-  @IsRequired()
-  @IsIn(enumToArray(UserStatus))
-  @Column({
-    type: "enum",
-    enum: UserStatus,
-    default: UserStatus.ACTIVE
-  })
-  status: string;
-
   @Exclude()
   @ApiProperty({readOnly: true, writeOnly: true})
   @IsOptional()
@@ -150,13 +134,8 @@ export class Customer extends BaseActionDate {
    * Relations
    */
 
-  @ApiProperty({writeOnly: true, type: () => Role})
-  @IsRequired()
-  @IsNumber()
-  roleId: number;
-
   @ApiProperty({readOnly: true, type: () => Role})
-  @ManyToOne(() => Role, item => item.users)
+  @ManyToOne(() => Role, item => item.customers)
   role: Role;
 
   @ApiProperty({readOnly: true, type: () => Bill})

@@ -1,6 +1,6 @@
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
-import {IsNumber, IsDateString} from "class-validator";
+import {IsNumber} from "class-validator";
 import {IsRequired} from "../decorators/isRequired.decorator";
 
 import {BaseActionDate} from "./base";
@@ -30,21 +30,21 @@ export class BillService extends BaseActionDate {
   @Column()
   netPrice: number;
 
-  @ApiProperty({
-    example: new Date().toISOString()
-  })
-  @IsRequired()
-  @IsDateString()
-  @Column()
-  startDay: Date;
+  // @ApiProperty({
+  //   example: new Date().toISOString()
+  // })
+  // @IsRequired()
+  // @IsDateString()
+  // @Column()
+  // startDay: Date;
 
-  @ApiProperty({
-    example: new Date().toISOString()
-  })
-  @IsRequired()
-  @IsDateString()
-  @Column()
-  endDate: Date;
+  // @ApiProperty({
+  //   example: new Date().toISOString()
+  // })
+  // @IsRequired()
+  // @IsDateString()
+  // @Column()
+  // endDate: Date;
 
   /**
    * Relations
