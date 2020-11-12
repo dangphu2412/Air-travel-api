@@ -1,6 +1,6 @@
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
-import {IsString} from "class-validator";
+import {IsNumber, IsOptional, IsString} from "class-validator";
 import {IsRequired} from "../decorators/isRequired.decorator";
 
 import {BaseActionDate} from "./base";
@@ -37,6 +37,22 @@ export class BillInfo extends BaseActionDate {
   @IsString()
   @Column()
   bankNumber: string;
+
+  @ApiProperty({
+    example: 1,
+    description: "It can be empty"
+  })
+  @IsOptional()
+  @IsNumber()
+  customerId: number | null;
+
+  @ApiProperty({
+    example: null,
+    description: "It can be empty"
+  })
+  @IsOptional()
+  @IsNumber()
+  providerId: number | null;
 
   /**
    * Relations

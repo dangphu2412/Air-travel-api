@@ -16,6 +16,7 @@ import {
 import {enumToArray} from "../../utils";
 import {Gender, UserStatus} from "../enums";
 import {Bill} from "./bill.entity";
+import { Payment } from "./payment.entity";
 
 @Entity("users")
 @Unique(["email"])
@@ -159,4 +160,9 @@ export class User extends BaseActionDate {
     @ApiProperty({readOnly: true, writeOnly: true, type: () => Bill})
     @OneToMany(() => Bill, item => item.userId)
     bills: Provider[];
+
+
+    @ApiProperty({readOnly: true, writeOnly: true, type: () => Payment})
+    @OneToMany(() => Bill, item => item.userId)
+    payments: Payment[];
 }

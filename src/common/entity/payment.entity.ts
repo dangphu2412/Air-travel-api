@@ -1,7 +1,7 @@
 import {EPayment} from "../enums/paymentStatus.enum";
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
-import {IsString, IsIn, IsNumber} from "class-validator";
+import {IsString, IsIn, IsNumber, IsEmpty} from "class-validator";
 
 import {IsRequired} from "../decorators/isRequired.decorator";
 
@@ -9,6 +9,7 @@ import {BaseActionDate} from "./base";
 import {Bill} from "./bill.entity";
 import {BillInfo} from "./billInfo.entity";
 import {enumToArray} from "../../utils";
+import { User } from ".";
 
 @Entity("payments")
 export class Payment extends BaseActionDate {
@@ -40,9 +41,24 @@ export class Payment extends BaseActionDate {
   @Column()
   amount: number;
 
+
+  /**
+   * Relattion key
+   */
+  @ApiProperty({readOnly: true})
+  @IsEmpty()
+  @Column()
+  userId: number;
+
   /**
    * Relations
    */
+
+  @ApiProperty({readOnly: true, type: () => User})
+  @ManyToOne(() => User, item => item.payments)
+  @JoinColumn({name: "userId"})
+  user: User;
+
   @ApiProperty({readOnly: true, type: () => Bill})
   @ManyToOne(() => Bill, bill => bill.payments)
   bill: Bill
