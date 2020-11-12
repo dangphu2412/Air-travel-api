@@ -17,7 +17,7 @@ import {CreateBilLDto} from "src/common/dto/Bill";
     type: Bill
   },
   routes: {
-    exclude: ["replaceOneBase"],
+    exclude: ["updateOneBase", "replaceOneBase"],
     deleteOneBase: {
       decorators: [
         GrantAccess({
@@ -55,20 +55,6 @@ export class BillController implements CrudController<Bill> {
     this.service.fillBillServices(entity, billServices);
     this.service.fillRemain(entity);
     return this.base.createOneBase(req, entity);
-  };
-
-  @Override("updateOneBase")
-  @GrantAccess({
-    action: ECrudAction.UPDATE,
-    type: "USER"
-  })
-  @UseInterceptors(SqlInterceptor)
-  async updateOneOverride(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Bill,
-    @CurrentUser() user: User
-  ): Promise<Bill> {
-    return this.base.updateOneBase(req, dto);
   };
 
   @UseInterceptors(CrudRequestInterceptor)
