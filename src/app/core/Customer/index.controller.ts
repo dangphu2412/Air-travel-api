@@ -13,17 +13,23 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 @Crud({
   model: {
-    type: Customer
+    type: Customer,
   },
   routes: {
     exclude: ["createManyBase", "replaceOneBase"],
     deleteOneBase: {
       decorators: [
         GrantAccess({
-          type: "CUSTOMER",
           action: ECrudAction.DELETE
         })
       ]
+    }
+  },
+  query: {
+    join: {
+      billInfos: {
+        eager: false
+      }
     }
   }
 })

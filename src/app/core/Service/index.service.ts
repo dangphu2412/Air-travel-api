@@ -75,6 +75,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
           }
         }
         break;
+      case Lang.EN:
       default:
         // Default EnSlug
         conditions = {

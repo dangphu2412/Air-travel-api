@@ -55,3 +55,11 @@ export const DestinationError = {
 export const CityError = {
   NotFound: "Not found this city"
 }
+
+export const BillError = {
+  NotFound: "Not found this bill"
+}
+
+export const BillInfoError = {
+  NotFound: "Not found this bill info"
+}

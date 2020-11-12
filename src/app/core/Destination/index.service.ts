@@ -121,6 +121,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
           }
         }
         break;
+      case Lang.EN:
       default:
         // Default EnSlug
         conditions = {
