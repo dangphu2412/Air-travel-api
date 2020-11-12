@@ -1,16 +1,16 @@
-
 import {ApiTags} from "@nestjs/swagger";
 import {Controller, Get, UseInterceptors} from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {Bill, Customer} from "src/common/entity";
+import {Bill, BillService as BillServiceEntity, User} from "src/common/entity";
 import {BillService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
+import {CreateBilLDto} from "src/common/dto/Bill";
 
 @Crud({
   model: {
@@ -39,32 +39,35 @@ export class BillController implements CrudController<Bill> {
   }
 
   @GrantAccess({
-    action: ECrudAction.CREATE,
-    type: "CUSTOMER"
+    action: ECrudAction.CREATE
   })
   @UseInterceptors(SqlInterceptor)
   @Override("createOneBase")
   async createOneOverride(
     @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Bill,
-    @CurrentUser() user: Customer
+    @ParsedBody() dto: CreateBilLDto,
+    @CurrentUser() user: User
   ): Promise<Bill> {
-    this.service.getUserId(dto, user);
-    return this.base.createOneBase(req, dto);
+    const customer = await this.service.getCustomer(dto.customerId);
+    const entity: Bill = this.service.createEntity(dto, user, customer);
+    const billServices: BillServiceEntity[] = await this.service.createBillServices(dto, entity);
+
+    this.service.fillBillServices(entity, billServices);
+    this.service.fillRemain(entity);
+    return this.base.createOneBase(req, entity);
   };
 
   @Override("updateOneBase")
   @GrantAccess({
     action: ECrudAction.UPDATE,
-    type: "CUSTOMER"
+    type: "USER"
   })
   @UseInterceptors(SqlInterceptor)
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Bill,
-    @CurrentUser() user: Customer
+    @CurrentUser() user: User
   ): Promise<Bill> {
-    this.service.getUserId(dto, user);
     return this.base.updateOneBase(req, dto);
   };
 

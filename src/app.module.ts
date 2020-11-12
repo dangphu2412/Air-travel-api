@@ -13,6 +13,8 @@ import {MediaModule} from "./app/core/Media/index.module";
 import {CustomerModule} from "./app/core/Customer/index.module";
 import {ServiceCategoryModule} from "./app/core/ServiceCategory/index.module";
 import {ProviderModule} from "./app/core/Provider/index.module";
+import {BillModule} from "./app/core/Bill/index.module";
+import {BillServiceModule} from "./app/core/BillService/index.module";
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import {ProviderModule} from "./app/core/Provider/index.module";
     DistrictModule,
     MediaModule,
     CustomerModule,
+    BillModule,
+    BillServiceModule,
     TypeOrmModule.forRoot(typeOrmConfig)
   ]
 })

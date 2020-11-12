@@ -1,11 +1,11 @@
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import { CrudRequest } from "@nestjsx/crud";
+import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {BaseService} from "src/app/base/base.service";
 
-import {Provider,User} from "src/common/entity";
-import { Not, IsNull } from "typeorm";
+import {Provider, User} from "src/common/entity";
+import {Not, IsNull} from "typeorm";
 import {UserService} from "../User/index.service";
 import {ProviderRepository} from "./index.repository";
 

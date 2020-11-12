@@ -8,21 +8,27 @@ import {BaseModule} from "src/app/base/base.module";
 import {UserModule} from "../User/index.module";
 import {UserRepository} from "../User/index.repository";
 import {UserService} from "../User/index.service";
+import {CustomerModule} from "../Customer/index.module";
+import {CustomerRepository} from "../Customer/index.repository";
+import {CustomerService} from "../Customer/index.service";
 
 @Module({
   imports: [
     BaseModule,
     UserModule,
+    CustomerModule,
     TypeOrmModule.forFeature([
       BillRepository,
-      UserRepository
+      UserRepository,
+      CustomerRepository
     ])
   ],
   controllers: [BillController],
   providers: [
     BillService,
     BaseService,
-    UserService
+    UserService,
+    CustomerService
   ],
   exports: [BillService]
 })

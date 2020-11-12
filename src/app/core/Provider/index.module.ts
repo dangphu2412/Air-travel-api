@@ -13,14 +13,13 @@ import {BaseService} from "src/app/base/base.service";
   imports: [
     UserModule,
     BaseModule,
-    UserModule,
     TypeOrmModule.forFeature([
       ProviderRepository,
       UserRepository
     ])
   ],
   controllers: [ProviderController],
-  providers: [ProviderService, UserService, BaseService, UserService],
+  providers: [ProviderService, UserService, BaseService],
   exports: [ProviderService]
 })
 export class ProviderModule {}

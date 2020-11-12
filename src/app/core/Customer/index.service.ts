@@ -31,6 +31,10 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
     });
   }
 
+  public assignRoleToDto(dto: Customer, role: Role) {
+    dto.role = role;
+  }
+
   public validateAuthor(userIdFromParams: number, user: Customer) {
     if (userIdFromParams !== user.id) {
       throw new ForbiddenException(

@@ -4,7 +4,7 @@ import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {Customer} from "src/common/entity";
+import {Customer, Role} from "src/common/entity";
 import {CustomerService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
@@ -16,7 +16,7 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
     type: Customer
   },
   routes: {
-    exclude: ["createOneBase", "createManyBase", "replaceOneBase"],
+    exclude: ["createManyBase", "replaceOneBase"],
     deleteOneBase: {
       decorators: [
         GrantAccess({
@@ -36,6 +36,20 @@ export class CustomerController implements CrudController<Customer> {
   get base(): CrudController<Customer> {
     return this;
   }
+
+  @UseInterceptors(SqlInterceptor)
+  @GrantAccess({
+    action: ECrudAction.CREATE
+  })
+  @Override("createOneBase")
+  async createOneOverride(
+    @ParsedRequest() req: CrudRequest,
+    @ParsedBody() dto: Customer
+  ): Promise<Customer> {
+    const role: Role = await this.service.getRoleCustomer();
+    this.service.assignRoleToDto(dto, role);
+    return this.base.createOneBase(req, dto);
+  };
 
   @UseInterceptors(SqlInterceptor)
   @GrantAccess({

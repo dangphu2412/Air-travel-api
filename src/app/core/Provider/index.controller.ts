@@ -1,14 +1,15 @@
 import {ApiOperation, ApiTags} from "@nestjs/swagger";
 import {Controller, Get, Param, Patch, UseInterceptors} from "@nestjs/common";
 import {
-  Crud, CrudController, Feature, Override, ParsedBody, ParsedRequest, CrudRequest, CrudRequestInterceptor
+  Crud, CrudController, Feature, Override, ParsedBody,
+  ParsedRequest, CrudRequest, CrudRequestInterceptor
 } from "@nestjsx/crud";
 import {Provider, User} from "src/common/entity";
 import {ProviderService} from "./index.service";
 import {CurrentUser, GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
-import { ParseIntPipe } from "@nestjs/common/pipes/parse-int.pipe";
+import {ParseIntPipe} from "@nestjs/common/pipes/parse-int.pipe";
 
 @Crud({
   model: {
