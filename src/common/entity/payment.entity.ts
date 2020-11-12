@@ -9,7 +9,7 @@ import {BaseActionDate} from "./base";
 import {Bill} from "./bill.entity";
 import {BillInfo} from "./billInfo.entity";
 import {enumToArray} from "../../utils";
-import { User } from ".";
+import {User} from ".";
 
 @Entity("payments")
 export class Payment extends BaseActionDate {

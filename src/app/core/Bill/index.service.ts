@@ -8,7 +8,7 @@ import {BaseService} from "src/app/base/base.service";
 import {DEFAULT_ERROR} from "src/common/constants";
 import {CreateBilLDto} from "src/common/dto/Bill";
 import {Bill, Customer, Role, User, BillService as BillServiceEntity} from "src/common/entity";
-import {EPayment, ERole, ErrorCodeEnum} from "src/common/enums";
+import {ERole, ErrorCodeEnum} from "src/common/enums";
 import {CustomerService} from "../Customer/index.service";
 import {BillRepository} from "./index.repository";
 

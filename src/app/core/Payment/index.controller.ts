@@ -4,12 +4,12 @@ import {Controller, UseInterceptors} from "@nestjs/common";
 import {
   Crud, CrudController, CrudRequest, Feature, Override, ParsedBody, ParsedRequest
 } from "@nestjsx/crud";
-import {Payment, Role, User} from "src/common/entity";
+import {Payment, User} from "src/common/entity";
 import {PaymentService} from "./index.service";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
-import { GrantAccess, CurrentUser } from "src/common/decorators";
-import { SqlInterceptor } from "src/common/interceptors/sql.interceptor";
-import { CreatePaymentDto } from "src/common/dto/Payment";
+import {GrantAccess, CurrentUser} from "src/common/decorators";
+import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
+import {CreatePaymentDto} from "src/common/dto/Payment";
 
 @Crud({
   model: {

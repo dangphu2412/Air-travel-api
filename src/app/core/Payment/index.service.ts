@@ -1,13 +1,13 @@
 import {Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
-import { BaseService } from "src/app/base/base.service";
-import { BillError, BillInfoError } from "src/common/constants";
-import { CreatePaymentDto } from "src/common/dto/Payment";
+import {BaseService} from "src/app/base/base.service";
+import {BillError, BillInfoError} from "src/common/constants";
+import {CreatePaymentDto} from "src/common/dto/Payment";
 import {Bill, BillInfo, Payment, User} from "src/common/entity";
-import { BillStatus, EPayment, ErrorCodeEnum } from "src/common/enums";
-import { BillService } from "../Bill/index.service";
-import { BillInfoService } from "../BillInfo/index.service";
+import {BillStatus, EPayment, ErrorCodeEnum} from "src/common/enums";
+import {BillService} from "../Bill/index.service";
+import {BillInfoService} from "../BillInfo/index.service";
 import {PaymentRepository} from "./index.repository";
 
 @Injectable()
@@ -30,7 +30,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     return this.repository.create({
       amount: dto.amount,
       description: dto.description,
-      type: dto.type,
+      type: dto.type
     });
   }
 
@@ -67,7 +67,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
   }
 
   public validateCompleteBillAndSync(entity: Payment): void {
-    const { customerRemain, providerRemain } = entity.bill;
+    const {customerRemain, providerRemain} = entity.bill;
     if (customerRemain === 0 && providerRemain === 0) {
       entity.bill.status = BillStatus.COMPLETED
     }
@@ -76,4 +76,4 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
   public syncBillToDatabase(bill: Bill): Promise<Bill> {
     return bill.save();
   }
-} 
+}

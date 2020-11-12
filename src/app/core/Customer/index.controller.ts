@@ -13,7 +13,7 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 
 @Crud({
   model: {
-    type: Customer,
+    type: Customer
   },
   routes: {
     exclude: ["createManyBase", "replaceOneBase"],

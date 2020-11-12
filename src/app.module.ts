@@ -15,8 +15,8 @@ import {ServiceCategoryModule} from "./app/core/ServiceCategory/index.module";
 import {ProviderModule} from "./app/core/Provider/index.module";
 import {BillModule} from "./app/core/Bill/index.module";
 import {BillServiceModule} from "./app/core/BillService/index.module";
-import { PaymentModule } from "./app/core/Payment/index.module";
-import { BillInfoModule } from "./app/core/BillInfo/index.module";
+import {PaymentModule} from "./app/core/Payment/index.module";
+import {BillInfoModule} from "./app/core/BillInfo/index.module";
 
 @Module({
   imports: [

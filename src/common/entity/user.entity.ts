@@ -16,7 +16,7 @@ import {
 import {enumToArray} from "../../utils";
 import {Gender, UserStatus} from "../enums";
 import {Bill} from "./bill.entity";
-import { Payment } from "./payment.entity";
+import {Payment} from "./payment.entity";
 
 @Entity("users")
 @Unique(["email"])
