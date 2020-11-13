@@ -2,8 +2,8 @@ import {ECrudAction, ECrudFeature, ERole} from "../../../common/enums";
 import {Permission, Role} from "../../../common/entity";
 import {TRacl} from "../../../common/type/t.Racl";
 import {enumToArray} from "../../../utils/array";
-import {flatMap, remove} from "lodash";
-import {TCrudAction} from "../../../common/type/t.CrudAction";
+import {flatMap} from "lodash";
+import {TCrudOptions} from "../../../common/type/t.CrudAction";
 import {In} from "typeorm";
 
 export class RaclHelper {
@@ -24,8 +24,11 @@ export class RaclHelper {
       {
         role: ERole.OPERATOR,
         permissions: flatMap([
-          ...this.createManyPermissionFromFeature(ECrudFeature.USER, ["DELETE", "REPLACE"]),
-          ...this.createManyPermissionFromFeature(ECrudFeature.ROLE)
+          ...this.createManyPermissionFromFeature(ECrudFeature.USER, {
+            exclude: ["DELETE", "REPLACE"]
+          }),
+          ...this.createManyPermissionFromFeature(ECrudFeature.ROLE),
+          ...this.createManyPermissionFromFeature(ECrudFeature.PROVIDER)
         ])
       },
       {
@@ -36,11 +39,17 @@ export class RaclHelper {
           ...this.createManyPermissionFromFeature(ECrudFeature.BILL_SERVICE),
           ...this.createManyPermissionFromFeature(ECrudFeature.CUSTOMER),
           ...this.createManyPermissionFromFeature(ECrudFeature.PAYMENT),
-          ...this.createManyPermissionFromFeature(ECrudFeature.DESTINATION)
+          ...this.createManyPermissionFromFeature(ECrudFeature.DESTINATION),
+          ...this.createManyPermissionFromFeature(ECrudFeature.PROVIDER)
         ])
       },
       {
         role: ERole.INTERN,
+        permissions: [
+        ]
+      },
+      {
+        role: ERole.CUSTOMER,
         permissions: [
         ]
       }
@@ -68,12 +77,20 @@ export class RaclHelper {
     return `${feature}_${action}`;
   }
 
-  public createManyPermissionFromFeature(feature: string, exclude?: TCrudAction[]): string[] {
-    let action = enumToArray(ECrudAction);
-    if (exclude) {
-      action = remove(action, exclude);
+  public createManyPermissionFromFeature(feature: string, options?: TCrudOptions): string[] {
+    let actions = enumToArray(ECrudAction);
+
+    if (options.exclude) {
+      actions = actions.filter(action => {
+        return !options.exclude.includes(action);
+      })
     }
-    return action.map(action => {
+    if (options.only) {
+      actions = actions.filter(action => {
+        return options.only.includes(action);
+      })
+    }
+    return actions.map(action => {
       return this.createPermission(feature, action);
     })
   }
