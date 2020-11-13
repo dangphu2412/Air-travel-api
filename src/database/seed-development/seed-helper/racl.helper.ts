@@ -80,16 +80,19 @@ export class RaclHelper {
   public createManyPermissionFromFeature(feature: string, options?: TCrudOptions): string[] {
     let actions = enumToArray(ECrudAction);
 
-    if (options.exclude) {
-      actions = actions.filter(action => {
-        return !options.exclude.includes(action);
-      })
+    if (options) {
+      if (options.exclude) {
+        actions = actions.filter(action => {
+          return !options.exclude.includes(action);
+        })
+      }
+      if (options.only) {
+        actions = actions.filter(action => {
+          return options.only.includes(action);
+        })
+      }
     }
-    if (options.only) {
-      actions = actions.filter(action => {
-        return options.only.includes(action);
-      })
-    }
+
     return actions.map(action => {
       return this.createPermission(feature, action);
     })
