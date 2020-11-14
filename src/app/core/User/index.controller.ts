@@ -1,4 +1,4 @@
-import {ApiTags} from "@nestjs/swagger";
+import {ApiOperation, ApiTags} from "@nestjs/swagger";
 import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
@@ -99,6 +99,10 @@ export class UserController implements CrudController<User> {
     return this.service.getDeleted(req);
   }
 
+  @ApiOperation({
+    summary: "Soft delete user"
+  })
+  @Override("deleteOneBase")
   @Delete("/:id")
   @GrantAccess({
     action: ECrudAction.SOFT_DEL

@@ -8,7 +8,7 @@ import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service
 import {UserError} from "src/common/constants";
 import {Role, User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
-import {FindOneOptions, In, IsNull, Not, UpdateResult} from "typeorm";
+import {FindOneOptions, IsNull, Not, UpdateResult} from "typeorm";
 import {UserRepository} from "./index.repository";
 
 @Injectable()
@@ -30,11 +30,7 @@ export class UserService extends TypeOrmCrudService<User> {
   }
 
   public isNotAdmin(user: User): boolean {
-    const {role} = user;
-    if (role.name === ERole.ADMIN) {
-      return false;
-    }
-    return true;
+    return user.role.name !== ERole.ADMIN;
   }
 
   public isNotAuthor(currentUser: User, compareUser: User) {
@@ -56,7 +52,8 @@ export class UserService extends TypeOrmCrudService<User> {
     const record = await this.repository.findOne(id, {
       where: {
         deletedAt: Not(IsNull())
-      }
+      },
+      withDeleted: true
     });
     if (!record) {
       throw new NotFoundException(
@@ -92,26 +89,32 @@ export class UserService extends TypeOrmCrudService<User> {
         ErrorCodeEnum.NOT_DELETE_YOURSELF
       );
     }
-    const records = await this.repository.find({
-      where: In([id, currentUser.id]),
+    const record = await this.repository.findOne(id, {
       relations: ["role"]
     });
-    const currentUserEntity = this.getCurrentUserFromEntities(
-      records, currentUser.id
-    );
-    const record = records.find(record => record.id !== currentUser.id);
-    if (!record) throw new NotFoundException(UserError.NotFound, ErrorCodeEnum.NOT_FOUND);
+    if (!record) {
+      throw new NotFoundException(
+        UserError.NotFound,
+        ErrorCodeEnum.NOT_FOUND
+      );
+    }
 
     if (record.deletedAt !== null) {
       throw new ConflictException(
         UserError.ConflictSoftDeleted,
-        ErrorCodeEnum.NOT_DELETE_YOURSELF
+        ErrorCodeEnum.CONFLICT
       );
     }
-    if (this.isNotAdmin(currentUserEntity)) {
+
+    /**
+     * Admin is allow to delete but can not delete admin
+     */
+
+    if (this.isNotAdmin(currentUser)
+    || !this.isNotAdmin(record)) {
       throw new ForbiddenException(
         UserError.ForbiddenDelete,
-        ErrorCodeEnum.NOT_DELETE_ADMIN_ROLE
+        ErrorCodeEnum.NOT_DELETE_ADMIN_USER
       );
     }
     return this.repository.softDelete(record.id);
