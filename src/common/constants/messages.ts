@@ -1,6 +1,6 @@
 export const DEFAULT_ERROR = {
   NotFound: "Not found",
-  ConflictSelf: "Not allow to delete your self",
+  ConflictSelf: "You are not admin or not an author",
   ConflictSoftDeleted: "Your record has been soft deleted",
   ConflictExisted: "This record existed",
   ConflictUnique: "Effect to resource conflict constraint keys",
