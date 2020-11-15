@@ -82,7 +82,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     const {user} = record;
     this.baseService.isNotAdminAndAuthorAndThrowErr(
       this.userService,
-      user, currentUser
+      currentUser, user
     );
     this.baseService.isNotSoftDeletedAndThrowErr(record);
     return this.repository.restore(record.id);
@@ -106,7 +106,7 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     const {user} = record;
     this.baseService.isNotAdminAndAuthorAndThrowErr(
       this.userService,
-      user, currentUser
+      currentUser, user
     );
     return this.repository.softDelete(record.id);
   }

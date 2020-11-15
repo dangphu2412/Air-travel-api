@@ -109,6 +109,7 @@ export class BaseService implements IBaseService {
     }
   }
 
+
   isNotAdminAndAuthor(
     service: UserService,
     currentUser: User,
@@ -118,6 +119,12 @@ export class BaseService implements IBaseService {
     && service.isNotAuthor(currentUser, userBeCompared)
   }
 
+  /**
+   *
+   * @param service Must be userservice
+   * @param currentUser user get from token
+   * @param userBeCompared user get from record
+   */
   isNotAdminAndAuthorAndThrowErr(
     service: UserService,
     currentUser: User,
