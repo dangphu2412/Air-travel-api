@@ -11,7 +11,7 @@ import {Lang} from "src/common/constants/lang";
 import {City, Destination, District, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
 import {SlugHelper} from "src/global/slugify";
-import {FindOneOptions, IsNull, Not, UpdateResult} from "typeorm";
+import {FindOneOptions, UpdateResult} from "typeorm";
 import {CityService} from "../City/index.service";
 import {DistrictService} from "../District/index.service";
 import {UserService} from "../User/index.service";
@@ -89,14 +89,11 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
   }
 
   public getDeleted(req: CrudRequest) {
-    return this.find({
-      where: {
-        deletedAt: Not(IsNull())
-      },
-      withDeleted: true,
-      skip: req.parsed.offset,
-      take: req.parsed.limit
-    });
+    return this.baseService
+      .findManySoftDeleted<Destination>(
+        this.repository,
+        req
+      )
   }
 
   public async softDelete(id: number, currentUser: User): Promise<UpdateResult> {
