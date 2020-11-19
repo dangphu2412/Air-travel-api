@@ -10,6 +10,7 @@ import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
+import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
 
 @Crud({
   model: {
@@ -99,6 +100,8 @@ export class UserController implements CrudController<User> {
     return this.service.getDeleted(req);
   }
 
+  @CrudSwaggerFindMany()
+  @Override("deleteOneBase")
   @Delete("/:id")
   @GrantAccess({
     action: ECrudAction.SOFT_DEL

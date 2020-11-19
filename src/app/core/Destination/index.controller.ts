@@ -11,6 +11,7 @@ import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {Lang} from "src/common/constants/lang";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
+import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
 
 @Crud({
   model: {
@@ -91,18 +92,14 @@ export class DestinationController implements CrudController<Destination> {
     return this.service.restore(id, user);
   }
 
-  @ApiOperation({
-    summary: "Get soft deleted"
-  })
+  @CrudSwaggerFindMany()
   @UseInterceptors(CrudRequestInterceptor)
   @Get("trashed")
   getDeleted(@ParsedRequest() req: CrudRequest) {
     return this.service.getDeleted(req);
   }
 
-  @ApiOperation({
-    summary: "Soft deleted"
-  })
+  @CrudSwaggerFindMany()
   @Override("deleteOneBase")
   @Delete(":id")
   @GrantAccess({

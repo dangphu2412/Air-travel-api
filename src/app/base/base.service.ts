@@ -10,13 +10,19 @@ import {ERole, ErrorCodeEnum} from "src/common/enums";
 import {Customer, User} from "src/common/entity";
 import {CrudRequest} from "@nestjsx/crud";
 import {UserService} from "../core/User/index.service";
+import {merge} from "lodash";
 
 @Injectable()
 export class BaseService implements IBaseService {
   findManySoftDeleted<T>(
     repository: Repository<T>,
     req: CrudRequest,
-    options?: FindManyOptions): Promise<T[]> {
+    options?: FindManyOptions<T>): Promise<T[]> {
+    if (options) {
+      options.where = merge(options.where, {
+        deletedAt: Not(IsNull())
+      });
+    }
     return repository.find({
       where: options?.where ?? {
         deletedAt: Not(IsNull())
@@ -109,6 +115,7 @@ export class BaseService implements IBaseService {
     }
   }
 
+
   isNotAdminAndAuthor(
     service: UserService,
     currentUser: User,
@@ -118,6 +125,12 @@ export class BaseService implements IBaseService {
     && service.isNotAuthor(currentUser, userBeCompared)
   }
 
+  /**
+   *
+   * @param service Must be userservice
+   * @param currentUser user get from token
+   * @param userBeCompared user get from record
+   */
   isNotAdminAndAuthorAndThrowErr(
     service: UserService,
     currentUser: User,
