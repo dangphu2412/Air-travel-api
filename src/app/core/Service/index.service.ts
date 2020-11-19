@@ -58,7 +58,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       .baseService
       .findWithRelationUserThrowErr(this.repository, id);
     const {user} = record;
-    this.baseService.isNotAdminAndAuthor(
+    this.baseService.isNotAdminAndAuthorAndThrowErr(
       this.userService,
       currentUser, user
     );

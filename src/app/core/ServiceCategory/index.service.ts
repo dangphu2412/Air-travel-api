@@ -49,7 +49,7 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
     const {user} = record;
     this.baseService.isNotAdminAndAuthorAndThrowErr(
       this.userService,
-      user, currentUser
+      currentUser, user
     );
     this.baseService.isNotSoftDeletedAndThrowErr(record);
     const restoreIds = [...mapToIds(record.children), record.id];
@@ -78,9 +78,9 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
         }
       );
     const {user} = record;
-    this.baseService.isNotAdminAndAuthor(
+    this.baseService.isNotAdminAndAuthorAndThrowErr(
       this.userService,
-      user, currentUser
+      currentUser, user
     );
     const softDeleteIds = [...mapToIds(record.children), record.id];
     return this.repository.softDelete(softDeleteIds);

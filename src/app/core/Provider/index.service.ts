@@ -5,7 +5,6 @@ import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service
 import {BaseService} from "src/app/base/base.service";
 
 import {Provider, User} from "src/common/entity";
-import {Not, IsNull} from "typeorm";
 import {UserService} from "../User/index.service";
 import {ProviderRepository} from "./index.repository";
 
@@ -34,21 +33,18 @@ export class ProviderService extends TypeOrmCrudService<Provider> {
     const {user} = record;
     this.baseService.isNotAdminAndAuthorAndThrowErr(
       this.userService,
-      user, currentUser
+      currentUser, user
     );
     this.baseService.isNotSoftDeletedAndThrowErr(record);
     return this.repository.restore(record.id);
   }
 
   public getDeleted(req: CrudRequest) {
-    return this.find({
-      where: {
-        deletedAt: Not(IsNull())
-      },
-      withDeleted: true,
-      skip: req.parsed.offset,
-      take: req.parsed.limit
-    });
+    return this.baseService
+      .findManySoftDeleted<Provider>(
+        this.repository,
+        req
+      )
   }
 
 
@@ -59,7 +55,7 @@ export class ProviderService extends TypeOrmCrudService<Provider> {
     const {user} = record;
     this.baseService.isNotAdminAndAuthorAndThrowErr(
       this.userService,
-      user, currentUser
+      currentUser, user
     );
     return this.repository.softDelete(record.id);
   }
