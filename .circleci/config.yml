@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  install:
+  install_packages:
     docker:
       - image: cimg/node:12.18-browsers
         auth:
@@ -35,7 +35,7 @@ jobs:
 workflows:
   test_my_app:
     jobs:
-      - install
+      - install_packages
       - lint:
-        requires:
-          - install
+          requires:
+            - install_packages
