@@ -28,6 +28,9 @@ jobs:
           keys:
             - node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
       - run:
+          name: Install packages
+          command: npm ci
+      - run:
           name: Run lint
           command: npm run lint
 
