@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   lint:
     docker:
-      - image: cimg/node:12.x
+      - image: cimg/node:12.18-browsers
         auth:
             username: chuotcona123
             password: qweasdzxc2412
