@@ -1,6 +1,21 @@
 version: 2.1
 
 jobs:
+  build:
+    docker:
+      - image: cimg/node:12.18-browsers
+        auth:
+            username: chuotcona123
+            password: qweasdzxc2412
+    steps:
+      - checkout
+      - run:
+          name: Install packages
+          command: npm ci
+      - save_cache:
+          key: node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
+          paths:
+            - ~/.npm
   lint:
     docker:
       - image: cimg/node:12.18-browsers
@@ -13,13 +28,6 @@ jobs:
           keys:
             - node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
       - run:
-          name: Install packages
-          command: npm ci
-      - save_cache:
-          key: node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
-          paths:
-            - ~/.npm
-      - run:
           name: Run lint
           command: npm run lint
 
@@ -27,4 +35,5 @@ jobs:
 workflows:
   test_my_app:
     jobs:
+      - build
       - lint
