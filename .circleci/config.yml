@@ -2,14 +2,11 @@ version: 2.1
 
 jobs:
   lint:
-    - run: 
-        name: "Setup docker variables"
-        command: echo 'export DOCKERHUB_PASSWORD="qweasdzxc2412"' >> $BASH_ENV
     docker:
       - image: cimg/node:12.x
         auth:
             username: chuotcona123
-            password: $DOCKERHUB_PASSWORD
+            password: qweasdzxc2412
     steps:
       - checkout
       - restore_cache:
