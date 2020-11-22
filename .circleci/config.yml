@@ -1,7 +1,33 @@
 version: 2.1
-orbs:
-  node: circleci/node@3.0.0
+
+jobs:
+  lint:
+    - run: 
+        name: "Setup docker variables"
+        command: echo 'export DOCKERHUB_PASSWORD="qweasdzxc2412"' >> $BASH_ENV
+    docker:
+      - image: cimg/node:12.x
+        auth:
+            username: chuotcona123
+            password: $DOCKERHUB_PASSWORD
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
+      - run:
+          name: Install packages
+          command: npm ci
+      - save_cache:
+          key: node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
+          paths:
+            - ~/.npm
+      - run:
+          name: Run lint
+          command: npm run lint
+
+
 workflows:
-  node-tests:
+  test_my_app:
     jobs:
-      - node/test
+      - lint
