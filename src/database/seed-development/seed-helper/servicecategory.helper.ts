@@ -8,29 +8,28 @@ export class ServiceCategoryHelper {
     this._csvHelper = csvHelper;
   }
 
-  public async initServiceCategory(): Promise<void> {
+  public async initServiceCategory(): Promise<ServiceCategory[]> {
     const data = await this._csvHelper.readCsv() as ServiceCategory[];
-    const parents = data.filter(item => item.parentId === "");
-    await Promise.all(parents.map(async item => {
+    const parents: Promise<ServiceCategory>[] = [];
+    const childs: Promise<ServiceCategory>[] = [];
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
       const dto = new ServiceCategory();
       dto.enName = item.enName || null;
       dto.viName = item.viName || null;
       dto.enSlug = SlugHelper.slugifyWithDateTime(item.enName);
       dto.viSlug = SlugHelper.slugifyWithDateTime(item.viName);
       dto.user = await User.findOne(item.userId) || null;
-      return dto.save();
-    }));
-    await Promise.all(data.map(async item => {
-      if (item.parentId !== "") {
-        const dto = new ServiceCategory();
-        dto.enName = item.enName || null;
-        dto.viName = item.viName || null;
-        dto.enSlug = SlugHelper.slugifyWithDateTime(item.enName);
-        dto.viSlug = SlugHelper.slugifyWithDateTime(item.viName);
-        dto.parent = await ServiceCategory.findOne(item.parentId) || null;
-        dto.user = await User.findOne(item.userId) || null;
-        return dto.save();
+
+      if (item.parentId === "") {
+        parents.push(dto.save());
       }
-    }));
+      else {
+        dto.parent = await ServiceCategory.findOne(item.parentId) || null;
+        childs.push(dto.save());
+      }
+    }
+
+    return Promise.all([...parents, ...childs]);
   }
 }

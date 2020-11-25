@@ -14,11 +14,11 @@ export interface DestinationSeed {
 }
 
 export class DestinationHelper {
-  public async initDestination(userCount: number) {
+  public initDestination(userCount: number) {
     const cityRepo = City.getRepository();
     const destinationRepo = Destination.getRepository();
 
-    await Promise.all(
+    return Promise.all(
       Object.keys(data).map(async e => {
         const city = await cityRepo.findOne({
           where: {
@@ -33,7 +33,7 @@ export class DestinationHelper {
         const startLatitude = data[e].coordination.latitude;
         const endLongitude = startLongitude + 0.05;
         const endLatitude = startLatitude + 0.05;
-        await Promise.all(currentValues.map(val => {
+        return Promise.all(currentValues.map(val => {
           const districtSlug = (
             SlugHelper
               .slugify(val.address.split(",")[0])

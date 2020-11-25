@@ -5,13 +5,14 @@ import {enumToArray} from "../../utils/array";
 import * as Entity from "../../common/entity";
 import {RaclHelper} from "./seed-helper/racl.helper";
 import {UserHepler} from "./seed-helper/user.helper";
-import {Role, User, Provider} from "../../common/entity";
+import {Role, User, Provider, Destination, ServiceCategory} from "../../common/entity";
 import {ServiceCategoryHelper} from "./seed-helper/servicecategory.helper";
 import {CsvHelper} from "../../utils/csv";
 import {resolve} from "path";
 import {CityAndDistrictHelper} from "./seed-helper/cityAndDistrict.helper";
 import {DestinationHelper} from "./seed-helper/destination.heper";
 import {ServiceHelper} from "./seed-helper/service.helper";
+import {flatMap} from "lodash";
 
 export default class Seeding implements Seeder {
   private serviceCategoryFilePath = resolve(__dirname, "data", "serviceCategory.csv");;
@@ -46,16 +47,18 @@ export default class Seeding implements Seeder {
       const serviceCategoryHelper = new ServiceCategoryHelper(
         new CsvHelper(this.serviceCategoryFilePath)
       );
-      await serviceCategoryHelper.initServiceCategory();
-
+      const serviceCategories: ServiceCategory[] = await serviceCategoryHelper
+        .initServiceCategory();
       const cityAndDistrictHelper = new CityAndDistrictHelper();
       await cityAndDistrictHelper.initCitiesAndDistricts();
 
       const destinationHelper = new DestinationHelper();
-      await destinationHelper.initDestination(userCount);
+      const destinations: Destination[] = flatMap(
+        await destinationHelper.initDestination(userCount)
+      );
 
       const serviceHelper = new ServiceHelper();
-      await serviceHelper.initService(userCount);
+      await serviceHelper.initService(userCount, serviceCategories, destinations);
 
       await factory(Provider)({userCount}).createMany(20);
     } catch (error) {
