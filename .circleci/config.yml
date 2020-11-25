@@ -21,7 +21,43 @@ jobs:
           key: node-deps-v1-{{ .Branch }}-{{ checksum "~/Air-travel-api/package-lock.json" }}
           paths:
             - ~/.npm
+  lint:
+    docker:
+      - image: cimg/node:12.18-browsers
+        auth:
+            username: chuotcona123
+            password: qweasdzxc2412
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
+      - run:
+          name: Install packages
+          command: npm ci
+      - run:
+          name: Run lint
+          command: npm run lint
+  deploy:
+    machine:
+      enabled: true
+    steps:
+      - run:
+        name: Deploy Over SSH
+          command: |
+            ssh $SSH_USER@$SSH_HOST "cd /home/Air-travel-api && sudo git pull && sudo npm install && sudo npm run build && sudo pm2 update"
+
 workflows:
   node-tests:
     jobs:
-      - lint/tests
+      - install_packages
+      - lint:
+          requires:
+            - install_packages
+      - deploy:
+          requires:
+            - install_packages
+            - lint
+           filters:
+             branches:
+               only: master # only deploy on the master branch
