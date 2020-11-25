@@ -1,5 +1,8 @@
 import {ApiOperation, ApiTags} from "@nestjs/swagger";
-import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
+import {
+  Controller, Patch, Param, ParseIntPipe,
+  Get, UseInterceptors, Delete
+} from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
