@@ -126,7 +126,7 @@ export class UserService extends TypeOrmCrudService<User> {
       relations: ["role", "role.permissions"],
       select: [
         "id", "fullName", "email", "avatar", "bio",
-        "birthday", "gender", "note", "status",
+        "birthday", "gender", "note", "status", "phone",
         "role"
       ]
     })
