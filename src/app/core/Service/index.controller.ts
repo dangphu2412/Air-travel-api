@@ -34,7 +34,10 @@ import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
         exclude: ["enContent", "viContent"],
         eager: true
       },
-      "destinations.location": {
+      "destinations.city": {
+        eager: true
+      },
+      "destinations.district": {
         eager: true
       },
       user: {
