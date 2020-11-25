@@ -33,7 +33,14 @@ jobs:
       - run:
           name: Run lint
           command: npm run lint
-
+  deploy:
+    machine:
+      enabled: true
+    steps:
+      - run:
+        name: Deploy Over SSH
+          command: |
+            ssh $SSH_USER@$SSH_HOST "cd /home/Air-travel-api && sudo git pull && sudo npm install && sudo npm run build && sudo pm2 update"
 
 workflows:
   test_my_app:
@@ -42,3 +49,10 @@ workflows:
       - lint:
           requires:
             - install_packages
+      - deploy:
+          requires:
+            - install_packages
+            - lint
+           filters:
+             branches:
+               only: master # only deploy on the master branch

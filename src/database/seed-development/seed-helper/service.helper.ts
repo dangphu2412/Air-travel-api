@@ -1,11 +1,15 @@
 import faker from "faker";
-import {Service} from "../../../common/entity";
+import {Destination, Service, ServiceCategory} from "../../../common/entity";
 import data from "../data/destination.json";
 import {DestinationSeed} from "./destination.heper";
 import {SlugHelper} from "../../../global/slugify";
 
 export class ServiceHelper {
-  public async initService(userCount: number): Promise<void> {
+  public async initService(
+    userCount: number,
+    serviceCategories: ServiceCategory[],
+    destinations: Destination[]
+  ): Promise<void> {
     await Promise.all(
       Object.keys(data).map(async e => {
         const currentValues: DestinationSeed[] = data[e].value;
@@ -45,6 +49,12 @@ export class ServiceHelper {
           item.userId = userId;
           item.unit = unit;
           item.gallery = gallery;
+          item.serviceCategories = [
+            faker.random.arrayElement(serviceCategories)
+          ];
+          item.destinations = [
+            faker.random.arrayElement(destinations)
+          ]
           return item.save();
         }));
       })
