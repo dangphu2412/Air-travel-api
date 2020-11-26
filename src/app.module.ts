@@ -17,6 +17,7 @@ import {BillModule} from "./app/core/Bill/index.module";
 import {BillServiceModule} from "./app/core/BillService/index.module";
 import {PaymentModule} from "./app/core/Payment/index.module";
 import {BillInfoModule} from "./app/core/BillInfo/index.module";
+import {NotificationModule} from "./app/core/Notification/index.module";
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import {BillInfoModule} from "./app/core/BillInfo/index.module";
     BillServiceModule,
     PaymentModule,
     BillInfoModule,
+    NotificationModule,
     TypeOrmModule.forRoot(typeOrmConfig)
   ]
 })
