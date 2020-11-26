@@ -131,4 +131,15 @@ export class UserService extends TypeOrmCrudService<User> {
       ]
     })
   }
+
+  public updateNotificationToken(notifyToken: string, user: User) {
+    if (user.notifyToken === notifyToken) {
+      throw new ConflictException(
+        UserError.ConflictNotifyToken,
+        ErrorCodeEnum.CONFLICT
+      );
+    }
+    user.notifyToken = notifyToken;
+    return user.save();
+  }
 }

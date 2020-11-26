@@ -46,6 +46,12 @@ export class RaclHelper {
       {
         role: ERole.INTERN,
         permissions: [
+          ...this.createManyPermissionFromFeature(ECrudFeature.BILL, {
+            only: ["READ"]
+          }),
+          ...this.createManyPermissionFromFeature(ECrudFeature.BILL_INFO, {
+            only: ["READ"]
+          })
         ]
       },
       {
