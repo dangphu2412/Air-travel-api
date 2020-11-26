@@ -116,13 +116,6 @@ export class User extends BaseActionDate {
     @Column({default: false})
     hasExpiredToken: boolean;
 
-    @Exclude()
-    @ApiProperty({readOnly: true, writeOnly: true})
-    @IsOptional()
-    @IsString()
-    @Column({nullable: true})
-    notifyToken: string;
-
     @BeforeInsert()
     @BeforeUpdate()
     hashPwd() {

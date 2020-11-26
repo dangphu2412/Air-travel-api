@@ -1,7 +1,7 @@
 import {ApiTags} from "@nestjs/swagger";
 import {
   Controller, Patch, Param, ParseIntPipe,
-  Get, UseInterceptors, Delete, Body
+  Get, UseInterceptors, Delete
 } from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
@@ -14,7 +14,6 @@ import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
-import {NotifyToken} from "src/common/dto/Notify/payload.dto";
 
 @Crud({
   model: {
@@ -115,16 +114,5 @@ export class UserController implements CrudController<User> {
     @CurrentUser() user: User
   ) {
     return this.service.softDelete(id, user);
-  }
-
-  @Patch("/notify/token")
-  @GrantAccess({
-    jwtOnly: true
-  })
-  updateNotificationToken(
-    @Body() body: NotifyToken,
-    @CurrentUser() user: User
-  ) {
-    return this.service.updateNotificationToken(body.nofifyToken, user);
   }
 }
