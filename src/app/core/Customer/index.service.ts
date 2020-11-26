@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable
 } from "@nestjs/common";
@@ -6,7 +7,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {BaseService} from "src/app/base/base.service";
-import {DEFAULT_ERROR} from "src/common/constants";
+import {DEFAULT_ERROR, UserError} from "src/common/constants";
 import {RegisterDto} from "src/common/dto/User";
 import {Customer, Role, User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
@@ -96,8 +97,14 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
     return this.repository.softDelete(record.id);
   }
 
-  public async mapRelationKeysToEntities(dto: Customer): Promise<Customer> {
-
-    return dto;
+  public updateNotificationToken(notifyToken: string, user: Customer) {
+    if (user.notifyToken === notifyToken) {
+      throw new ConflictException(
+        UserError.ConflictNotifyToken,
+        ErrorCodeEnum.CONFLICT
+      );
+    }
+    user.notifyToken = notifyToken;
+    return user.save();
   }
 }

@@ -1,5 +1,8 @@
 import {ApiOperation, ApiTags} from "@nestjs/swagger";
-import {Controller, Patch, Param, ParseIntPipe, Get, UseInterceptors, Delete} from "@nestjs/common";
+import {
+  Controller, Patch, Param, ParseIntPipe,
+  Get, UseInterceptors, Delete, Body
+} from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
@@ -11,6 +14,7 @@ import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
+import {NotifyToken} from "src/common/dto/Notify/payload.dto";
 
 @Crud({
   model: {
@@ -69,7 +73,6 @@ export class CustomerController implements CrudController<Customer> {
     @CurrentUser() user: Customer
   ): Promise<Customer> {
     const userId: number = req.parsed.paramsFilter[0].value;
-    await this.service.mapRelationKeysToEntities(dto);
     this.service.validateAuthor(userId, user);
     return this.base.updateOneBase(req, dto);
   };
@@ -128,5 +131,17 @@ export class CustomerController implements CrudController<Customer> {
     const userId: number = req.parsed.paramsFilter[0].value;
     this.service.validateAuthor(userId, user);
     return this.base.deleteOneBase(req);
+  }
+
+
+  @Patch("/notify/token")
+  @GrantAccess({
+    jwtOnly: true
+  })
+  updateNotificationToken(
+    @Body() body: NotifyToken,
+    @CurrentUser() user: Customer
+  ) {
+    return this.service.updateNotificationToken(body.nofifyToken, user);
   }
 }
