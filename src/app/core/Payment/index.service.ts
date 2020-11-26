@@ -8,6 +8,7 @@ import {Bill, BillInfo, Payment, User} from "src/common/entity";
 import {BillStatus, EPayment, ErrorCodeEnum} from "src/common/enums";
 import {BillService} from "../Bill/index.service";
 import {BillInfoService} from "../BillInfo/index.service";
+import {NotificationService} from "../Notification/index.service";
 import {PaymentRepository} from "./index.repository";
 
 @Injectable()
@@ -17,7 +18,8 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     private repository: PaymentRepository,
     private baseService: BaseService,
     private billService: BillService,
-    private billInfoService: BillInfoService
+    private billInfoService: BillInfoService,
+    private notifyService: NotificationService
   ) {
     super(repository);
   }
@@ -35,7 +37,9 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
   }
 
   public async mapRelationKeysToEntities(entity: Payment, dto: CreatePaymentDto): Promise<void> {
-    const bill: Bill = await this.billService.findOne(dto.billId);
+    const bill: Bill = await this.billService.findOne(dto.billId, {
+      relations: ["customer"]
+    });
     const billInfo: BillInfo = await this.billInfoService.findOne(dto.billInfoId);
 
     if (!bill) throw new NotFoundException(BillError.NotFound, ErrorCodeEnum.NOT_FOUND);
@@ -60,7 +64,8 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
       default:
         entity.bill.customerRemain -= entity.amount;
         if (entity.bill.customerRemain === 0) {
-          entity.bill.status = BillStatus.PROVIDER_PAID
+          entity.bill.status = BillStatus.PROVIDER_PAID;
+          this.notifyService.notifyCustomerBillFinished(entity.bill.customer);
         }
         break;
     }
