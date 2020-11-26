@@ -9,6 +9,7 @@ import {DEFAULT_ERROR} from "src/common/constants";
 import {CreateBilLDto} from "src/common/dto/Bill";
 import {Bill, Customer, Role, User, BillService as BillServiceEntity} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
+import {EntityManager} from "typeorm";
 import {CustomerService} from "../Customer/index.service";
 import {BillRepository} from "./index.repository";
 
@@ -21,10 +22,6 @@ export class BillService extends TypeOrmCrudService<Bill> {
     private customerService: CustomerService
   ) {
     super(repository);
-  }
-
-  public fillBillServices(entity: Bill, billServices: BillServiceEntity[]) {
-    entity.billServices = billServices;
   }
 
   public fillRemain(entity: Bill) {
@@ -55,8 +52,13 @@ export class BillService extends TypeOrmCrudService<Bill> {
     );
   }
 
-  public createEntity(dto: CreateBilLDto, user: User, customer: Customer) {
-    return this.repository.create({
+  public createBill(
+    dto: CreateBilLDto,
+    user: User,
+    customer: Customer,
+    transactionManager: EntityManager
+  ): Promise<Bill> {
+    const entity = this.repository.create({
       status: dto.status,
       note: dto.note,
       user,
@@ -66,20 +68,31 @@ export class BillService extends TypeOrmCrudService<Bill> {
       customerRemain: 0,
       providerRemain: 0
     })
+    return transactionManager.save(entity);
   }
 
-  public createBillServices(dto: CreateBilLDto, billEntity: Bill) {
+  public createBillServices(
+    dto: CreateBilLDto,
+    billEntity: Bill,
+    transactionManager: EntityManager
+  ): Promise<BillServiceEntity[]> {
     return Promise.all(dto.billServices.map(billService => {
       const entity = new BillServiceEntity();
       entity.netPrice = billService.netPrice;
       entity.quantity = billService.quantity;
       entity.price = billService.price;
       entity.netPrice = billService.netPrice;
+      entity.bill = billEntity;
 
       billEntity.totalPrice += billService.price;
       billEntity.totalNetPrice += billService.netPrice;
 
-      return entity.save();
+      return transactionManager.save(entity);
     }));
+  }
+
+  updateBillRemain(entity: Bill, transactionManager: EntityManager): Promise<Bill> {
+    this.fillRemain(entity);
+    return transactionManager.save(entity);
   }
 }

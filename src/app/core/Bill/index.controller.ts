@@ -4,13 +4,14 @@ import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {Bill, BillService as BillServiceEntity, User} from "src/common/entity";
+import {Bill, User} from "src/common/entity";
 import {BillService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CreateBilLDto} from "src/common/dto/Bill";
+import {getManager} from "typeorm";
 
 @Crud({
   model: {
@@ -25,6 +26,21 @@ import {CreateBilLDto} from "src/common/dto/Bill";
           type: "CUSTOMER"
         })
       ]
+    }
+  },
+  query: {
+    join: {
+      billServices: {
+        eager: true
+      },
+      user: {
+        allow: ["id", "fullName", "avatar"],
+        eager: true
+      },
+      customer: {
+        allow: ["id", "fullName", "avatar"],
+        eager: true
+      }
     }
   }
 })
@@ -43,18 +59,20 @@ export class BillController implements CrudController<Bill> {
   })
   @UseInterceptors(SqlInterceptor)
   @Override("createOneBase")
-  async createOneOverride(
+  createOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: CreateBilLDto,
     @CurrentUser() user: User
   ): Promise<Bill> {
-    const customer = await this.service.getCustomer(dto.customerId);
-    const entity: Bill = this.service.createEntity(dto, user, customer);
-    const billServices: BillServiceEntity[] = await this.service.createBillServices(dto, entity);
+    return getManager().transaction(async transactionManager => {
+      const customer = await this.service.getCustomer(dto.customerId);
+      const entity: Bill = await this.service.createBill(dto, user, customer, transactionManager);
 
-    this.service.fillBillServices(entity, billServices);
-    this.service.fillRemain(entity);
-    return this.base.createOneBase(req, entity);
+      await this.service.createBillServices(dto, entity, transactionManager);
+
+      await this.service.updateBillRemain(entity, transactionManager);
+      return entity;
+    })
   };
 
   @UseInterceptors(CrudRequestInterceptor)

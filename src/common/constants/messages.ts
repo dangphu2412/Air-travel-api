@@ -17,7 +17,8 @@ export const UserError = {
   ConflictExisted: "User existed",
   ForbiddenDelete: "Not allowed to soft delete admin or super admin",
   ConflictRestore: "Your record has been restore",
-  Unauthorized: "Your username or password is not right"
+  Unauthorized: "Your username or password is not right",
+  ConflictNotifyToken: "This token has already in used"
 }
 
 export const CustomerError = {

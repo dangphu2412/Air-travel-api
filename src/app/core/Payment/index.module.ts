@@ -11,6 +11,8 @@ import {BillInfoService} from "../BillInfo/index.service";
 import {CustomerModule} from "../Customer/index.module";
 import {CustomerRepository} from "../Customer/index.repository";
 import {CustomerService} from "../Customer/index.service";
+import {NotificationModule} from "../Notification/index.module";
+import {NotificationService} from "../Notification/index.service";
 import {ProviderModule} from "../Provider/index.module";
 import {ProviderRepository} from "../Provider/index.repository";
 import {ProviderService} from "../Provider/index.service";
@@ -30,6 +32,7 @@ import {PaymentService} from "./index.service";
     CustomerModule,
     ProviderModule,
     UserModule,
+    NotificationModule,
     TypeOrmModule.forFeature([
       PaymentRepository,
       BillRepository,
@@ -47,7 +50,8 @@ import {PaymentService} from "./index.service";
     BillInfoService,
     CustomerService,
     ProviderService,
-    UserService
+    UserService,
+    NotificationService
   ],
   exports: [PaymentService]
 })

@@ -21,3 +21,7 @@ export const S3_CONFIG = {
   S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
   S3_SIGNED_URL_TIMEOUT: parseInt(process.env.S3_SIGNED_URL_TIMEOUT, 10)
 }
+
+export const FIREBASE_CONFIG = {
+  DATABASE_FIREBASE_URL: process.env.DATABASE_FIREBASE_URL
+}
