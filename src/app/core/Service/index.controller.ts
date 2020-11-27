@@ -26,7 +26,7 @@ import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
         allow: ["id", "viName", "enName", "enSlug", "viSlug", "thumbnail"],
         eager: true
       },
-      provider: {
+      providers: {
         allow: ["id", "fullName", "avatar"],
         eager: true
       },
