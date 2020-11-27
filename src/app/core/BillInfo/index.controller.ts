@@ -25,7 +25,6 @@ import {EBillInfoType} from "src/common/enums/billInfoType.enum";
 export class BillInfoController implements CrudController<BillInfo> {
   constructor(public service: BillInfoService) {}
 
-
   get base(): CrudController<BillInfo> {
     return this;
   }
