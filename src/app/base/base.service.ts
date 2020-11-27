@@ -148,7 +148,7 @@ export class BaseService implements IBaseService {
 
   isNotAdminAndThrowErr(user: User): void {
     const {role} = user;
-    if (role.name === ERole.ADMIN) {
+    if (role.name !== ERole.ADMIN) {
       throw new ForbiddenException(
         DEFAULT_ERROR.Forbidden,
         ErrorCodeEnum.FORBIDDEN
