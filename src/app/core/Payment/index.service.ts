@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException} from "@nestjs/common";
+import {ConflictException, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {BaseService} from "src/app/base/base.service";
@@ -55,6 +55,12 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
 
     switch (type) {
       case EPayment.PAY_OUT:
+        if (entity.amount > entity.bill.providerRemain) {
+          throw new ConflictException(
+            BillError.ConflictRemainGreaterThan,
+            ErrorCodeEnum.CONFLICT
+          )
+        }
         entity.bill.providerRemain -= entity.amount;
         if (entity.bill.providerRemain === 0) {
           entity.bill.status = BillStatus.CUSTOMER_PAID
@@ -62,6 +68,12 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
         break;
       case EPayment.GET_IN:
       default:
+        if (entity.amount > entity.bill.providerRemain) {
+          throw new ConflictException(
+            BillError.ConflictRemainGreaterThan,
+            ErrorCodeEnum.CONFLICT
+          )
+        }
         entity.bill.customerRemain -= entity.amount;
         if (entity.bill.customerRemain === 0) {
           entity.bill.status = BillStatus.PROVIDER_PAID;

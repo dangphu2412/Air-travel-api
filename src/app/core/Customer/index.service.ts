@@ -7,7 +7,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {BaseService} from "src/app/base/base.service";
-import {DEFAULT_ERROR, UserError} from "src/common/constants";
+import {CustomerError, DEFAULT_ERROR} from "src/common/constants";
 import {RegisterDto} from "src/common/dto/User";
 import {Customer, Role, User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
@@ -98,9 +98,15 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
   }
 
   public updateNotificationToken(notifyToken: string, user: Customer) {
+    if (!user.notifyToken) {
+      throw new ConflictException(
+        CustomerError.ConflictEmptyToken,
+        ErrorCodeEnum.CONFLICT
+      );
+    }
     if (user.notifyToken === notifyToken) {
       throw new ConflictException(
-        UserError.ConflictNotifyToken,
+        CustomerError.ConflictNotifyToken,
         ErrorCodeEnum.CONFLICT
       );
     }

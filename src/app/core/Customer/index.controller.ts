@@ -64,7 +64,8 @@ export class CustomerController implements CrudController<Customer> {
 
   @UseInterceptors(SqlInterceptor)
   @GrantAccess({
-    action: ECrudAction.UPDATE
+    action: ECrudAction.UPDATE,
+    type: "CUSTOMER"
   })
   @Override("updateOneBase")
   async updateOneOverride(
@@ -82,7 +83,8 @@ export class CustomerController implements CrudController<Customer> {
   })
   @Patch(":id/restore")
   @GrantAccess({
-    action: ECrudAction.RESTORE
+    action: ECrudAction.RESTORE,
+    type: "CUSTOMER"
   })
   restoreCustomer(
     @Param("id", ParseIntPipe) id: number,
@@ -136,7 +138,8 @@ export class CustomerController implements CrudController<Customer> {
 
   @Patch("/notify/token")
   @GrantAccess({
-    jwtOnly: true
+    jwtOnly: true,
+    type: "CUSTOMER"
   })
   updateNotificationToken(
     @Body() body: NotifyToken,

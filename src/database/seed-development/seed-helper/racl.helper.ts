@@ -105,8 +105,8 @@ export class RaclHelper {
   }
 
   public async assignPermissionsToRoles(roleEntities: Array<Role>) {
-    await this.createPermissions();
     await this.createSuperPermission();
+    await this.createPermissions();
     const racls = this._racls;
     await Promise.all(
       racls.map(async racl => {
