@@ -18,7 +18,11 @@ export default class Seeding implements Seeder {
   private serviceCategoryFilePath = resolve(__dirname, "data", "serviceCategory.csv");;
 
   private randomUser(factory: Factory, role: Role) {
-    return factory(User)({role, password: "123123"}).createMany(10)
+    return factory(User)({role, password: "123123"}).createMany(10);
+  }
+
+  private randomProvider(factory: Factory, userCount: number) {
+    return factory(Provider)({userCount}).createMany(10);
   }
 
   private initRoles(roles: ERole[]) {
@@ -43,6 +47,7 @@ export default class Seeding implements Seeder {
       const userRole: Role = roleEntities.find(role => role.name === ERole.INTERN);
       await this.randomUser(factory, userRole);
       const userCount: number = await userHelper.countUser();
+      const providers: Provider[] = await this.randomProvider(factory, userCount);
 
       const serviceCategoryHelper = new ServiceCategoryHelper(
         new CsvHelper(this.serviceCategoryFilePath)
@@ -58,7 +63,7 @@ export default class Seeding implements Seeder {
       );
 
       const serviceHelper = new ServiceHelper();
-      await serviceHelper.initService(userCount, serviceCategories, destinations);
+      await serviceHelper.initService(userCount, serviceCategories, destinations, providers);
 
       await factory(Provider)({userCount}).createMany(20);
     } catch (error) {

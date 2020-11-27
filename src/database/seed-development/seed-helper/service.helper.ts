@@ -1,5 +1,5 @@
 import faker from "faker";
-import {Destination, Service, ServiceCategory} from "../../../common/entity";
+import {Destination, Service, ServiceCategory, Provider} from "../../../common/entity";
 import data from "../data/destination.json";
 import {DestinationSeed} from "./destination.heper";
 import {SlugHelper} from "../../../global/slugify";
@@ -8,7 +8,8 @@ export class ServiceHelper {
   public async initService(
     userCount: number,
     serviceCategories: ServiceCategory[],
-    destinations: Destination[]
+    destinations: Destination[],
+    providers: Provider[]
   ): Promise<void> {
     await Promise.all(
       Object.keys(data).map(async e => {
@@ -54,6 +55,9 @@ export class ServiceHelper {
           ];
           item.destinations = [
             faker.random.arrayElement(destinations)
+          ],
+          item.providers = [
+            faker.random.arrayElement(providers)
           ]
           return item.save();
         }));
