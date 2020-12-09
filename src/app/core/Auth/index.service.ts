@@ -34,7 +34,6 @@ export class AuthService {
     }
     const payload: TJwtPayload = {
       userId: user.id,
-      permissions: this.getPermissions(user.role),
       type
     }
     const loginResponse: IUserLoginResponse = {
