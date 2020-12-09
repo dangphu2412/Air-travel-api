@@ -98,12 +98,6 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
   }
 
   public updateNotificationToken(notifyToken: string, user: Customer) {
-    if (!user.notifyToken) {
-      throw new ConflictException(
-        CustomerError.ConflictEmptyToken,
-        ErrorCodeEnum.CONFLICT
-      );
-    }
     if (user.notifyToken === notifyToken) {
       throw new ConflictException(
         CustomerError.ConflictNotifyToken,
