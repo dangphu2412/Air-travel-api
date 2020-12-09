@@ -2,8 +2,9 @@ import {NestFactory} from "@nestjs/core";
 import "./config/crud.config";
 import {AppModule} from "./app.module";
 import {BundleApp} from "./config/bundle";
+import * as env from "dotenv";
 
-require("dotenv").config({path: ".env"});
+env.config();
 
 async function bootstrap() {
   /**

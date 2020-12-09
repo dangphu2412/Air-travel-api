@@ -10,6 +10,7 @@ import {CurrentUser, GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {ParseIntPipe} from "@nestjs/common/pipes/parse-int.pipe";
+import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
 
 @Crud({
   model: {
@@ -76,6 +77,7 @@ export class ProviderController implements CrudController<Provider> {
   @ApiOperation({
     summary: "Soft delete provider"
   })
+  @CrudSwaggerFindMany()
   @Override("deleteOneBase")
   @GrantAccess({
     action: ECrudAction.SOFT_DEL
