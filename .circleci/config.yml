@@ -53,6 +53,6 @@ workflows:
           requires:
             - install_packages
             - lint
-           filters:
-             branches:
-               only: master # only deploy on the master branch
+          filters:
+            branches:
+              only: master # only deploy on the master branch
