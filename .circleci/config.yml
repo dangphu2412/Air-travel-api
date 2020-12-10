@@ -4,51 +4,29 @@ jobs:
   install_packages:
     docker:
       - image: cimg/node:12.18-browsers
-        auth:
-            username: chuotcona123
-            password: qweasdzxc2412
     steps:
       - checkout
       - run:
           name: Install packages
-          command: yarn ci
+          command: npm install
       - save_cache:
-          key: yarn-packages-{{checksum "yarn.lock"}}
+          key: v1-dependencies-{{ checksum "package.json" }}
           paths:
-            - ~/.cache/yarn
-  lint:
-    docker:
-      - image: cimg/node:12.18-browsers
-        auth:
-            username: chuotcona123
-            password: qweasdzxc2412
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - yarn-packages-{{checksum "yarn.lock"}}
-      - run:
-          name: Install packages
-          command: yarn ci
-      - run:
-          name: Run lint
-          command: yarn run lint
+            - node_modules
   deploy:
     machine:
       enabled: true
     steps:
+      - checkout
       - run:
           name: Deploy Over SSH
           command:
-            ssh $SSH_USER@$SSH_HOST "cd /home/Air-travel-api && sudo git pull && sudo npm install && sudo npm run build && sudo pm2 update"
+            ssh $SSH_USER@$SSH_HOST "cd /home/Air-travel-api && sudo git pull && sudo npm run build && sudo pm2 update"
 
 workflows:
   test_my_app:
     jobs:
       - install_packages
-      - lint:
-          requires:
-            - install_packages
       - deploy:
           requires:
             - install_packages
