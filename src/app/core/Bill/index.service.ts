@@ -5,7 +5,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {BaseService} from "src/app/base/base.service";
-import {DEFAULT_ERROR} from "src/common/constants";
+import {CustomerError} from "src/common/constants";
 import {CreateBilLDto} from "src/common/dto/Bill";
 import {Bill, Customer, Role, User, BillService as BillServiceEntity} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
@@ -32,7 +32,7 @@ export class BillService extends TypeOrmCrudService<Bill> {
   async getCustomer(id: number) {
     const customer = await this.customerService.findOne(id);
 
-    if (!customer) throw new NotFoundException(DEFAULT_ERROR.NotFound, ErrorCodeEnum.NOT_FOUND);
+    if (!customer) throw new NotFoundException(CustomerError.NotFound, ErrorCodeEnum.NOT_FOUND);
 
     return customer;
   }
@@ -84,7 +84,7 @@ export class BillService extends TypeOrmCrudService<Bill> {
       entity.netPrice = billService.netPrice;
       entity.bill = billEntity;
 
-      billEntity.totalPrice += billService.price;
+      billEntity.totalPrice += billService.price * billService.quantity;
       billEntity.totalNetPrice += billService.netPrice;
 
       return transactionManager.save(entity);

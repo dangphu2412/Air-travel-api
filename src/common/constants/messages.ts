@@ -21,6 +21,7 @@ export const UserError = {
 }
 
 export const CustomerError = {
+  NotFound: "Not found this customer",
   ConflictExisted: "Your account has been existed",
   Unauthorized: "Your username or password is not right",
   ConflictNotifyToken: "This token has already in used",
