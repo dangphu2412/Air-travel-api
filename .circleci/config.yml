@@ -30,7 +30,6 @@ workflows:
       - deploy:
           requires:
             - install_packages
-            - lint
           filters:
             branches:
               only: master # only deploy on the master branch
