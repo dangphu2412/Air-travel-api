@@ -18,10 +18,13 @@ jobs:
       enabled: true
     steps:
       - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "b2:3b:fa:32:ac:6f:c4:05:78:da:69:0f:0e:e4:da:45"
       - run:
           name: Deploy Over SSH
-          command:
-            ssh $SSH_USER@$SSH_HOST "cd /home/Air-travel-api && sudo git pull && sudo npm run build && sudo pm2 update"
+          command: |
+            ssh $SSH_USER@$SSH_HOST "cd /home/Air-travel-api && echo Success access && sudo git pull && sudo npm run build && sudo pm2 update"
 
 workflows:
   test_my_app:
