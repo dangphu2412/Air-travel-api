@@ -11,11 +11,11 @@ jobs:
       - checkout
       - run:
           name: Install packages
-          command: npm ci
+          command: yarn ci
       - save_cache:
-          key: node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
+          key: yarn-packages-{{checksum "yarn.lock"}}
           paths:
-            - ~/.npm
+            - ~/.cache/yarn
   lint:
     docker:
       - image: cimg/node:12.18-browsers
@@ -26,13 +26,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
+            - yarn-packages-{{checksum "yarn.lock"}}
       - run:
           name: Install packages
-          command: npm ci
+          command: yarn ci
       - run:
           name: Run lint
-          command: npm run lint
+          command: yarn run lint
   deploy:
     machine:
       enabled: true
