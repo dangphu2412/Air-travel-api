@@ -132,6 +132,13 @@ export class Customer extends BaseActionDate {
   @Column({nullable: true})
   notifyToken: string;
 
+  // For getting favourites service
+  @ApiProperty({readOnly: false, writeOnly: true})
+  @Column("simple-array", {
+    nullable: true
+  })
+  favouriteServiceIds: number[]
+
   // Trigger
   @BeforeInsert()
   @BeforeUpdate()

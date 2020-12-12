@@ -72,7 +72,9 @@ export class Bill extends BaseActionDate {
 
   @ApiProperty({readOnly: true})
   @IsEmpty()
-  @Column()
+  @Column({
+    nullable: true
+  })
   userId: number;
 
   /**

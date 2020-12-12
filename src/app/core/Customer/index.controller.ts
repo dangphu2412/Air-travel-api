@@ -147,4 +147,10 @@ export class CustomerController implements CrudController<Customer> {
   ) {
     return this.service.updateNotificationToken(body.nofifyToken, user);
   }
+
+  /**
+   * TODO:
+   * Customer service favourites api
+   * POST
+   */
 }

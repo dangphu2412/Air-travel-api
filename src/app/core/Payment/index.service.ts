@@ -84,7 +84,8 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
               CustomerError.ConflictEmptyToken
             )
           }
-          this.notifyService.notifyCustomerBillFinished(entity.bill.customer);
+          const billId = entity.bill.id;
+          this.notifyService.notifyCustomerBillFinished(entity.bill.customer, billId);
         }
         break;
     }

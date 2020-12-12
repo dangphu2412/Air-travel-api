@@ -1,17 +1,18 @@
-import {ApiTags} from "@nestjs/swagger";
-import {Controller, Get, UseInterceptors} from "@nestjs/common";
+import {ApiBody, ApiOperation, ApiTags} from "@nestjs/swagger";
+import {Body, Controller, Get, Post, UseInterceptors} from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {Bill, User} from "src/common/entity";
+import {Bill, Customer, User} from "src/common/entity";
 import {BillService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
-import {CreateBilLDto} from "src/common/dto/Bill";
+import {CreateBillByUserDto} from "src/common/dto/Bill";
 import {getManager} from "typeorm";
+import {CreateBillByCustomerDto} from "src/common/dto/Bill/createBillByCustomer.dto";
 
 @Crud({
   model: {
@@ -61,12 +62,36 @@ export class BillController implements CrudController<Bill> {
   @Override("createOneBase")
   createOneOverride(
     @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: CreateBilLDto,
+    @ParsedBody() dto: CreateBillByUserDto,
     @CurrentUser() user: User
   ): Promise<Bill> {
     return getManager().transaction(async transactionManager => {
       const customer = await this.service.getCustomer(dto.customerId);
       const entity: Bill = await this.service.createBill(dto, user, customer, transactionManager);
+
+      await this.service.createBillServices(dto, entity, transactionManager);
+
+      await this.service.updateBillRemain(entity, transactionManager);
+      return entity;
+    })
+  };
+
+  @GrantAccess({
+    jwtOnly: true,
+    type: "CUSTOMER"
+  })
+  @UseInterceptors(SqlInterceptor)
+  @Post("customers")
+  @ApiOperation({
+    summary: "Create bill by customer"
+  })
+  @ApiBody({type: () => CreateBillByCustomerDto})
+  createBillByCustomer(
+    @Body() dto: CreateBillByCustomerDto,
+    @CurrentUser() customer: Customer
+  ): Promise<Bill> {
+    return getManager().transaction(async transactionManager => {
+      const entity: Bill = await this.service.createBill(dto, null, customer, transactionManager);
 
       await this.service.createBillServices(dto, entity, transactionManager);
 

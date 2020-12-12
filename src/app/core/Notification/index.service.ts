@@ -10,12 +10,12 @@ export class NotificationService {
     this.firebaseService = FirebaseService
   }
 
-  notifyCustomerBillFinished(customer: Customer) {
+  notifyCustomerBillFinished(customer: Customer, id: number) {
     const token = customer.notifyToken;
     return this.firebaseService.messaging().sendToDevice(token, {
       notification: {
         title: "Bill paid",
-        body: "Your bill has successfully paid"
+        body: `Your bill ${id} has successfully paid`
       }
     });
   }

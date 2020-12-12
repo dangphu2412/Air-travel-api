@@ -54,7 +54,7 @@ export class BillService extends TypeOrmCrudService<Bill> {
 
   public createBill(
     dto: CreateBilLDto,
-    user: User,
+    user: User | null,
     customer: Customer,
     transactionManager: EntityManager
   ): Promise<Bill> {
