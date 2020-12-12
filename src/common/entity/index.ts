@@ -13,3 +13,4 @@ export * from "./serviceCategory.entity";
 export * from "./user.entity";
 export * from "./city.entity";
 export * from "./district.entity";
+export * from "./notification.entity";

@@ -50,7 +50,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
     entity.billInfo = billInfo;
   }
 
-  public syncRemainToBill(entity: Payment): void {
+  public async syncRemainToBill(entity: Payment): Promise<void | Notification> {
     const type: EPayment = entity.type;
 
     switch (type) {
@@ -85,7 +85,12 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
             )
           }
           const billId = entity.bill.id;
-          this.notifyService.notifyCustomerBillFinished(entity.bill.customer, billId);
+          const notification = {
+            title: "Bill paid",
+            body: `Your bill ${billId} has successfully paid`
+          }
+          this.notifyService.notifyCustomerBillFinished(entity.bill.customer, notification);
+          await this.notifyService.createNotifyOfCustomer(billId, notification)
         }
         break;
     }
