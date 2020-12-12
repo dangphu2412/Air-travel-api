@@ -1,5 +1,5 @@
 import {ApiProperty} from "@nestjs/swagger";
-import {IsNumber} from "class-validator";
+import {IsDateString, IsNumber} from "class-validator";
 import {IsRequired} from "src/common/decorators/isRequired.decorator";
 
 export class CreateBillServiceDto {
@@ -22,4 +22,18 @@ export class CreateBillServiceDto {
     @IsRequired()
     @IsNumber()
     netPrice: number;
+
+    @ApiProperty({
+      example: new Date().toISOString()
+    })
+    @IsRequired()
+    @IsDateString()
+    startDay: Date;
+
+    @ApiProperty({
+      example: new Date().toISOString()
+    })
+    @IsRequired()
+    @IsDateString()
+    endDate: Date;
 }

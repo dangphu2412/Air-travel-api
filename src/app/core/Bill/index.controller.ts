@@ -19,7 +19,7 @@ import {CreateBillByCustomerDto} from "src/common/dto/Bill/createBillByCustomer.
     type: Bill
   },
   routes: {
-    exclude: ["updateOneBase", "replaceOneBase"],
+    exclude: ["replaceOneBase"],
     deleteOneBase: {
       decorators: [
         GrantAccess({

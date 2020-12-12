@@ -21,6 +21,9 @@ import {CityRepository} from "../City/index.repository";
 import {BaseService} from "src/app/base/base.service";
 import {UserService} from "../User/index.service";
 import {BaseModule} from "src/app/base/base.module";
+import {CustomerRepository} from "../Customer/index.repository";
+import {CustomerModule} from "../Customer/index.module";
+import {CustomerService} from "../Customer/index.service";
 
 @Module({
   imports: [
@@ -31,6 +34,7 @@ import {BaseModule} from "src/app/base/base.module";
     CityModule,
     DistrictModule,
     BaseModule,
+    CustomerModule,
     TypeOrmModule.forFeature([
       ServiceRepository,
       UserRepository,
@@ -38,14 +42,15 @@ import {BaseModule} from "src/app/base/base.module";
       ProviderRepository,
       DestinationRepository,
       DistrictRepository,
-      CityRepository
+      CityRepository,
+      CustomerRepository
     ])
   ],
   controllers: [ServiceController],
   providers: [
     ServiceService, ServiceCategoryService,
     ProviderService, DestinationService, BaseService,
-    UserService
+    UserService, CustomerService
   ],
   exports: [ServiceService]
 })

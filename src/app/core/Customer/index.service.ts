@@ -11,6 +11,7 @@ import {CustomerError, DEFAULT_ERROR} from "src/common/constants";
 import {RegisterDto} from "src/common/dto/User";
 import {Customer, Role, User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
+import {TValidateUser} from "src/common/type/t.Validate";
 import {FindOneOptions, UpdateResult} from "typeorm";
 import {CustomerRepository} from "./index.repository";
 
@@ -114,5 +115,9 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
 
     customer.favouriteServiceIds = favouriteServiceIds;
     return customer.save();
+  }
+
+  public isCustomer(user: User | Customer) {
+    return user.role.name === ERole.CUSTOMER;
   }
 }

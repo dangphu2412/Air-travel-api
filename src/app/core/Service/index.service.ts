@@ -1,13 +1,16 @@
 import {
-  Injectable
+  Injectable, NotFoundException
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {CrudRequest} from "@nestjsx/crud";
+import {CrudRequest, GetManyDefaultResponse} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {BaseService} from "src/app/base/base.service";
+import {CustomerError} from "src/common/constants";
 import {Lang} from "src/common/constants/lang";
-import {Service, User} from "src/common/entity";
+import {Customer, Service, User} from "src/common/entity";
+import {ErrorCodeEnum} from "src/common/enums";
 import {FindOneOptions, UpdateResult} from "typeorm";
+import {CustomerService} from "../Customer/index.service";
 import {DestinationService} from "../Destination/index.service";
 import {ProviderService} from "../Provider/index.service";
 import {ServiceCategoryService} from "../ServiceCategory/index.service";
@@ -23,7 +26,8 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     private providerService: ProviderService,
     private serviceCategoryService: ServiceCategoryService,
     private destinationService: DestinationService,
-    private userService: UserService
+    private userService: UserService,
+    private customerService: CustomerService
   ) {
     super(repository);
   }
@@ -94,5 +98,47 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     dto.providers = await this.providerService.findByIds(providerIds);
     dto.serviceCategories = await this.serviceCategoryService.findByIds(serviceCategoryIds);
     return dto;
+  }
+
+  public async findCustomerFavouriteServices(customerId: number): Promise<number[]> {
+    const customer: Customer = await this.customerService.findOne(customerId);
+
+    if (!customer) {
+      throw new NotFoundException(
+        ErrorCodeEnum.NOT_FOUND,
+        CustomerError.NotFound
+      )
+    }
+
+    return customer.favouriteServiceIds;
+  }
+
+  public getManyFilterFavourite(
+    services: GetManyDefaultResponse<Service>,
+    user: Customer | User
+  ): any {
+    const isCustomer = this.customerService.isCustomer(user);
+
+    if (isCustomer) {
+      const data = this.filterFavourite(services.data, user.id);
+      return {
+        count: services.count,
+        data,
+        page: services.page,
+        pageCount: services.pageCount,
+        total: services.total
+      }
+    }
+    return services;
+  }
+
+  public filterFavourite(services: Service[], userId: number): any[] {
+    return services.map(service => {
+      const response: any = {
+        ...service,
+        isFavourite: service.user.id === userId
+      };
+      return response;
+    })
   }
 }

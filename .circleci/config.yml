@@ -21,7 +21,7 @@ jobs:
       - run:
           name: Deploy Over SSH
           command:
-            ssh $SSH_USER@$SSH_HOST "cd /home/Air-travel-api && echo Success access && git pull && npm run build && pm2 update"
+            ssh $SSH_USER@$SSH_HOST "cd /home/Air-travel-api && echo Success access && git pull && npm run build && npm run schema:sync && pm2 update"
 
 workflows:
   test_my_app:
