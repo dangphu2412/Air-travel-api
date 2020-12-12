@@ -117,6 +117,10 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     services: GetManyDefaultResponse<Service>,
     user: Customer | User
   ): any {
+    if (user === null) {
+      return services;
+    }
+
     const isCustomer = this.customerService.isCustomer(user);
 
     if (isCustomer) {

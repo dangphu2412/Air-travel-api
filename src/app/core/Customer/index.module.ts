@@ -8,21 +8,27 @@ import {BaseModule} from "src/app/base/base.module";
 import {UserModule} from "../User/index.module";
 import {UserRepository} from "../User/index.repository";
 import {UserService} from "../User/index.service";
+import {NotificationRepository} from "../Notification/index.repository";
+import {NotificationModule} from "../Notification/index.module";
+import {NotificationService} from "../Notification/index.service";
 
 @Module({
   imports: [
     BaseModule,
     UserModule,
+    NotificationModule,
     TypeOrmModule.forFeature([
       CustomerRepository,
-      UserRepository
+      UserRepository,
+      NotificationRepository
     ])
   ],
   controllers: [CustomerController],
   providers: [
     CustomerService,
     BaseService,
-    UserService
+    UserService,
+    NotificationService
   ],
   exports: [CustomerService]
 })

@@ -160,4 +160,31 @@ export class CustomerController implements CrudController<Customer> {
   ) {
     return this.service.addFavouriteServiceToCustomer(dto.favouriteServiceIds, user.id);
   }
+
+  @CrudSwaggerFindMany()
+  @GrantAccess({
+    jwtOnly: true,
+    type: "CUSTOMER"
+  })
+  @UseInterceptors(CrudRequestInterceptor)
+  @Get("/notifications")
+  async getNotification(
+    @ParsedRequest() req: CrudRequest,
+    @CurrentUser() user: Customer
+  ) {
+    const data = await this.service.getNotifications(req, user);
+    const total = await this.service.getNotificationCount();
+    const {parsed} = req;
+    const limit = parsed.limit ?? 0;
+    const offset = parsed.offset ?? 0;
+    const page = total !== 0 ? Math.ceil(offset / limit) : 0;
+    const pageCount = total !== 0 ? Math.ceil(total / limit) : 0;
+    return {
+      data,
+      count: limit,
+      total,
+      page,
+      pageCount
+    }
+  }
 }

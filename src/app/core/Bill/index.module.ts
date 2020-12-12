@@ -11,16 +11,20 @@ import {UserService} from "../User/index.service";
 import {CustomerModule} from "../Customer/index.module";
 import {CustomerRepository} from "../Customer/index.repository";
 import {CustomerService} from "../Customer/index.service";
+import {NotificationRepository} from "../Notification/index.repository";
+import {NotificationModule} from "../Notification/index.module";
 
 @Module({
   imports: [
     BaseModule,
     UserModule,
     CustomerModule,
+    NotificationModule,
     TypeOrmModule.forFeature([
       BillRepository,
       UserRepository,
-      CustomerRepository
+      CustomerRepository,
+      NotificationRepository
     ])
   ],
   controllers: [BillController],

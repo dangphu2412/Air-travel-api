@@ -1,10 +1,10 @@
 import {applyDecorators} from "@nestjs/common";
 import {ApiOperation} from "@nestjs/swagger";
 
-export function CrudSwaggerFindMany() {
+export function CrudSwaggerFindMany(summary = "Get soft deleted") {
   return applyDecorators(
     ApiOperation({
-      summary: "Get soft deleted",
+      summary,
       parameters: [
         {
           in: "query",

@@ -12,6 +12,7 @@ import {RegisterDto} from "src/common/dto/User";
 import {Customer, Role, User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
 import {FindOneOptions, UpdateResult} from "typeorm";
+import {NotificationRepository} from "../Notification/index.repository";
 import {CustomerRepository} from "./index.repository";
 
 @Injectable()
@@ -20,6 +21,7 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
     @InjectRepository(Customer)
     private repository: CustomerRepository,
     private baseService: BaseService,
+    private notificationRepository: NotificationRepository
   ) {
     super(repository);
   }
@@ -118,5 +120,19 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
 
   public isCustomer(user: User | Customer) {
     return user.role.name === ERole.CUSTOMER;
+  }
+
+  public getNotifications(req: CrudRequest, user: Customer) {
+    return this.notificationRepository.find({
+      skip: req.parsed.offset ?? req.options.query.maxLimit,
+      take: req.parsed.limit ?? req.options.query.limit,
+      where: {
+        customerId: user.id
+      }
+    });
+  }
+
+  public getNotificationCount() {
+    return this.notificationRepository.count();
   }
 }
