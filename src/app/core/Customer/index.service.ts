@@ -11,7 +11,6 @@ import {CustomerError, DEFAULT_ERROR} from "src/common/constants";
 import {RegisterDto} from "src/common/dto/User";
 import {Customer, Role, User} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
-import {TValidateUser} from "src/common/type/t.Validate";
 import {FindOneOptions, UpdateResult} from "typeorm";
 import {CustomerRepository} from "./index.repository";
 
