@@ -35,7 +35,7 @@ export class BillService extends BaseActionDate {
   })
   @IsRequired()
   @IsDateString()
-  @Column()
+  @Column({nullable: true})
   startDay: Date;
 
   @ApiProperty({
@@ -43,7 +43,7 @@ export class BillService extends BaseActionDate {
   })
   @IsRequired()
   @IsDateString()
-  @Column()
+  @Column({nullable: true})
   endDate: Date;
 
   /**
