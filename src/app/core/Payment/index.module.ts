@@ -12,6 +12,7 @@ import {CustomerModule} from "../Customer/index.module";
 import {CustomerRepository} from "../Customer/index.repository";
 import {CustomerService} from "../Customer/index.service";
 import {NotificationModule} from "../Notification/index.module";
+import {NotificationRepository} from "../Notification/index.repository";
 import {NotificationService} from "../Notification/index.service";
 import {ProviderModule} from "../Provider/index.module";
 import {ProviderRepository} from "../Provider/index.repository";
@@ -39,7 +40,8 @@ import {PaymentService} from "./index.service";
       BillInfoRepository,
       CustomerRepository,
       ProviderRepository,
-      UserRepository
+      UserRepository,
+      NotificationRepository
     ])
   ],
   controllers: [PaymentController],

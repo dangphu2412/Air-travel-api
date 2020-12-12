@@ -1,7 +1,7 @@
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {messaging} from "firebase-admin";
-import {Customer} from "src/common/entity";
+import {Customer, Notification} from "src/common/entity";
 import {FirebaseService} from "../../../global/firebase";
 import {NotificationRepository} from "./index.repository";
 
@@ -12,8 +12,10 @@ export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private repository: NotificationRepository,
+
   ) {
-    this.firebaseService = FirebaseService
+    this.repository = repository;
+    this.firebaseService = FirebaseService;
   }
 
   notifyCustomerBillFinished(

@@ -15,6 +15,7 @@ import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {Lang} from "src/common/constants/lang";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
+import {AuthNotRequired} from "src/common/decorators/jwtNotRequired.decorator";
 
 @Crud({
   model: {
@@ -197,9 +198,7 @@ export class ServiceController implements CrudController<Service> {
     return this.base.getManyBase(req);
   }
 
-  @GrantAccess({
-    jwtOnly: true
-  })
+  @AuthNotRequired()
   @Override("getManyBase")
   async getManyOverride(
     @ParsedRequest() req: CrudRequest,

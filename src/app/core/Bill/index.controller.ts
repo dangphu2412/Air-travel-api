@@ -27,6 +27,22 @@ import {CreateBillByCustomerDto} from "src/common/dto/Bill/createBillByCustomer.
           type: "CUSTOMER"
         })
       ]
+    },
+    getManyBase: {
+      decorators: [
+        GrantAccess({
+          action: ECrudAction.READ,
+          type: "CUSTOMER"
+        })
+      ]
+    },
+    getOneBase: {
+      decorators: [
+        GrantAccess({
+          action: ECrudAction.READ,
+          type: "CUSTOMER"
+        })
+      ]
     }
   },
   query: {

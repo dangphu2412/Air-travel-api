@@ -5,6 +5,8 @@ import {BaseService} from "src/app/base/base.service";
 import {CustomerModule} from "../Customer/index.module";
 import {CustomerRepository} from "../Customer/index.repository";
 import {CustomerService} from "../Customer/index.service";
+import {NotificationModule} from "../Notification/index.module";
+import {NotificationRepository} from "../Notification/index.repository";
 import {ProviderModule} from "../Provider/index.module";
 import {ProviderRepository} from "../Provider/index.repository";
 import {ProviderService} from "../Provider/index.service";
@@ -23,11 +25,13 @@ import {BillInfoService} from "./index.service";
     BaseModule,
     UserModule,
     ProviderModule,
+    NotificationModule,
     TypeOrmModule.forFeature([
       BillInfoRepository,
       CustomerRepository,
       ProviderRepository,
-      UserRepository
+      UserRepository,
+      NotificationRepository
     ])
   ],
   controllers: [BillInfoController],
