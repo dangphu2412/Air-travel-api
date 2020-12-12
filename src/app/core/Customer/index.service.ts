@@ -108,4 +108,11 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
     user.notifyToken = notifyToken;
     return user.save();
   }
+
+  public async addFavouriteServiceToCustomer(favouriteServiceIds: number[], userId: number) {
+    const customer: Customer = await this.findOne(userId);
+
+    customer.favouriteServiceIds = favouriteServiceIds;
+    return customer.save();
+  }
 }
