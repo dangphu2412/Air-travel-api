@@ -36,7 +36,7 @@ export class BillService extends BaseActionDate {
   @IsRequired()
   @IsDateString()
   @Column({nullable: true})
-  startDay: Date;
+  startDate: Date;
 
   @ApiProperty({
     example: new Date().toISOString()

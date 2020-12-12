@@ -44,7 +44,7 @@ export class PaymentController implements CrudController<Payment> {
     await this.service.mapRelationKeysToEntities(entity, dto);
 
     this.service.getUserId(entity, user);
-    this.service.syncRemainToBill(entity);
+    await this.service.syncRemainToBill(entity);
     this.service.validateCompleteBillAndSync(entity);
 
     await this.service.syncBillToDatabase(entity.bill);

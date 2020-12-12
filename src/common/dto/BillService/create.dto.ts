@@ -28,7 +28,7 @@ export class CreateBillServiceDto {
     })
     @IsRequired()
     @IsDateString()
-    startDay: Date;
+    startDate: Date;
 
     @ApiProperty({
       example: new Date().toISOString()
