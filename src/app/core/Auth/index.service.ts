@@ -21,7 +21,7 @@ export class AuthService {
   ) {}
 
   public getPermissions(role: Role): string[] {
-    return role?.permissions.map(permission => permission.name) || [];
+    return role?.permissions.map(permission => permission.name) ?? [];
   }
 
   public getloginResponse(user: User, type: TValidateUser): IUserLoginResponse {

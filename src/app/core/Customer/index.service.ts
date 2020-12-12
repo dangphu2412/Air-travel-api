@@ -65,7 +65,8 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
         email: user.email,
         password: user.password,
         fullName: user.fullName,
-        role
+        role,
+        phone: user.phone
       }
     ).save();
   }

@@ -20,4 +20,10 @@ export class RegisterDto {
   })
   @IsString()
   public password: string;
+
+  @ApiProperty({
+    example: "0964485641"
+  })
+  @IsString()
+  public phone: string;
 }
