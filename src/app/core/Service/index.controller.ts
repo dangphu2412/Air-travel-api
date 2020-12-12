@@ -1,13 +1,13 @@
 import {ApiOperation, ApiTags} from "@nestjs/swagger";
 import {
   Controller, Patch, Param, ParseIntPipe,
-  Get, UseInterceptors, Delete
+  Get, UseInterceptors, Delete, Query
 } from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
-  ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
+  ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody, GetManyDefaultResponse
 } from "@nestjsx/crud";
-import {Service, User} from "src/common/entity";
+import {Customer, Service, User} from "src/common/entity";
 import {ServiceService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
@@ -174,5 +174,38 @@ export class ServiceController implements CrudController<Service> {
     @Param("slug") slug: string
   ): Promise<Service> {
     return this.service.getBySlugWithMutilpleLanguagues(slug, Lang.VN);
+  }
+
+  @CrudSwaggerFindMany()
+  @UseInterceptors(CrudRequestInterceptor)
+  @ApiOperation({
+    summary: "Get one record by vietnam slug"
+  })
+  @Get("favourites")
+  async getFavouriteServicesByCustomer(
+    @ParsedRequest() req: CrudRequest,
+    @Query("dic") customerId: number
+  ) {
+    const favouriteIds: number[] = await this.service.findCustomerFavouriteServices(customerId);
+    req.parsed.filter = [
+      {
+        field: "id",
+        operator: "$in",
+        value: favouriteIds
+      }
+    ]
+    return this.base.getManyBase(req);
+  }
+
+  @GrantAccess({
+    jwtOnly: true
+  })
+  @Override("getManyBase")
+  async getManyOverride(
+    @ParsedRequest() req: CrudRequest,
+    @CurrentUser() user: Customer | User
+  ) {
+    const services = await this.base.getManyBase(req) as GetManyDefaultResponse<Service>;
+    return this.service.getManyFilterFavourite(services, user);
   }
 }
