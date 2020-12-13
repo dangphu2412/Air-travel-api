@@ -13,6 +13,7 @@ import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CreateBillByUserDto} from "src/common/dto/Bill";
 import {getManager} from "typeorm";
 import {CreateBillByCustomerDto} from "src/common/dto/Bill/createBillByCustomer.dto";
+import {UpdateBillByUserDto} from "src/common/dto/Bill/updateBillByUser.dto";
 
 @Crud({
   model: {
@@ -28,11 +29,11 @@ import {CreateBillByCustomerDto} from "src/common/dto/Bill/createBillByCustomer.
         })
       ]
     },
+    // TODO: Remember to override to grant access to author only
     getManyBase: {
       decorators: [
         GrantAccess({
-          action: ECrudAction.READ,
-          type: "CUSTOMER"
+          jwtOnly: true
         })
       ]
     },
@@ -115,6 +116,25 @@ export class BillController implements CrudController<Bill> {
       return entity;
     })
   };
+
+  @GrantAccess({
+    action: ECrudAction.UPDATE
+  })
+  @UseInterceptors(SqlInterceptor)
+  @Override("updateOneBase")
+  updateOneOverride(
+    @ParsedBody() dto: UpdateBillByUserDto,
+    @CurrentUser() user: User
+  ): Promise<Bill> {
+    return getManager().transaction(async transactionManager => {
+      const bill = await this.service.findOne(dto.id);
+      this.service.validateAuthor(bill, user);
+      await this.service.updateRelation(bill, dto, transactionManager);
+      this.service.updateBill(bill, dto);
+      return transactionManager.save(bill);
+    });
+  }
+
 
   @UseInterceptors(CrudRequestInterceptor)
   @Get("trashed")
