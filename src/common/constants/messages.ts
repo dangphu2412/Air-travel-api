@@ -61,7 +61,8 @@ export const CityError = {
 
 export const BillError = {
   NotFound: "Not found this bill",
-  ConflictRemainGreaterThan: "Cannot subtract with amount greater than remain"
+  ConflictRemainGreaterThan: "Cannot subtract with amount greater than remain",
+  ConfilictAuthor: "You are not creator of this bill"
 }
 
 export const BillInfoError = {

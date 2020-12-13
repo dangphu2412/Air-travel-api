@@ -1,14 +1,17 @@
 import {
+  ForbiddenException,
   Injectable, NotFoundException
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {BaseService} from "src/app/base/base.service";
-import {CustomerError} from "src/common/constants";
+import {BillError, CustomerError} from "src/common/constants";
 import {CreateBilLDto} from "src/common/dto/Bill";
+import {UpdateBillByUserDto} from "src/common/dto/Bill/updateBillByUser.dto";
 import {Bill, Customer, Role, User, BillService as BillServiceEntity} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
+import {filterIdToUpdate} from "src/utils";
 import {EntityManager} from "typeorm";
 import {CustomerService} from "../Customer/index.service";
 import {BillRepository} from "./index.repository";
@@ -96,5 +99,27 @@ export class BillService extends TypeOrmCrudService<Bill> {
   updateBillRemain(entity: Bill, transactionManager: EntityManager): Promise<Bill> {
     this.fillRemain(entity);
     return transactionManager.save(entity);
+  }
+
+  validateAuthor(bill: Bill, user: User): void {
+    if (bill.userId !== user.id) {
+      throw new ForbiddenException(
+        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
+        BillError.ConfilictAuthor
+      );
+    }
+  }
+
+  public async updateRelation(
+    bill: Bill,
+    dto: UpdateBillByUserDto,
+    transactionManager: EntityManager
+  ) {
+    const {existedRecords, newRecords} = filterIdToUpdate(dto.billServices);
+    // const newBilServices = await this.createBillServices(dto, newRecords as Bill, transactionManager);
+  }
+
+  updateBill(bill: Bill, dto: UpdateBillByUserDto) {
+
   }
 }
