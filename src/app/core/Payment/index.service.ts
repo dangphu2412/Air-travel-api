@@ -78,7 +78,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
         if (entity.bill.customerRemain === 0) {
           entity.bill.status = BillStatus.PROVIDER_PAID;
 
-          if (entity.bill.customer.notifyToken === null) {
+          if (entity.bill.customer.notifyTokens.length === 0) {
             throw new ConflictException(
               ErrorCodeEnum.NULL_TOKEN,
               CustomerError.ConflictEmptyToken

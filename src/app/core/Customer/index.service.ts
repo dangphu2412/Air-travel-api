@@ -101,13 +101,26 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
   }
 
   public updateNotificationToken(notifyToken: string, user: Customer) {
-    if (user.notifyToken === notifyToken) {
-      throw new ConflictException(
-        CustomerError.ConflictNotifyToken,
-        ErrorCodeEnum.CONFLICT
-      );
+    if (user.notifyTokens !== null && user.notifyTokens.length) {
+      if (user.notifyTokens.includes(notifyToken)) {
+        throw new ConflictException(
+          CustomerError.ConflictNotifyToken,
+          ErrorCodeEnum.CONFLICT
+        );
+      }
+      user.notifyTokens.push(notifyToken);
     }
-    user.notifyToken = notifyToken;
+
+    if (user.notifyTokens === null) {
+      user.notifyTokens = [];
+    }
+    return user.save();
+  }
+
+  public unsubcribeNotificationToken(notifyToken: string, user: Customer) {
+    user.notifyTokens = user.notifyTokens.filter(token => {
+      return token !== notifyToken;
+    })
     return user.save();
   }
 

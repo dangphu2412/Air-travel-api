@@ -22,10 +22,12 @@ export class NotificationService {
     customer: Customer,
     notification: messaging.NotificationMessagePayload
   ) {
-    const token = customer.notifyToken;
-    return this.firebaseService.messaging().sendToDevice(token, {
-      notification
-    });
+    const tokens = customer.notifyTokens ?? [];
+    return Promise.all(tokens.map(token => {
+      return this.firebaseService.messaging().sendToDevice(token, {
+        notification
+      });
+    }));
   }
 
   createNotifyOfCustomer(customerId: number, notification: messaging.NotificationMessagePayload) {

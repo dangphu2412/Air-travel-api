@@ -6,7 +6,7 @@ import {
 } from "typeorm";
 import {
   IsString, IsEmail, IsMobilePhone,
-  IsOptional, IsIn, IsDateString, IsBoolean
+  IsOptional, IsIn, IsDateString, IsBoolean, IsArray
 } from "class-validator";
 import {Exclude} from "class-transformer";
 import {Gender} from "../enums/gender.enum";
@@ -128,9 +128,9 @@ export class Customer extends BaseActionDate {
   @Exclude()
   @ApiProperty({readOnly: true, writeOnly: true})
   @IsOptional()
-  @IsString()
-  @Column({nullable: true})
-  notifyToken: string;
+  @IsArray()
+  @Column({nullable: true, type: "simple-array"})
+  notifyTokens: string[];
 
   // For getting favourites service
   @ApiProperty({readOnly: false, writeOnly: true})
@@ -141,9 +141,21 @@ export class Customer extends BaseActionDate {
 
   // Trigger
   @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword() {
+  hashPassword() {
     this.password = BcryptService.hash(this.password);
+  }
+
+  @BeforeUpdate()
+  async triggerBeforeUpdate() {
+    const userRepository = Customer.getRepository();
+    const currentUser = await userRepository.findOne(this.id, {
+      select: ["id", "password"]
+    });
+    if (
+      !BcryptService.compare(this.password, currentUser.password)
+      && this.password !== currentUser.password
+    )
+      this.password = BcryptService.hash(this.password);
   }
   /**
    * Relations
