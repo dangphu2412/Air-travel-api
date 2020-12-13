@@ -57,6 +57,9 @@ export class RaclHelper {
       {
         role: ERole.CUSTOMER,
         permissions: [
+          ...this.createManyPermissionFromFeature(ECrudFeature.BILL, {
+            only: ["READ"]
+          })
         ]
       }
     ]
