@@ -20,11 +20,13 @@ import {NotificationModule} from "../Notification/index.module";
     UserModule,
     CustomerModule,
     NotificationModule,
+    UserModule,
     TypeOrmModule.forFeature([
       BillRepository,
       UserRepository,
       CustomerRepository,
-      NotificationRepository
+      NotificationRepository,
+      UserRepository
     ])
   ],
   controllers: [BillController],
@@ -32,7 +34,8 @@ import {NotificationModule} from "../Notification/index.module";
     BillService,
     BaseService,
     UserService,
-    CustomerService
+    CustomerService,
+    UserService
   ],
   exports: [BillService]
 })

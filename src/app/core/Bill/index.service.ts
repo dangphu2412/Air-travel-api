@@ -15,6 +15,7 @@ import {ERole, ErrorCodeEnum} from "src/common/enums";
 import {filterIdToUpdate} from "src/utils";
 import {EntityManager} from "typeorm";
 import {CustomerService} from "../Customer/index.service";
+import {UserService} from "../User/index.service";
 import {BillRepository} from "./index.repository";
 
 @Injectable()
@@ -23,9 +24,19 @@ export class BillService extends TypeOrmCrudService<Bill> {
     @InjectRepository(Bill)
     private repository: BillRepository,
     private baseService: BaseService,
-    private customerService: CustomerService
+    private customerService: CustomerService,
+    private userService: UserService
   ) {
     super(repository);
+  }
+
+  validateAuthor(bill: Bill, user: User): void {
+    if (bill.userId !== user.id) {
+      throw new ForbiddenException(
+        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
+        BillError.ConfilictAuthor
+      );
+    }
   }
 
   public fillRemain(entity: Bill) {
@@ -91,9 +102,6 @@ export class BillService extends TypeOrmCrudService<Bill> {
       entity.endDate = billService.endDate;
       entity.serviceId = billService.serviceId;
 
-      billEntity.totalPrice += billService.price * billService.quantity;
-      billEntity.totalNetPrice += billService.netPrice;
-
       return transactionManager.save(entity);
     }));
   }
@@ -103,14 +111,6 @@ export class BillService extends TypeOrmCrudService<Bill> {
     return transactionManager.save(entity);
   }
 
-  validateAuthor(bill: Bill, user: User): void {
-    if (bill.userId !== user.id) {
-      throw new ForbiddenException(
-        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
-        BillError.ConfilictAuthor
-      );
-    }
-  }
 
   public async updateRelation(
     bill: Bill,
@@ -131,5 +131,32 @@ export class BillService extends TypeOrmCrudService<Bill> {
         bill[key] = dto[key];
       }
     });
+  }
+
+  calcTotalThenMapToEntity(entity: Bill): void {
+    entity.billServices.forEach(item => {
+      entity.totalPrice += item.price * item.quantity;
+      entity.totalNetPrice += item.netPrice;
+    })
+  }
+
+  public async softDelete(id: number, currentUser: User) {
+    const record = await this
+      .baseService
+      .findWithRelationUser(this.repository, id);
+    const {user} = record;
+
+    if (!user) {
+      this.baseService.isNotAdminAndThrowErr(
+        currentUser
+      );
+    } else {
+      this.baseService.isNotAdminAndAuthorAndThrowErr(
+        this.userService,
+        user, currentUser
+      );
+    }
+
+    return this.repository.softDelete(record.id);
   }
 }

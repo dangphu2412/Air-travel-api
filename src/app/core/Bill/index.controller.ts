@@ -1,5 +1,5 @@
 import {ApiBody, ApiOperation, ApiTags} from "@nestjs/swagger";
-import {Body, Controller, Get, Post, UseInterceptors} from "@nestjs/common";
+import {Body, Controller, Get, Param, ParseIntPipe, Post, UseInterceptors} from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
@@ -21,14 +21,6 @@ import {UpdateBillByUserDto} from "src/common/dto/Bill/updateBillByUser.dto";
   },
   routes: {
     exclude: ["replaceOneBase"],
-    deleteOneBase: {
-      decorators: [
-        GrantAccess({
-          action: ECrudAction.DELETE,
-          type: "CUSTOMER"
-        })
-      ]
-    },
     // TODO: Remember to override to grant access to author only
     getManyBase: {
       decorators: [
@@ -40,8 +32,7 @@ import {UpdateBillByUserDto} from "src/common/dto/Bill/updateBillByUser.dto";
     getOneBase: {
       decorators: [
         GrantAccess({
-          action: ECrudAction.READ,
-          type: "CUSTOMER"
+          jwtOnly: true
         })
       ]
     }
@@ -91,6 +82,7 @@ export class BillController implements CrudController<Bill> {
       const entity: Bill = await this.service.createBill(dto, user, customer, transactionManager);
 
       await this.service.createBillServices(dto.billServices, entity, transactionManager);
+      this.service.calcTotalThenMapToEntity(entity);
 
       await this.service.updateBillRemain(entity, transactionManager);
       return entity;
@@ -114,7 +106,11 @@ export class BillController implements CrudController<Bill> {
     return getManager().transaction(async transactionManager => {
       const entity: Bill = await this.service.createBill(dto, null, customer, transactionManager);
 
-      await this.service.createBillServices(dto.billServices, entity, transactionManager);
+      const billServices = await this.service.createBillServices(
+        dto.billServices, entity, transactionManager
+      );
+      entity.billServices = billServices;
+      this.service.calcTotalThenMapToEntity(entity);
 
       await this.service.updateBillRemain(entity, transactionManager);
       return entity;
@@ -134,9 +130,14 @@ export class BillController implements CrudController<Bill> {
       const bill = await this.service.findOne(dto.id, {
         relations: ["billServices", "user", "customer"]
       });
+
       this.service.validateAuthor(bill, user);
+
       await this.service.updateRelation(bill, dto, transactionManager);
+
+      this.service.calcTotalThenMapToEntity(bill);
       this.service.updateBill(bill, dto);
+
       return transactionManager.save(bill);
     });
   }
@@ -150,5 +151,16 @@ export class BillController implements CrudController<Bill> {
   })
   getDeleted(@ParsedRequest() req: CrudRequest) {
     return this.service.getDeleted(req);
+  }
+
+  @Override("deleteOneBase")
+  @GrantAccess({
+    action: ECrudAction.SOFT_DEL
+  })
+  async softDelete(
+    @Param("id", ParseIntPipe) id: number,
+    @CurrentUser() user: User
+  ) {
+    return this.service.softDelete(id, user);
   }
 }
