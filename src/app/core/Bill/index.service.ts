@@ -97,7 +97,7 @@ export class BillService extends TypeOrmCrudService<Bill> {
       entity.quantity = billService.quantity;
       entity.price = billService.price;
       entity.netPrice = billService.netPrice;
-      entity.bill = billEntity;
+      entity.billId = billEntity.id;
       entity.startDate = billService.startDate;
       entity.endDate = billService.endDate;
       entity.serviceId = billService.serviceId;

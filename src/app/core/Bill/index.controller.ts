@@ -4,7 +4,7 @@ import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {Bill, Customer, User} from "src/common/entity";
+import {Bill, Customer, User, BillService as BillServiceEntity} from "src/common/entity";
 import {BillService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
@@ -81,7 +81,12 @@ export class BillController implements CrudController<Bill> {
       const customer = await this.service.getCustomer(dto.customerId);
       const entity: Bill = await this.service.createBill(dto, user, customer, transactionManager);
 
-      await this.service.createBillServices(dto.billServices, entity, transactionManager);
+      const billServices: BillServiceEntity[] = await this.service.createBillServices(
+        dto.billServices, entity, transactionManager
+      );
+
+      entity.billServices = billServices;
+
       this.service.calcTotalThenMapToEntity(entity);
 
       await this.service.updateBillRemain(entity, transactionManager);
@@ -106,14 +111,13 @@ export class BillController implements CrudController<Bill> {
     return getManager().transaction(async transactionManager => {
       const entity: Bill = await this.service.createBill(dto, null, customer, transactionManager);
 
-      const billServices = await this.service.createBillServices(
+      const billServices: BillServiceEntity[] = await this.service.createBillServices(
         dto.billServices, entity, transactionManager
       );
       entity.billServices = billServices;
       this.service.calcTotalThenMapToEntity(entity);
 
-      await this.service.updateBillRemain(entity, transactionManager);
-      return entity;
+      return this.service.updateBillRemain(entity, transactionManager);
     })
   };
 

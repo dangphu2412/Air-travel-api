@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
 import {IsDateString, IsNumber, IsOptional} from "class-validator";
 import {IsRequired} from "../decorators/isRequired.decorator";
@@ -54,14 +54,28 @@ export class BillService extends BaseActionDate {
   @Column({nullable: true})
   serviceId: number;
 
+  @ApiProperty({
+    example: 1
+  })
+  @IsOptional()
+  @IsNumber()
+  @Column({nullable: true})
+  billId: number;
+
   /**
    * Relations
    */
   @ApiProperty({readOnly: true, type: () => Bill})
   @ManyToOne(() => Bill, bill => bill.billServices)
+  @JoinColumn({
+    name: "billId"
+  })
   bill: Bill
 
   @ApiProperty({readOnly: true, type: () => Service})
   @ManyToOne(() => Service, service => service.billServices)
+  @JoinColumn({
+    name: "serviceId"
+  })
   service: Service
 }
