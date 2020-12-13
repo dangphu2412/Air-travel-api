@@ -26,6 +26,7 @@ export class AuthService {
 
   public getloginResponse(user: User, type: TValidateUser): IUserLoginResponse {
     const info: IUserInfo = {
+      id: user.id,
       email: user.email,
       avatar: user.avatar,
       fullName: user.fullName,

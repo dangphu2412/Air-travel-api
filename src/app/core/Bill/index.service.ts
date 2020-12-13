@@ -9,6 +9,7 @@ import {BaseService} from "src/app/base/base.service";
 import {BillError, CustomerError} from "src/common/constants";
 import {CreateBilLDto} from "src/common/dto/Bill";
 import {UpdateBillByUserDto} from "src/common/dto/Bill/updateBillByUser.dto";
+import {CreateBillServiceDto} from "src/common/dto/BillService";
 import {Bill, Customer, Role, User, BillService as BillServiceEntity} from "src/common/entity";
 import {ERole, ErrorCodeEnum} from "src/common/enums";
 import {filterIdToUpdate} from "src/utils";
@@ -75,11 +76,11 @@ export class BillService extends TypeOrmCrudService<Bill> {
   }
 
   public createBillServices(
-    dto: CreateBilLDto,
+    billServices: CreateBillServiceDto[],
     billEntity: Bill,
     transactionManager: EntityManager
   ): Promise<BillServiceEntity[]> {
-    return Promise.all(dto.billServices.map(billService => {
+    return Promise.all(billServices.map(billService => {
       const entity = new BillServiceEntity();
       entity.netPrice = billService.netPrice;
       entity.quantity = billService.quantity;
@@ -116,10 +117,18 @@ export class BillService extends TypeOrmCrudService<Bill> {
     transactionManager: EntityManager
   ) {
     const {existedRecords, newRecords} = filterIdToUpdate(dto.billServices);
-    // const newBilServices = await this.createBillServices(dto, newRecords as Bill, transactionManager);
+    const newBilServices: BillServiceEntity[] = await this.createBillServices(
+      newRecords, bill, transactionManager
+    );
+
+    bill.billServices = [...existedRecords, ...newBilServices];
   }
 
   updateBill(bill: Bill, dto: UpdateBillByUserDto) {
-
+    Object.keys(dto).forEach(key => {
+      if (bill[key] && bill[key] !== dto[key]) {
+        bill[key] = dto[key];
+      }
+    });
   }
 }

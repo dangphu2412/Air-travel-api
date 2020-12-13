@@ -86,7 +86,7 @@ export class BillController implements CrudController<Bill> {
       const customer = await this.service.getCustomer(dto.customerId);
       const entity: Bill = await this.service.createBill(dto, user, customer, transactionManager);
 
-      await this.service.createBillServices(dto, entity, transactionManager);
+      await this.service.createBillServices(dto.billServices, entity, transactionManager);
 
       await this.service.updateBillRemain(entity, transactionManager);
       return entity;
@@ -110,7 +110,7 @@ export class BillController implements CrudController<Bill> {
     return getManager().transaction(async transactionManager => {
       const entity: Bill = await this.service.createBill(dto, null, customer, transactionManager);
 
-      await this.service.createBillServices(dto, entity, transactionManager);
+      await this.service.createBillServices(dto.billServices, entity, transactionManager);
 
       await this.service.updateBillRemain(entity, transactionManager);
       return entity;
@@ -127,7 +127,9 @@ export class BillController implements CrudController<Bill> {
     @CurrentUser() user: User
   ): Promise<Bill> {
     return getManager().transaction(async transactionManager => {
-      const bill = await this.service.findOne(dto.id);
+      const bill = await this.service.findOne(dto.id, {
+        relations: ["billServices", "user", "customer"]
+      });
       this.service.validateAuthor(bill, user);
       await this.service.updateRelation(bill, dto, transactionManager);
       this.service.updateBill(bill, dto);
