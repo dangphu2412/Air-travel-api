@@ -1,10 +1,10 @@
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
-import {IsDateString, IsNumber} from "class-validator";
+import {IsDateString, IsNumber, IsOptional} from "class-validator";
 import {IsRequired} from "../decorators/isRequired.decorator";
 
 import {BaseActionDate} from "./base";
-import {Bill} from "./bill.entity";
+import {Bill, Service} from ".";
 
 @Entity("billServices")
 export class BillService extends BaseActionDate {
@@ -46,10 +46,22 @@ export class BillService extends BaseActionDate {
   @Column({nullable: true})
   endDate: Date;
 
+  @ApiProperty({
+    example: 1
+  })
+  @IsOptional()
+  @IsNumber()
+  @Column({nullable: true})
+  serviceId: number;
+
   /**
    * Relations
    */
   @ApiProperty({readOnly: true, type: () => Bill})
   @ManyToOne(() => Bill, bill => bill.billServices)
   bill: Bill
+
+  @ApiProperty({readOnly: true, type: () => Service})
+  @ManyToOne(() => Service, service => service.billServices)
+  service: Service
 }

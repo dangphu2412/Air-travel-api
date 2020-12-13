@@ -80,7 +80,7 @@ export class BillService extends TypeOrmCrudService<Bill> {
     billEntity: Bill,
     transactionManager: EntityManager
   ): Promise<BillServiceEntity[]> {
-    return Promise.all(billServices.map(billService => {
+    return Promise.all(billServices.map(async billService => {
       const entity = new BillServiceEntity();
       entity.netPrice = billService.netPrice;
       entity.quantity = billService.quantity;
@@ -89,6 +89,7 @@ export class BillService extends TypeOrmCrudService<Bill> {
       entity.bill = billEntity;
       entity.startDate = billService.startDate;
       entity.endDate = billService.endDate;
+      entity.serviceId = billService.serviceId;
 
       billEntity.totalPrice += billService.price * billService.quantity;
       billEntity.totalNetPrice += billService.netPrice;

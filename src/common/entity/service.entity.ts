@@ -2,7 +2,7 @@ import {SlugHelper} from "../../global/slugify";
 import {
   Entity, PrimaryGeneratedColumn, Column,
   Unique, BeforeInsert, ManyToMany,
-  JoinTable, ManyToOne, JoinColumn} from "typeorm";
+  JoinTable, ManyToOne, JoinColumn, OneToMany} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
 import {IsOptional, IsString, IsNumber, IsEmpty} from "class-validator";
 
@@ -11,6 +11,7 @@ import {Provider} from "./provider.entity";
 import {ServiceCategory} from "./serviceCategory.entity";
 import {Destination} from "./destination.entity";
 import {BaseActionDate} from "./base";
+import {BillService} from "./billService.entity";
 
 @Entity("services")
 @Unique(["enSlug", "viSlug"])
@@ -236,4 +237,9 @@ export class Service extends BaseActionDate {
   @ManyToOne(() => User, item => item.services)
   @JoinColumn({name: "userId"})
   user: User;
+
+  @ApiProperty({readOnly: true, type: () => BillService})
+  @OneToMany(() => BillService, item => item.service)
+  @JoinColumn()
+  billServices: BillService[]
 }

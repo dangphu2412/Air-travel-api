@@ -51,6 +51,10 @@ import {UpdateBillByUserDto} from "src/common/dto/Bill/updateBillByUser.dto";
       billServices: {
         eager: true
       },
+      "billServices.service": {
+        allow: ["id", "viTitle", "enTitle"],
+        eager: true
+      },
       user: {
         allow: ["id", "fullName", "avatar"],
         eager: true
