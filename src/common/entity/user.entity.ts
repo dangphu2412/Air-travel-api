@@ -117,9 +117,21 @@ export class User extends BaseActionDate {
     hasExpiredToken: boolean;
 
     @BeforeInsert()
-    @BeforeUpdate()
     hashPwd() {
       this.password = BcryptService.hash(this.password);
+    }
+
+    @BeforeUpdate()
+    async triggerBeforeUpdate() {
+      const userRepository = User.getRepository();
+      const currentUser = await userRepository.findOne(this.id, {
+        select: ["id", "password"]
+      });
+      if (
+        !BcryptService.compare(this.password, currentUser.password)
+        && this.password !== currentUser.password
+      )
+        this.password = BcryptService.hash(this.password);
     }
 
     /**

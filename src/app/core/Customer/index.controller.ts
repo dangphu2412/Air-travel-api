@@ -149,6 +149,18 @@ export class CustomerController implements CrudController<Customer> {
     return this.service.updateNotificationToken(body.nofifyToken, user);
   }
 
+  @Patch("/notify/token")
+  @GrantAccess({
+    jwtOnly: true,
+    type: "CUSTOMER"
+  })
+  unsubcribeNotificationToken(
+    @Body() body: NotifyToken,
+    @CurrentUser() user: Customer
+  ) {
+    return this.service.unsubcribeNotificationToken(body.nofifyToken, user);
+  }
+
   @GrantAccess({
     jwtOnly: true,
     type: "CUSTOMER"
