@@ -191,8 +191,21 @@ export class ServiceController implements CrudController<Service> {
     @CurrentUser() user: Customer
   ) {
     const favouriteIds: number[] = await this.service.findCustomerFavouriteServices(user.id);
+    const data = await this.service.findServicesByIds(req, favouriteIds);
 
-    return this.service.findServicesByIds(req, favouriteIds);
+    const total = await this.service.getCount();
+    const {parsed, options} = req;
+    const limit = parsed.limit ?? options.query.limit ?? 0;
+    const offset = parsed.offset ?? 0;
+    const page = total !== 0 ? Math.ceil(offset / limit) : 0;
+    const pageCount = total !== 0 ? Math.ceil(total / limit) : 0;
+    return {
+      data,
+      count: limit,
+      total,
+      page,
+      pageCount
+    }
   }
 
   @AuthNotRequired()
