@@ -101,7 +101,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     return dto;
   }
 
-  public async findCustomerFavouriteServices(customerId: number): Promise<number[]> {
+  public async findCustomerFavouriteServices(customerId: number): Promise<string[]> {
     const customer: Customer = await this.customerService.findOne(customerId);
 
     if (!customer) {
@@ -125,7 +125,7 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     const isCustomer = this.customerService.isCustomer(user);
 
     if (isCustomer) {
-      const data = this.filterFavourite(services.data, user.id);
+      const data = this.filterFavourite(services.data, user as Customer);
       return {
         count: services.count,
         data,
@@ -137,18 +137,19 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     return services;
   }
 
-  public filterFavourite(services: Service[], userId: number): any[] {
+  public filterFavourite(services: Service[], user: Customer): any[] {
+    const {favouriteServiceIds} = user;
     return services.map(service => {
       const response: any = {
         ...service,
-        isFavourite: service.user.id === userId
+        isFavourite: favouriteServiceIds.includes(service.id.toString())
       };
       return response;
     })
   }
 
   public findServicesByIds(
-    req: CrudRequest = null, favouriteIds: number[]
+    req: CrudRequest = null, favouriteIds: string[]
   ): Promise<Service[]> | []{
     if (favouriteIds === null || !favouriteIds.length) {
       return [];

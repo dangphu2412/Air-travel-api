@@ -191,7 +191,7 @@ export class ServiceController implements CrudController<Service> {
     @ParsedRequest() req: CrudRequest,
     @CurrentUser() user: Customer
   ) {
-    const favouriteIds: number[] = await this.service.findCustomerFavouriteServices(user.id);
+    const favouriteIds: string[] = await this.service.findCustomerFavouriteServices(user.id);
     const data = await this.service.findServicesByIds(req, favouriteIds);
 
     const total = await this.service.getCount();

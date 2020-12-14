@@ -138,7 +138,7 @@ export class Customer extends BaseActionDate {
   @Column("simple-array", {
     nullable: true
   })
-  favouriteServiceIds: number[]
+  favouriteServiceIds: string[]
 
   // Trigger
   @BeforeInsert()
