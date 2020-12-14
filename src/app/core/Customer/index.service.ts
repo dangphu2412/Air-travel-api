@@ -140,14 +140,16 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
       customer.favouriteServiceIds = [];
     }
 
-    if (customer.favouriteServiceIds.includes(id)) {
-      throw new ConflictException(
-        ErrorCodeEnum.ALREADY_EXIST,
-        CustomerError.ConflictFavouriteKeyExited
+    const indexOfCustomer = customer.favouriteServiceIds.indexOf(id);
+
+    if (indexOfCustomer) {
+      customer.favouriteServiceIds = customer.favouriteServiceIds.filter(
+        id => id !== indexOfCustomer
       )
     }
-
-    customer.favouriteServiceIds.push(id);
+    else {
+      customer.favouriteServiceIds.push(id);
+    }
 
     return customer.save();
   }
