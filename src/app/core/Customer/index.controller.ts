@@ -160,7 +160,7 @@ export class CustomerController implements CrudController<Customer> {
   })
   @Put("services/:id/favourites")
   createFavouriteServicesForCustomer(
-    @Param("id", ParseIntPipe) id: number,
+    @Param("id") id: number,
     @CurrentUser() user: Customer
   ) {
     return this.service.addFavouriteServiceToCustomer(id, user.id);
