@@ -1,7 +1,7 @@
 import {ApiOperation, ApiTags} from "@nestjs/swagger";
 import {
   Controller, Patch, Param, ParseIntPipe,
-  Get, UseInterceptors, Delete, Body, Post
+  Get, UseInterceptors, Delete, Body, Post, Put
 } from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
@@ -15,7 +15,6 @@ import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
 import {NotifyToken} from "src/common/dto/Notify/payload.dto";
-import {CustomerFavouriteServiceDto} from "src/common/dto/Customer";
 
 @Crud({
   model: {
@@ -165,12 +164,12 @@ export class CustomerController implements CrudController<Customer> {
     jwtOnly: true,
     type: "CUSTOMER"
   })
-  @Post("/favourites")
+  @Put("services/:id/favourites")
   createFavouriteServicesForCustomer(
-    @Body() dto: CustomerFavouriteServiceDto,
+    @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: Customer
   ) {
-    return this.service.addFavouriteServiceToCustomer(dto.favouriteServiceId, user.id);
+    return this.service.addFavouriteServiceToCustomer(id, user.id);
   }
 
   @CrudSwaggerFindMany()
