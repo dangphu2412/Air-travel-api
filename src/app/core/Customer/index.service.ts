@@ -10,7 +10,7 @@ import {BaseService} from "src/app/base/base.service";
 import {CustomerError, DEFAULT_ERROR} from "src/common/constants";
 import {RegisterDto} from "src/common/dto/User";
 import {Customer, Role, User} from "src/common/entity";
-import {ERole, ErrorCodeEnum} from "src/common/enums";
+import {ENotify, ERole, ErrorCodeEnum} from "src/common/enums";
 import {FindOneOptions, UpdateResult} from "typeorm";
 import {NotificationRepository} from "../Notification/index.repository";
 import {CustomerRepository} from "./index.repository";
@@ -100,7 +100,17 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
     return this.repository.softDelete(record.id);
   }
 
-  public updateNotificationToken(notifyToken: string, user: Customer) {
+  public updateNotificationToken(notifyToken: string, user: Customer, status: ENotify) {
+    switch (status) {
+      case ENotify.SUB:
+        return this.subcribeNotificationToken(notifyToken, user);
+      case ENotify.UN_SUB:
+      default:
+        return this.unsubcribeNotificationToken(notifyToken, user);
+    }
+  }
+
+  public subcribeNotificationToken(notifyToken: string, user: Customer) {
     // Init array
     if (user.notifyTokens === null) {
       user.notifyTokens = [];

@@ -1,4 +1,4 @@
-import {ApiOperation, ApiTags} from "@nestjs/swagger";
+import {ApiOperation, ApiParam, ApiTags} from "@nestjs/swagger";
 import {
   Controller, Patch, Param, ParseIntPipe,
   Get, UseInterceptors, Delete, Body, Put
@@ -11,7 +11,7 @@ import {Customer, Role} from "src/common/entity";
 import {CustomerService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
-import {ECrudAction, ECrudFeature} from "src/common/enums";
+import {ECrudAction, ECrudFeature, ENotify} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
 import {NotifyToken} from "src/common/dto/Notify/payload.dto";
@@ -141,23 +141,16 @@ export class CustomerController implements CrudController<Customer> {
     jwtOnly: true,
     type: "CUSTOMER"
   })
+  @ApiParam({
+    name: "status",
+    enum: ENotify
+  })
   updateNotificationToken(
     @Body() body: NotifyToken,
-    @CurrentUser() user: Customer
+    @CurrentUser() user: Customer,
+    @Param("status") status: ENotify
   ) {
-    return this.service.updateNotificationToken(body.nofifyToken, user);
-  }
-
-  @Patch("/notify/token")
-  @GrantAccess({
-    jwtOnly: true,
-    type: "CUSTOMER"
-  })
-  unsubcribeNotificationToken(
-    @Body() body: NotifyToken,
-    @CurrentUser() user: Customer
-  ) {
-    return this.service.unsubcribeNotificationToken(body.nofifyToken, user);
+    return this.service.updateNotificationToken(body.nofifyToken, user, status);
   }
 
   @GrantAccess({
