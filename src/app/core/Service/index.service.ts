@@ -16,6 +16,7 @@ import {ProviderService} from "../Provider/index.service";
 import {ServiceCategoryService} from "../ServiceCategory/index.service";
 import {UserService} from "../User/index.service";
 import {ServiceRepository} from "./index.repository";
+import {IBestSeller} from "./interface";
 
 @Injectable()
 export class ServiceService extends TypeOrmCrudService<Service> {
@@ -146,15 +147,15 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     })
   }
 
-  public findServicesByCustomerIds(
-    req: CrudRequest, favouriteIds: number[]
+  public findServicesByIds(
+    req: CrudRequest = null, favouriteIds: number[]
   ): Promise<Service[]> | []{
     if (favouriteIds === null || !favouriteIds.length) {
       return [];
     }
     return this.repository.find({
-      skip: req.parsed.offset ?? 0,
-      take: req.parsed.limit ?? req.options.query.limit,
+      skip: req?.parsed?.offset ?? 0,
+      take: req?.parsed?.limit ?? req?.options?.query?.limit ?? 10,
       relations: [
         "serviceCategories",
         "providers",
@@ -170,11 +171,21 @@ export class ServiceService extends TypeOrmCrudService<Service> {
   }
 
   public async getBestSeller() {
-    const services = await this.repository
+    const ids = await this.getBestSellerIds();
+    return this.findServicesByIds(null, ids);
+  }
+
+  public async getBestSellerIds() {
+    const services: any[] = await this.repository
       .createQueryBuilder("service")
+      .select(["service.id", "service.createdAt"])
       .leftJoinAndSelect("service.billServices", "billServices")
-      .loadRelationCountAndMap("service.billServices", "billServices")
+      .loadRelationCountAndMap("service.billServices", "service.billServices")
+      .orderBy("service.createdAt", "DESC")
       .getMany();
-    return services;
+
+    return services
+      .sort((pre: IBestSeller, af: IBestSeller) => af.billServices - pre.billServices)
+      .splice(0, 5).map(record => record.id);
   }
 }

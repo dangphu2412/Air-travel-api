@@ -192,7 +192,7 @@ export class ServiceController implements CrudController<Service> {
   ) {
     const favouriteIds: number[] = await this.service.findCustomerFavouriteServices(user.id);
 
-    return this.service.findServicesByCustomerIds(req, favouriteIds);
+    return this.service.findServicesByIds(req, favouriteIds);
   }
 
   @AuthNotRequired()
