@@ -9,7 +9,7 @@ import {CustomerError} from "src/common/constants";
 import {Lang} from "src/common/constants/lang";
 import {Customer, Service, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
-import {FindOneOptions, UpdateResult} from "typeorm";
+import {FindOneOptions, In, UpdateResult} from "typeorm";
 import {CustomerService} from "../Customer/index.service";
 import {DestinationService} from "../Destination/index.service";
 import {ProviderService} from "../Provider/index.service";
@@ -144,5 +144,28 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       };
       return response;
     })
+  }
+
+  public findServicesByCustomerIds(
+    req: CrudRequest, favouriteIds: number[]
+  ): Promise<Service[]> | []{
+    if (favouriteIds === null || !favouriteIds.length) {
+      return [];
+    }
+    return this.repository.find({
+      skip: req.parsed.offset ?? 0,
+      take: req.parsed.limit ?? req.options.query.limit,
+      relations: [
+        "serviceCategories",
+        "providers",
+        "destinations",
+        "destinations.city",
+        "destinations.district",
+        "user"
+      ],
+      where: {
+        id: In(favouriteIds)
+      }
+    });
   }
 }

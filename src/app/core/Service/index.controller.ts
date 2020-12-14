@@ -179,23 +179,20 @@ export class ServiceController implements CrudController<Service> {
 
   @CrudSwaggerFindMany()
   @UseInterceptors(CrudRequestInterceptor)
+  @GrantAccess({
+    jwtOnly: true
+  })
   @ApiOperation({
-    summary: "Get one record by vietnam slug"
+    summary: "Get many favourite services"
   })
   @Get("favourites")
   async getFavouriteServicesByCustomer(
     @ParsedRequest() req: CrudRequest,
-    @Query("dic") customerId: number
+    @CurrentUser() user: Customer
   ) {
-    const favouriteIds: number[] = await this.service.findCustomerFavouriteServices(customerId);
-    req.parsed.filter = [
-      {
-        field: "id",
-        operator: "$in",
-        value: favouriteIds
-      }
-    ]
-    return this.base.getManyBase(req);
+    const favouriteIds: number[] = await this.service.findCustomerFavouriteServices(user.id);
+
+    return this.service.findServicesByCustomerIds(req, favouriteIds);
   }
 
   @AuthNotRequired()
