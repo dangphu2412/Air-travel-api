@@ -172,7 +172,6 @@ export class ServiceService extends TypeOrmCrudService<Service> {
   public async getBestSeller() {
     const services = await this.repository
       .createQueryBuilder("service")
-      .select(["service.id", "service.viName", "service.enName"])
       .leftJoinAndSelect("service.billServices", "billServices")
       .loadRelationCountAndMap("service.billServices", "billServices")
       .getMany();
