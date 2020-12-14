@@ -1,7 +1,7 @@
 import {ApiOperation, ApiTags} from "@nestjs/swagger";
 import {
   Controller, Patch, Param, ParseIntPipe,
-  Get, UseInterceptors, Delete, Body, Post, Put
+  Get, UseInterceptors, Delete, Body, Put
 } from "@nestjs/common";
 import {
   Crud, CrudController, Feature,

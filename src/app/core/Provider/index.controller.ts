@@ -25,6 +25,13 @@ import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
         })
       ]
     }
+  },
+  query: {
+    join: {
+      billInfos: {
+        eager: false
+      }
+    }
   }
 })
 @ApiTags("Providers")
