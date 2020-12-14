@@ -146,6 +146,7 @@ export class BillService extends TypeOrmCrudService<Bill> {
       .findWithRelationUser(this.repository, id);
     const {user} = record;
 
+    // User may null when bill was not accepted
     if (!user) {
       this.baseService.isNotAdminAndThrowErr(
         currentUser
