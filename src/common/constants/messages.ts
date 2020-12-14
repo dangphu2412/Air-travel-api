@@ -25,7 +25,8 @@ export const CustomerError = {
   ConflictExisted: "Your account has been existed",
   Unauthorized: "Your username or password is not right",
   ConflictNotifyToken: "This token has already in used",
-  ConflictEmptyToken: "You have not updated your token"
+  ConflictEmptyToken: "You have not updated your token",
+  ConflictFavouriteKeyExited: "This service has been added to favourite"
 }
 
 export const RoleError = {

@@ -131,6 +131,13 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
     if (favouriteServiceIds === null || favouriteServiceIds.length === 0) {
       customer.favouriteServiceIds = [];
     }
+
+    if (favouriteServiceIds.includes(id)) {
+      throw new ConflictException(
+        ErrorCodeEnum.ALREADY_EXIST,
+        CustomerError.ConflictFavouriteKeyExited
+      )
+    }
     customer.favouriteServiceIds.push(id);
     return customer.save();
   }

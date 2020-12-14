@@ -188,4 +188,8 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       .sort((pre: IBestSeller, af: IBestSeller) => af.billServices - pre.billServices)
       .splice(0, 5).map(record => record.id);
   }
+
+  public getCount() {
+    return this.repository.count();
+  }
 }
