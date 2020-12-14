@@ -28,6 +28,7 @@
     "schema:reset": "npm run schema:drop && npm run schema:sync && npm run seed:run"
   },
   "dependencies": {
+    "@nestjs/bull": "^0.3.1",
     "@nestjs/common": "^7.0.0",
     "@nestjs/core": "^7.0.0",
     "@nestjs/jwt": "^7.1.0",
@@ -38,6 +39,7 @@
     "@nestjsx/crud": "^4.6.2",
     "@nestjsx/crud-typeorm": "^4.6.2",
     "bcryptjs": "^2.4.3",
+    "bull": "^3.20.0",
     "cache-manager": "^3.4.0",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",

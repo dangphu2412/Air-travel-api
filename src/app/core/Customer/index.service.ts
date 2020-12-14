@@ -136,19 +136,19 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
   public async addFavouriteServiceToCustomer(id: number, userId: number) {
     const customer: Customer = await this.findOne(userId);
 
-    const {favouriteServiceIds} = customer;
-
-    if (favouriteServiceIds === null || favouriteServiceIds.length === 0) {
+    if (customer.favouriteServiceIds === null || customer.favouriteServiceIds.length === 0) {
       customer.favouriteServiceIds = [];
     }
 
-    if (favouriteServiceIds.includes(id)) {
+    if (customer.favouriteServiceIds.includes(id)) {
       throw new ConflictException(
         ErrorCodeEnum.ALREADY_EXIST,
         CustomerError.ConflictFavouriteKeyExited
       )
     }
+
     customer.favouriteServiceIds.push(id);
+
     return customer.save();
   }
 
