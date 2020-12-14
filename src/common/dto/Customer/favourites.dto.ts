@@ -1,10 +1,10 @@
 import {ApiProperty} from "@nestjs/swagger";
-import {IsArray} from "class-validator";
+import {IsNumber} from "class-validator";
 
 export class CustomerFavouriteServiceDto {
-    @IsArray()
+    @IsNumber()
     @ApiProperty({
-      example: [1, 2, 3]
+      example: 1
     })
-    favouriteServiceIds: number[];
+    favouriteServiceId: number;
 }

@@ -124,10 +124,15 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
     return user.save();
   }
 
-  public async addFavouriteServiceToCustomer(favouriteServiceIds: number[], userId: number) {
+  public async addFavouriteServiceToCustomer(id: number, userId: number) {
     const customer: Customer = await this.findOne(userId);
 
-    customer.favouriteServiceIds = favouriteServiceIds;
+    const {favouriteServiceIds} = customer;
+
+    if (favouriteServiceIds === null || favouriteServiceIds.length === 0) {
+      customer.favouriteServiceIds = [];
+    }
+    customer.favouriteServiceIds.push(id);
     return customer.save();
   }
 
