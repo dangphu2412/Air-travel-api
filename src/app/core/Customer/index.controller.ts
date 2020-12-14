@@ -1,4 +1,4 @@
-import {ApiOperation, ApiParam, ApiTags} from "@nestjs/swagger";
+import {ApiOperation, ApiParam, ApiQuery, ApiTags} from "@nestjs/swagger";
 import {
   Controller, Patch, Param, ParseIntPipe,
   Get, UseInterceptors, Delete, Body, Put, Query
@@ -142,7 +142,7 @@ export class CustomerController implements CrudController<Customer> {
     jwtOnly: true,
     type: "CUSTOMER"
   })
-  @ApiParam({
+  @ApiQuery({
     name: "status",
     enum: ENotify
   })

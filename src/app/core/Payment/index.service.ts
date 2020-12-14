@@ -55,13 +55,12 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
 
     switch (type) {
       case EPayment.PAY_OUT:
-        // TODO: Check this in next commit
-        // if (entity.amount > entity.bill.providerRemain) {
-        //   throw new ConflictException(
-        //     BillError.ConflictRemainGreaterThan,
-        //     ErrorCodeEnum.CONFLICT
-        //   )
-        // }
+        if (entity.amount > entity.bill.providerRemain) {
+          throw new ConflictException(
+            BillError.ConflictRemainGreaterThan,
+            ErrorCodeEnum.CONFLICT
+          )
+        }
         entity.bill.providerRemain -= entity.amount;
         if (entity.bill.providerRemain === 0) {
           entity.bill.status = BillStatus.CUSTOMER_PAID

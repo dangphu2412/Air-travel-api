@@ -16,7 +16,28 @@ import {EBillInfoType} from "src/common/enums/billInfoType.enum";
     type: BillInfo
   },
   routes: {
-    only: ["getManyBase", "getOneBase", "createOneBase"]
+    only: ["getManyBase", "getOneBase", "createOneBase"],
+    getManyBase: {
+      decorators: [
+        GrantAccess({
+          action: ECrudAction.READ
+        })
+      ]
+    },
+    getOneBase: {
+      decorators: [
+        GrantAccess({
+          action: ECrudAction.READ
+        })
+      ]
+    }
+  },
+  query: {
+    join: {
+      customer: {
+        eager: true
+      }
+    }
   }
 })
 @ApiTags("BillInfos")

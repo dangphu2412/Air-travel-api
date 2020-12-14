@@ -1,4 +1,4 @@
 export enum ENotify {
-    SUB,
-    UN_SUB
+    SUB = "SUB",
+    UN_SUB = "UN_SUB"
 }
