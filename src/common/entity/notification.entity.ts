@@ -39,8 +39,8 @@ export class Notification extends BaseActionDate {
     @Column()
     customerId: number;
 
-    @ApiProperty({readOnly: true, type: () => User})
-    @ManyToOne(() => User, item => item.services)
+    @ApiProperty({readOnly: true, type: () => Customer})
+    @ManyToOne(() => Customer, item => item.customer)
     @JoinColumn({name: "customerId"})
     customer: Customer;
 }

@@ -17,6 +17,7 @@ import {BillInfo} from "./billInfo.entity";
 import {Role} from "./role.entity";
 import {enumToArray} from "../../utils";
 import {BcryptService} from "../../global/bcrypt";
+import {Notification} from "./notification.entity";
 
 @Entity("customers")
 @Unique(["email"])
@@ -172,4 +173,8 @@ export class Customer extends BaseActionDate {
   @ApiProperty({readOnly: true, type: () => BillInfo})
   @OneToMany(() => BillInfo, info => info.customer)
   billInfos: BillInfo[]
+
+  @ApiProperty({readOnly: true, type: () => BillInfo})
+  @OneToMany(() => Notification, info => info.customer)
+  customer: Notification[]
 }
