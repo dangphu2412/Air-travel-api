@@ -101,19 +101,18 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
   }
 
   public updateNotificationToken(notifyToken: string, user: Customer) {
-    if (user.notifyTokens !== null && user.notifyTokens.length) {
-      if (user.notifyTokens.includes(notifyToken)) {
-        throw new ConflictException(
-          CustomerError.ConflictNotifyToken,
-          ErrorCodeEnum.CONFLICT
-        );
-      }
-      user.notifyTokens.push(notifyToken);
-    }
-
+    // Init array
     if (user.notifyTokens === null) {
       user.notifyTokens = [];
     }
+    if (user.notifyTokens.includes(notifyToken)) {
+      throw new ConflictException(
+        CustomerError.ConflictNotifyToken,
+        ErrorCodeEnum.CONFLICT
+      );
+    }
+    user.notifyTokens.push(notifyToken);
+
     return user.save();
   }
 
