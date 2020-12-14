@@ -7,7 +7,7 @@ import {
   Crud, CrudController, Feature,
   ParsedRequest, CrudRequest, CrudRequestInterceptor, Override, ParsedBody
 } from "@nestjsx/crud";
-import {Customer, Role} from "src/common/entity";
+import {Customer, Notification, Role} from "src/common/entity";
 import {CustomerService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
@@ -15,6 +15,7 @@ import {ECrudAction, ECrudFeature, ENotify} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
 import {NotifyToken} from "src/common/dto/Notify/payload.dto";
+import {mappingResponseFromCrudReq} from "src/utils";
 
 @Crud({
   model: {
@@ -178,17 +179,10 @@ export class CustomerController implements CrudController<Customer> {
   ) {
     const data = await this.service.getNotifications(req, user);
     const total = await this.service.getNotificationCount();
-    const {parsed} = req;
-    const limit = parsed.limit ?? 0;
-    const offset = parsed.offset ?? 0;
-    const page = total !== 0 ? Math.ceil(offset / limit) : 0;
-    const pageCount = total !== 0 ? Math.ceil(total / limit) : 0;
-    return {
+    return mappingResponseFromCrudReq<Notification>(
+      req,
       data,
-      count: limit,
-      total,
-      page,
-      pageCount
-    }
+      total
+    );
   }
 }
