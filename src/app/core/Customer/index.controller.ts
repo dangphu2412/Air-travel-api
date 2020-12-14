@@ -1,4 +1,4 @@
-import {ApiOperation, ApiParam, ApiQuery, ApiTags} from "@nestjs/swagger";
+import {ApiOperation, ApiQuery, ApiTags} from "@nestjs/swagger";
 import {
   Controller, Patch, Param, ParseIntPipe,
   Get, UseInterceptors, Delete, Body, Put, Query
