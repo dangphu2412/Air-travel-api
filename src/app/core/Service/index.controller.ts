@@ -16,6 +16,7 @@ import {Lang} from "src/common/constants/lang";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
 import {AuthNotRequired} from "src/common/decorators/jwtNotRequired.decorator";
+import {mappingResponseFromCrudReq} from "src/utils";
 
 @Crud({
   model: {
@@ -194,18 +195,11 @@ export class ServiceController implements CrudController<Service> {
     const data = await this.service.findServicesByIds(req, favouriteIds);
 
     const total = await this.service.getCount();
-    const {parsed, options} = req;
-    const limit = parsed.limit ?? options.query.limit ?? 0;
-    const offset = parsed.offset ?? 0;
-    const page = total !== 0 ? Math.ceil(offset / limit) : 0;
-    const pageCount = total !== 0 ? Math.ceil(total / limit) : 0;
-    return {
+    return mappingResponseFromCrudReq<Service>(
+      req,
       data,
-      count: limit,
-      total,
-      page,
-      pageCount
-    }
+      total
+    );
   }
 
   @AuthNotRequired()
