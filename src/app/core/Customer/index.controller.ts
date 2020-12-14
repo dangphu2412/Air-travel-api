@@ -1,7 +1,7 @@
 import {ApiOperation, ApiParam, ApiTags} from "@nestjs/swagger";
 import {
   Controller, Patch, Param, ParseIntPipe,
-  Get, UseInterceptors, Delete, Body, Put
+  Get, UseInterceptors, Delete, Body, Put, Query
 } from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
@@ -149,7 +149,7 @@ export class CustomerController implements CrudController<Customer> {
   updateNotificationToken(
     @Body() body: NotifyToken,
     @CurrentUser() user: Customer,
-    @Param("status") status: ENotify
+    @Query("status") status: ENotify
   ) {
     return this.service.updateNotificationToken(body.nofifyToken, user, status);
   }
