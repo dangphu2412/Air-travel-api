@@ -159,8 +159,8 @@ export class CustomerService extends TypeOrmCrudService<Customer> {
 
   public getNotifications(req: CrudRequest, user: Customer) {
     return this.notificationRepository.find({
-      skip: req.parsed.offset ?? req.options.query.maxLimit,
-      take: req.parsed.limit ?? req.options.query.limit,
+      skip: req.parsed.offset ?? 0,
+      take: req.parsed.limit ?? req.options.query.limit ?? 10,
       where: {
         customerId: user.id
       }

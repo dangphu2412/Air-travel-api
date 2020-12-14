@@ -35,14 +35,14 @@ export const filterIdToUpdate = (presentRecords: any[]) => {
 export const mappingResponseFromCrudReq = <T>(
   req: CrudRequest, data: T[], total: number
 ): GetManyDefaultResponse<T> => {
-  const {parsed} = req;
-  const limit = parsed.limit ?? 0;
+  const {parsed, options} = req;
+  const limit = parsed.limit ?? options.query.limit ?? 0;
   const offset = parsed.offset ?? 0;
   const page = total !== 0 ? Math.ceil(offset / limit) : 0;
   const pageCount = total !== 0 ? Math.ceil(total / limit) : 0;
   return {
     data,
-    count: limit,
+    count: data.length,
     total,
     page,
     pageCount
