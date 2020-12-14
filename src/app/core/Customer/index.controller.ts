@@ -170,7 +170,7 @@ export class CustomerController implements CrudController<Customer> {
     @Body() dto: CustomerFavouriteServiceDto,
     @CurrentUser() user: Customer
   ) {
-    return this.service.addFavouriteServiceToCustomer(dto.favouriteServiceIds, user.id);
+    return this.service.addFavouriteServiceToCustomer(dto.favouriteServiceId, user.id);
   }
 
   @CrudSwaggerFindMany()

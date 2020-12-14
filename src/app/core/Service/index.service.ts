@@ -9,7 +9,7 @@ import {CustomerError} from "src/common/constants";
 import {Lang} from "src/common/constants/lang";
 import {Customer, Service, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
-import {FindOneOptions, In, UpdateResult} from "typeorm";
+import {FindOneOptions, In, JoinOptions, UpdateResult} from "typeorm";
 import {CustomerService} from "../Customer/index.service";
 import {DestinationService} from "../Destination/index.service";
 import {ProviderService} from "../Provider/index.service";
@@ -167,5 +167,15 @@ export class ServiceService extends TypeOrmCrudService<Service> {
         id: In(favouriteIds)
       }
     });
+  }
+
+  public async getBestSeller() {
+    const services = await this.repository
+      .createQueryBuilder("service")
+      .select(["service.id", "service.viName", "service.enName"])
+      .leftJoinAndSelect("service.billServices", "billServices")
+      .loadRelationCountAndMap("service.billServices", "billServices")
+      .getMany();
+    return services;
   }
 }

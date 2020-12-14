@@ -1,7 +1,7 @@
 import {ApiOperation, ApiTags} from "@nestjs/swagger";
 import {
   Controller, Patch, Param, ParseIntPipe,
-  Get, UseInterceptors, Delete, Query
+  Get, UseInterceptors, Delete
 } from "@nestjs/common";
 import {
   Crud, CrudController, Feature,
@@ -203,5 +203,13 @@ export class ServiceController implements CrudController<Service> {
   ) {
     const services = await this.base.getManyBase(req) as GetManyDefaultResponse<Service>;
     return this.service.getManyFilterFavourite(services, user);
+  }
+
+  @ApiOperation({
+    summary: "Get top seller"
+  })
+  @Get("best-seller")
+  async getBestSeller() {
+    return this.service.getBestSeller();
   }
 }
