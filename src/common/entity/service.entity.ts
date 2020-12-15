@@ -12,6 +12,7 @@ import {ServiceCategory} from "./serviceCategory.entity";
 import {Destination} from "./destination.entity";
 import {BaseActionDate} from "./base";
 import {BillService} from "./billService.entity";
+import {Comment} from "./comment.entity";
 
 @Entity("services")
 @Unique(["enSlug", "viSlug"])
@@ -242,4 +243,9 @@ export class Service extends BaseActionDate {
   @OneToMany(() => BillService, item => item.service)
   @JoinColumn()
   billServices: BillService[]
+
+  @ApiProperty({readOnly: true, type: () => BillService})
+  @OneToMany(() => Comment, item => item.service)
+  @JoinColumn()
+  comments: BillService[]
 }

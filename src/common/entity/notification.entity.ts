@@ -8,7 +8,6 @@ import {IsString, IsEmpty} from "class-validator";
 import {IsRequired} from "../decorators/isRequired.decorator";
 
 import {BaseActionDate} from "./base";
-import {User} from "./user.entity";
 import {Customer} from ".";
 
 @Entity("notifications")

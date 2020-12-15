@@ -79,7 +79,7 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
           entity.bill.status = BillStatus.PROVIDER_PAID;
 
           if (
-            entity.bill.customer.notifyTokens === null &&
+            entity.bill.customer.notifyTokens === null ||
             entity.bill.customer.notifyTokens.length === 0
           ) {
             throw new ConflictException(

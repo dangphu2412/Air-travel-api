@@ -26,6 +26,8 @@ export class NotificationService {
     tokens.forEach(token => {
       this.firebaseService.messaging().sendToDevice(token, {
         notification
+      }).then(val => {
+        console.log("Send notify success" + val)
       });
     });
   }
