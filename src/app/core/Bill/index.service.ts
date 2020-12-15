@@ -106,6 +106,36 @@ export class BillService extends TypeOrmCrudService<Bill> {
     }));
   }
 
+  public updateExistedBillServices(
+    billServices: BillServiceEntity[],
+    billEntity: Bill,
+    transactionManager: EntityManager
+  ) {
+    const updateRecords = [];
+    billServices.forEach(billService => {
+      let flag = false;
+      const index = billEntity
+        .billServices
+        .findIndex(item => item.id === billService.id);
+
+      Object.keys(billService).forEach(key => {
+        if (
+          billService[key] &&
+          billService[key] !== billEntity.billServices[index][key]
+        ) {
+          billEntity.billServices[index][key] = billService[key];
+          flag = true;
+        }
+      });
+
+      if (flag) updateRecords.push(
+        transactionManager.save(billEntity.billServices[index])
+      );
+
+      return Promise.all(updateRecords);
+    })
+  }
+
   updateBillRemain(entity: Bill, transactionManager: EntityManager): Promise<Bill> {
     this.fillRemain(entity);
     return transactionManager.save(entity);
@@ -122,19 +152,24 @@ export class BillService extends TypeOrmCrudService<Bill> {
       newRecords, bill, transactionManager
     );
 
+    await this.updateExistedBillServices(existedRecords, bill, transactionManager);
+
+    this.calcTotalThenMapToEntity(bill, newBilServices);
+
     bill.billServices = [...existedRecords, ...newBilServices];
   }
 
   updateBill(bill: Bill, dto: UpdateBillByUserDto) {
     Object.keys(dto).forEach(key => {
       if (bill[key] && bill[key] !== dto[key]) {
+        console.log(key)
         bill[key] = dto[key];
       }
     });
   }
 
-  calcTotalThenMapToEntity(entity: Bill): void {
-    entity.billServices.forEach(item => {
+  calcTotalThenMapToEntity(entity: Bill, billServices: BillServiceEntity[]): void {
+    billServices.forEach(item => {
       entity.totalPrice += item.price * item.quantity;
       entity.totalNetPrice += item.netPrice;
     })

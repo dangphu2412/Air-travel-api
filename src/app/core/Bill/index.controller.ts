@@ -87,7 +87,7 @@ export class BillController implements CrudController<Bill> {
 
       entity.billServices = billServices;
 
-      this.service.calcTotalThenMapToEntity(entity);
+      this.service.calcTotalThenMapToEntity(entity, entity.billServices);
 
       await this.service.updateBillRemain(entity, transactionManager);
       return entity;
@@ -115,7 +115,7 @@ export class BillController implements CrudController<Bill> {
         dto.billServices, entity, transactionManager
       );
       entity.billServices = billServices;
-      this.service.calcTotalThenMapToEntity(entity);
+      this.service.calcTotalThenMapToEntity(entity, entity.billServices);
 
       return this.service.updateBillRemain(entity, transactionManager);
     })
@@ -139,7 +139,6 @@ export class BillController implements CrudController<Bill> {
 
       await this.service.updateRelation(bill, dto, transactionManager);
 
-      this.service.calcTotalThenMapToEntity(bill);
       this.service.updateBill(bill, dto);
 
       return transactionManager.save(bill);
