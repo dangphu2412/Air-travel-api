@@ -27,7 +27,9 @@ export class RaclHelper {
           ...this.createManyPermissionFromFeature(ECrudFeature.USER, {
             exclude: ["DELETE", "REPLACE"]
           }),
-          ...this.createManyPermissionFromFeature(ECrudFeature.ROLE),
+          ...this.createManyPermissionFromFeature(ECrudFeature.ROLE, {
+            only: ["READ"]
+          }),
           ...this.createManyPermissionFromFeature(ECrudFeature.PROVIDER)
         ])
       },

@@ -138,7 +138,7 @@ export class User extends BaseActionDate {
      * Key relations
      */
 
-    @ApiProperty({writeOnly: true, type: () => Role})
+    @ApiProperty({writeOnly: true})
     @IsRequired()
     @IsNumber()
     roleId: number;
@@ -146,6 +146,7 @@ export class User extends BaseActionDate {
     /**
      * Relations
      */
+    @ApiProperty({readOnly: true, type: () => Role})
     @ManyToOne(() => Role)
     role: Role
 
