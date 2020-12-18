@@ -1,12 +1,12 @@
 
 import {ApiTags} from "@nestjs/swagger";
-import {Body, Controller, UseInterceptors} from "@nestjs/common";
+import {Body, Controller} from "@nestjs/common";
 import {
-  Crud, CrudController, CrudRequest, Feature, Override, ParsedBody, ParsedRequest
+  Crud, CrudController, CrudRequest, Feature, Override, ParsedRequest
 } from "@nestjsx/crud";
-import {Comment, Customer, User} from "src/common/entity";
+import {Comment, Customer} from "src/common/entity";
 import {CommentService} from "./index.service";
-import {ECrudAction, ECrudFeature} from "src/common/enums";
+import {ECrudFeature} from "src/common/enums";
 import {GrantAccess, CurrentUser} from "src/common/decorators";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 

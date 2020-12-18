@@ -64,7 +64,7 @@ export class UserController implements CrudController<User> {
   @GrantAccess({
     action: ECrudAction.CREATE
   })
-  @Override("updateOneBase")
+  @Override("createOneBase")
   async createOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: User,
