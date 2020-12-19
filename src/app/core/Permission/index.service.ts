@@ -16,7 +16,9 @@ export class PermissionService extends TypeOrmCrudService<Permission>{
 
   getAll() {
     return this.repository.find({
-      where: Not("ALL")
+      where: {
+        name: Not("ALL")
+      }
     });
   }
 
