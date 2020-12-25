@@ -1,9 +1,11 @@
-import {Injectable} from "@nestjs/common";
+import {ForbiddenException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
 import {BaseService} from "src/app/base/base.service";
 import {Permission, Role, User} from "src/common/entity";
+import {ErrorCodeEnum} from "src/common/enums";
+import {ERole} from "src/common/enums/racl.enum";
 import {Not, IsNull, UpdateResult} from "typeorm";
 import {PermissionService} from "../Permission/index.service";
 import {RoleRepository} from "./index.repository";
@@ -61,6 +63,13 @@ export class RoleService extends TypeOrmCrudService<Role> {
         this.repository,
         id
       );
+
+    if (record.name === ERole.ADMIN) {
+      throw new ForbiddenException(
+        ErrorCodeEnum.NOT_DELETE_ADMIN_ROLE,
+        "You are not allow to delete admin role"
+      )
+    }
     if (record.users) {
       await this.syncUserToUpdatePermission(record.users);
     }
