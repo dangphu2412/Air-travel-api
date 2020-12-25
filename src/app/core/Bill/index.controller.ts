@@ -8,7 +8,7 @@ import {Bill, Customer, User, BillService as BillServiceEntity} from "src/common
 import {BillService} from "./index.service";
 import {CurrentUser} from "src/common/decorators";
 import {GrantAccess} from "src/common/decorators";
-import {ECrudAction, ECrudFeature} from "src/common/enums";
+import {ECrudAction, ECrudFeature, ERole} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CreateBillByUserDto} from "src/common/dto/Bill";
 import {getManager} from "typeorm";
@@ -135,7 +135,9 @@ export class BillController implements CrudController<Bill> {
         relations: ["billServices", "user", "customer"]
       });
 
-      this.service.validateAuthor(bill, user);
+      if (user.role.name !== ERole.ADMIN) {
+        this.service.validateAuthor(bill, user);
+      }
 
       await this.service.updateRelation(bill, dto, transactionManager);
 
