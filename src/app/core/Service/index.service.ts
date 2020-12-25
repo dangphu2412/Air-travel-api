@@ -68,8 +68,8 @@ export class ServiceService extends TypeOrmCrudService<Service> {
     const {user} = record;
     if (this.userService.isNotAuthor(currentUser, user)) {
       throw new ForbiddenException(
+        "You are not author",
         ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
-        "You are not author"
       )
     }
     return this.repository.softDelete(record.id);
@@ -111,8 +111,8 @@ export class ServiceService extends TypeOrmCrudService<Service> {
 
     if (!customer) {
       throw new NotFoundException(
+        CustomerError.NotFound,
         ErrorCodeEnum.NOT_FOUND,
-        CustomerError.NotFound
       )
     }
 

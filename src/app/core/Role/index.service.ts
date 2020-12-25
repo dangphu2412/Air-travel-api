@@ -1,8 +1,9 @@
-import {ForbiddenException, Injectable} from "@nestjs/common";
+import {ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
 import {BaseService} from "src/app/base/base.service";
+import {DEFAULT_ERROR} from "src/common/constants";
 import {Permission, Role, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
 import {ERole} from "src/common/enums/racl.enum";
@@ -57,17 +58,18 @@ export class RoleService extends TypeOrmCrudService<Role> {
 
   public async softDelete(id: number, user: User): Promise<UpdateResult> {
     this.baseService.isNotAdminAndThrowErr(user);
-    const record = await this
-      .baseService
-      .findWithRelationUserThrowErr(
-        this.repository,
-        id
-      );
+    const record = await this.repository.findOne(id);
+    if (!record) {
+      throw new NotFoundException(
+        DEFAULT_ERROR.NotFound,
+        ErrorCodeEnum.NOT_FOUND
+      )
+    }
 
     if (record.name === ERole.ADMIN) {
       throw new ForbiddenException(
-        ErrorCodeEnum.NOT_DELETE_ADMIN_ROLE,
-        "You are not allow to delete admin role"
+        "You are not allow to delete admin role",
+        ErrorCodeEnum.NOT_DELETE_ADMIN_ROLE
       )
     }
     if (record.users) {

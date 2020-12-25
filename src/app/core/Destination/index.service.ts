@@ -83,8 +83,8 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     const {user} = record;
     if (this.userService.isNotAuthor(currentUser, user)) {
       throw new ForbiddenException(
+        "You are not author",
         ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
-        "You are not author"
       )
     }
     this.baseService.isNotSoftDeletedAndThrowErr(record);
@@ -106,8 +106,8 @@ export class DestinationService extends TypeOrmCrudService<Destination> {
     const {user} = record;
     if (this.userService.isNotAuthor(currentUser, user)) {
       throw new ForbiddenException(
+        "You are not author",
         ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
-        "You are not author"
       )
     }
     return this.repository.softDelete(record.id);

@@ -25,8 +25,8 @@ export class BillInfoService extends TypeOrmCrudService<BillInfo> {
         const provider = await this.providerService.findOne(dto.providerId);
         if (!provider) {
           throw new NotFoundException(
-            ErrorCodeEnum.NOT_FOUND,
             "Not found provider please check again",
+            ErrorCodeEnum.NOT_FOUND,
           );
         }
         dto.provider = provider;

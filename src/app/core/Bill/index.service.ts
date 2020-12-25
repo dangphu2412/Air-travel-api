@@ -33,8 +33,8 @@ export class BillService extends TypeOrmCrudService<Bill> {
   validateAuthor(bill: Bill, user: User): void {
     if (bill.userId !== user.id) {
       throw new ForbiddenException(
-        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
-        BillError.ConfilictAuthor
+        BillError.ConfilictAuthor,
+        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM
       );
     }
   }

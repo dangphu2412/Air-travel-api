@@ -83,8 +83,8 @@ export class PaymentService extends TypeOrmCrudService<Payment> {
             entity.bill.customer.notifyTokens.length === 0
           ) {
             throw new ConflictException(
+              CustomerError.ConflictEmptyToken,
               ErrorCodeEnum.NULL_TOKEN,
-              CustomerError.ConflictEmptyToken
             )
           }
           const customerId = entity.bill.customer.id;

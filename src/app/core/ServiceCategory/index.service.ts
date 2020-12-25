@@ -50,8 +50,8 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
     const {user} = record;
     if (this.userService.isNotAuthor(currentUser, user)) {
       throw new ForbiddenException(
+        "You are not author",
         ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
-        "You are not author"
       )
     }
     this.baseService.isNotSoftDeletedAndThrowErr(record);
@@ -83,8 +83,8 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
     const {user} = record;
     if (this.userService.isNotAuthor(currentUser, user)) {
       throw new ForbiddenException(
+        "You are not author",
         ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
-        "You are not author"
       )
     }
     const softDeleteIds = [...mapToIds(record.children), record.id];
