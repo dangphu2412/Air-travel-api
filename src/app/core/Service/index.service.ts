@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable, NotFoundException
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
@@ -43,10 +44,12 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       .findByIdSoftDeletedAndThrowErr(this.repository, id);
     const {user} = record;
 
-    this.baseService.isNotAdminAndAuthorAndThrowErr(
-      this.userService,
-      currentUser, user
-    );
+    if (this.userService.isNotAuthor(currentUser, user)) {
+      throw new ForbiddenException(
+        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
+        "You are not author"
+      )
+    }
     this.baseService.isNotSoftDeletedAndThrowErr(record);
     return this.repository.restore(record.id);
   }
@@ -63,10 +66,12 @@ export class ServiceService extends TypeOrmCrudService<Service> {
       .baseService
       .findWithRelationUserThrowErr(this.repository, id);
     const {user} = record;
-    this.baseService.isNotAdminAndAuthorAndThrowErr(
-      this.userService,
-      currentUser, user
-    );
+    if (this.userService.isNotAuthor(currentUser, user)) {
+      throw new ForbiddenException(
+        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
+        "You are not author"
+      )
+    }
     return this.repository.softDelete(record.id);
   }
 

@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {ForbiddenException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm/lib/typeorm-crud.service";
 import {ServiceCategory, User} from "src/common/entity";
@@ -9,6 +9,7 @@ import {Lang} from "src/common/constants/lang";
 import {UserService} from "../User/index.service";
 import {BaseService} from "src/app/base/base.service";
 import {mapToIds} from "src/utils";
+import {ErrorCodeEnum} from "src/common/enums";
 
 @Injectable()
 export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> {
@@ -47,10 +48,12 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
         }
       );
     const {user} = record;
-    this.baseService.isNotAdminAndAuthorAndThrowErr(
-      this.userService,
-      currentUser, user
-    );
+    if (this.userService.isNotAuthor(currentUser, user)) {
+      throw new ForbiddenException(
+        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
+        "You are not author"
+      )
+    }
     this.baseService.isNotSoftDeletedAndThrowErr(record);
     const restoreIds = [...mapToIds(record.children), record.id];
     return this.repository.restore(restoreIds);
@@ -78,10 +81,12 @@ export class ServiceCategoryService extends TypeOrmCrudService<ServiceCategory> 
         }
       );
     const {user} = record;
-    this.baseService.isNotAdminAndAuthorAndThrowErr(
-      this.userService,
-      currentUser, user
-    );
+    if (this.userService.isNotAuthor(currentUser, user)) {
+      throw new ForbiddenException(
+        ErrorCodeEnum.NOT_CHANGE_ANOTHER_AUTHORS_ITEM,
+        "You are not author"
+      )
+    }
     const softDeleteIds = [...mapToIds(record.children), record.id];
     return this.repository.softDelete(softDeleteIds);
   }
