@@ -1,6 +1,7 @@
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {messaging} from "firebase-admin";
+import {NotificationContent} from "src/common/dto/Notify/notificationContent.dto";
 import {Customer, Notification} from "src/common/entity";
 import {FirebaseService} from "../../../global/firebase";
 import {NotificationRepository} from "./index.repository";
@@ -38,5 +39,24 @@ export class NotificationService {
       title: notification.title,
       customerId
     }).save();
+  }
+
+  async sendAllTestCustomers(body: NotificationContent) {
+    const customers: Customer[] = await Customer.find();
+
+    customers.forEach(customer => {
+      return customer.notifyTokens.forEach(token => {
+        if (token) {
+          this.firebaseService.messaging().sendToDevice(token, {
+            notification: {
+              title: body.title,
+              body: body.body
+            }
+          }).then(val => {
+            console.log("Send notify success" + val)
+          });
+        }
+      });
+    });
   }
 }

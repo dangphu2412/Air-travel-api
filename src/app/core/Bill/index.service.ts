@@ -112,7 +112,7 @@ export class BillService extends TypeOrmCrudService<Bill> {
     transactionManager: EntityManager
   ) {
     const updateRecords = [];
-    billServices.forEach(billService => {
+    return billServices.map(billService => {
       let flag = false;
       const index = billEntity
         .billServices
@@ -162,7 +162,6 @@ export class BillService extends TypeOrmCrudService<Bill> {
   updateBill(bill: Bill, dto: UpdateBillByUserDto) {
     Object.keys(dto).forEach(key => {
       if (bill[key] && bill[key] !== dto[key]) {
-        console.log(key)
         bill[key] = dto[key];
       }
     });
