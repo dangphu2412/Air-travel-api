@@ -8,6 +8,7 @@ import {RaclHelper} from "src/database/seed-development/seed-helper/racl.helper"
 import {ErrorCodeEnum} from "../enums";
 import {DEFAULT_ERROR} from "../constants";
 import {Permission} from "../entity";
+import {castPermission} from "src/utils";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -26,9 +27,12 @@ export class RolesGuard implements CanActivate {
     const controller = context.getClass();
 
     const feature = getFeature(controller);
-    const action = getAction(handler);
+    let action = getAction(handler);
+
+    action = castPermission(action);
 
     const requiredPermission: string = (new RaclHelper()).createPermission(feature, action);
+
     this.assignUserToRequest(request, user);
     this.validateTokenExpired(user);
     return this.matchRacls(requiredPermission, permissions);

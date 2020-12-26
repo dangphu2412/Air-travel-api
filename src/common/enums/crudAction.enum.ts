@@ -1,11 +1,19 @@
 export enum ECrudAction {
-  READ = "Read-All",
-  CREATE = "Create-One",
-  UPDATE = "Update-One",
-  REPLACE = "Replace-One",
-  SOFT_DEL = "Delete-One",
-  DELETE = "Delete-One",
+  READ = "READ",
+  CREATE = "CREATE",
+  UPDATE = "UPDATE",
+  REPLACE = "REPLACE",
+  SOFT_DEL = "SOFT_DEL",
+  DELETE = "DELETE",
   RESTORE = "RESTORE"
+}
+
+export enum EBaseCrudAction {
+  "Read-All"= "READ",
+  "Create-One"= "CREATE",
+  "Update-One"= "UPDATE",
+  "Replace-One"= "REPLACE",
+  "Delete-One"= "SOFT_DEL"
 }
 
 export enum ECrudFeature {

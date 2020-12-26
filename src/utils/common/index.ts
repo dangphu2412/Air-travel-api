@@ -1,4 +1,5 @@
 import {CrudRequest, GetManyDefaultResponse} from "@nestjsx/crud";
+import {EBaseCrudAction, ECrudAction} from "src/common/enums";
 import {TValidateUser} from "src/common/type/t.Validate";
 
 export const generateRandomNumber = (min: number, max: number): number => {
@@ -47,4 +48,8 @@ export const mappingResponseFromCrudReq = <T>(
     page,
     pageCount
   }
+}
+
+export const castPermission = (action: ECrudAction): EBaseCrudAction => {
+  return EBaseCrudAction[action] ?? action;
 }

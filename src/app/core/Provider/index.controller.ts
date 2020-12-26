@@ -83,6 +83,9 @@ export class ProviderController implements CrudController<Provider> {
     summary: "Get soft deleted providers"
   })
   @UseInterceptors(CrudRequestInterceptor)
+  @GrantAccess({
+    action: "SOFT_DEL"
+  })
   @Get("trashed")
   getDeleted(@ParsedRequest() req: CrudRequest) {
     return this.service.getDeleted(req);
@@ -92,10 +95,10 @@ export class ProviderController implements CrudController<Provider> {
     summary: "Soft delete provider"
   })
   @CrudSwaggerFindMany()
-  @Override("deleteOneBase")
   @GrantAccess({
     action: ECrudAction.SOFT_DEL
   })
+  @Override("deleteOneBase")
   async softDelete(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() user: User
