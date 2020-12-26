@@ -1,7 +1,7 @@
 import {EPayment} from "../enums/paymentStatus.enum";
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
-import {IsString, IsIn, IsNumber, IsEmpty} from "class-validator";
+import {IsString, IsIn, IsNumber, IsEmpty, IsOptional} from "class-validator";
 
 import {IsRequired} from "../decorators/isRequired.decorator";
 
@@ -28,10 +28,11 @@ export class Payment extends BaseActionDate {
   type: EPayment;
 
   @ApiProperty()
-  @IsRequired()
+  @IsOptional()
   @IsString()
   @Column({
-    type: "text"
+    type: "text",
+    nullable: true
   })
   description: string;
 

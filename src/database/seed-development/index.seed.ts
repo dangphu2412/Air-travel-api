@@ -5,7 +5,7 @@ import {enumToArray} from "../../utils/array";
 import * as Entity from "../../common/entity";
 import {RaclHelper} from "./seed-helper/racl.helper";
 import {UserHepler} from "./seed-helper/user.helper";
-import {Role, User, Provider, Destination, ServiceCategory} from "../../common/entity";
+import {Role, User, Provider, Destination, ServiceCategory, Customer} from "../../common/entity";
 import {ServiceCategoryHelper} from "./seed-helper/servicecategory.helper";
 import {CsvHelper} from "../../utils/csv";
 import {resolve} from "path";
@@ -65,7 +65,9 @@ export default class Seeding implements Seeder {
       const serviceHelper = new ServiceHelper();
       await serviceHelper.initService(userCount, serviceCategories, destinations, providers);
 
+      const customerRole: Role = roleEntities.find(role => role.name === ERole.CUSTOMER);
       await factory(Provider)({userCount}).createMany(20);
+      await factory(Customer)({customerRole}).createMany(20);
     } catch (error) {
       throw error;
     }

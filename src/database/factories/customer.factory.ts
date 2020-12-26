@@ -1,11 +1,10 @@
 import Faker from "faker";
 import {define} from "typeorm-seeding";
-import {Role, User} from "../../common/entity";
-import {UserStatus} from "../../common/enums/userStatus.enum";
+import {Role, Customer} from "../../common/entity";
 import {Gender} from "../../common/enums/gender.enum";
 import {enumToArray} from "../../utils";
 
-define(User, (faker: typeof Faker, context: { role: Role }) => {
+define(Customer, (faker: typeof Faker, context: { role: Role }) => {
   const randomImg = [
     // eslint-disable-next-line max-len
     "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRlUbAyS_643dq_B69jZAlPNW6_Xc7SLELY6SpRsc5OI2wHiiYG&usqp=CAU",
@@ -17,27 +16,29 @@ define(User, (faker: typeof Faker, context: { role: Role }) => {
 
   const fullName = faker.name.findName();
   const email = faker.internet.email(fullName);
-  const password = "member";
+  const password = "123123";
   const phoneNumber = faker.phone.phoneNumber();
   const avatar = faker.random.arrayElement(randomImg);
   const gender = faker.random.arrayElement(enumToArray(Gender));
   const birthday = faker.date.between("1975/01/01", "2010/01/01");
   const bio = faker.lorem.paragraph();
   const note = faker.lorem.paragraph();
-  const status = faker.random.arrayElement(enumToArray(UserStatus));
 
-  const user = new User();
-  user.fullName = fullName;
-  user.email = email;
-  user.password = password;
-  user.phone = phoneNumber;
-  user.avatar = avatar;
-  user.gender = gender;
-  user.birthday = birthday;
-  user.bio = bio;
-  user.note = note;
-  user.status = status;
-  user.role = role;
+  const customer = new Customer();
+  customer.fullName = fullName;
+  customer.email = email;
+  customer.password = password;
+  customer.phone = phoneNumber;
+  customer.avatar = avatar;
+  customer.gender = gender;
+  customer.birthday = birthday;
+  customer.bio = bio;
+  customer.note = note;
+  customer.role = role;
+  customer.favouriteServiceIds = [
+    "" + faker.random.arrayElement([1, 5]),
+    "" + faker.random.arrayElement([6, 10])
+  ];
 
-  return user;
+  return customer;
 });
