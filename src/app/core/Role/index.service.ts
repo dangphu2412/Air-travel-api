@@ -4,6 +4,7 @@ import {CrudRequest} from "@nestjsx/crud";
 import {TypeOrmCrudService} from "@nestjsx/crud-typeorm";
 import {BaseService} from "src/app/base/base.service";
 import {DEFAULT_ERROR} from "src/common/constants";
+import {UpdateRoleDto} from "src/common/dto/Role/update.dto";
 import {Permission, Role, User} from "src/common/entity";
 import {ErrorCodeEnum} from "src/common/enums";
 import {ERole} from "src/common/enums/racl.enum";
@@ -28,6 +29,31 @@ export class RoleService extends TypeOrmCrudService<Role> {
     const permissions: Permission[] = await this.permissionService.findByIds(permissionIds);
     dto.permissions = permissions;
     return dto;
+  }
+
+  async transferToEntity(dto: UpdateRoleDto, user: User, id: number) {
+    const entity = await this.repository.findOne(id);
+
+    this.validateNotUpdateAdminRole(entity);
+    if (dto.name !== "" && dto.name !== null) {
+      entity.name = dto.name;
+    }
+
+    if (dto.permissionIds.length > 0) {
+      entity.permissionIds = dto.permissionIds;
+      this.mapRelationKeysToEntities(entity, user);
+    }
+
+    return entity;
+  }
+
+  validateNotUpdateAdminRole(role: Role) {
+    if (role.name === ERole.ADMIN) {
+      throw new ForbiddenException(
+        "Can not update admin permissions",
+        ErrorCodeEnum.NOT_UPDATE_ADMIN_ROLE
+      )
+    }
   }
 
   public async restore(id: number, user: User) {
