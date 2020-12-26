@@ -18,6 +18,13 @@ import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
   },
   routes: {
     exclude: ["createManyBase"],
+    getManyBase: {
+      decorators: [
+        GrantAccess({
+          action: ECrudAction.READ
+        })
+      ]
+    },
     replaceOneBase: {
       decorators: [
         GrantAccess({
@@ -44,11 +51,11 @@ export class ProviderController implements CrudController<Provider> {
     return this;
   }
 
+  @UseInterceptors(SqlInterceptor)
+  @Override("createOneBase")
   @GrantAccess({
     action: ECrudAction.CREATE
   })
-  @UseInterceptors(SqlInterceptor)
-  @Override("createOneBase")
   createOneOverride(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Provider,

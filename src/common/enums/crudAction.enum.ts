@@ -1,10 +1,10 @@
 export enum ECrudAction {
-  READ = "READ",
-  CREATE = "CREATE",
-  UPDATE = "UPDATE",
-  REPLACE = "REPLACE",
-  SOFT_DEL = "SOFT_DEL",
-  DELETE = "DELETE",
+  READ = "Read-All",
+  CREATE = "Create-One",
+  UPDATE = "Update-One",
+  REPLACE = "Replace-One",
+  SOFT_DEL = "Delete-One",
+  DELETE = "Delete-One",
   RESTORE = "RESTORE"
 }
 

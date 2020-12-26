@@ -25,10 +25,10 @@ export class RaclHelper {
         role: ERole.OPERATOR,
         permissions: flatMap([
           ...this.createManyPermissionFromFeature(ECrudFeature.USER, {
-            exclude: ["DELETE", "REPLACE"]
+            exclude: ["Delete-One", "Replace-One"]
           }),
           ...this.createManyPermissionFromFeature(ECrudFeature.ROLE, {
-            only: ["READ"]
+            only: ["Read-All"]
           }),
           ...this.createManyPermissionFromFeature(ECrudFeature.PROVIDER)
         ])
@@ -49,10 +49,10 @@ export class RaclHelper {
         role: ERole.INTERN,
         permissions: [
           ...this.createManyPermissionFromFeature(ECrudFeature.BILL, {
-            only: ["READ"]
+            only: ["Read-All"]
           }),
           ...this.createManyPermissionFromFeature(ECrudFeature.BILL_INFO, {
-            only: ["READ"]
+            only: ["Read-All"]
           })
         ]
       },
@@ -60,7 +60,7 @@ export class RaclHelper {
         role: ERole.CUSTOMER,
         permissions: [
           ...this.createManyPermissionFromFeature(ECrudFeature.BILL, {
-            only: ["READ"]
+            only: ["Read-All"]
           })
         ]
       }

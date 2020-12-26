@@ -3,7 +3,7 @@ import {Controller, Get} from "@nestjs/common";
 import {PermissionService} from "./index.service";
 import {GrantAccess} from "src/common/decorators";
 import {Feature} from "@nestjsx/crud";
-import {ECrudFeature} from "src/common/enums";
+import {ECrudAction, ECrudFeature} from "src/common/enums";
 
 @Feature(ECrudFeature.PERMISSIONS)
 @ApiTags("Permissions")
@@ -12,7 +12,7 @@ export class PermissionController {
   constructor(public service: PermissionService) {}
 
   @GrantAccess({
-    action: "READ"
+    action: ECrudAction.READ
   })
   @ApiOperation({
     summary: "Fetch all permissions"
