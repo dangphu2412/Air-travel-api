@@ -15,7 +15,6 @@ export class Role extends BaseActionDate {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ApiProperty()
     @Column()
     @IsRequired()
     name: string;

@@ -11,7 +11,6 @@ import {CurrentUser, GrantAccess} from "src/common/decorators";
 import {ECrudAction, ECrudFeature} from "src/common/enums";
 import {SqlInterceptor} from "src/common/interceptors/sql.interceptor";
 import {CrudSwaggerFindMany} from "src/common/decorators/crudSwagger.decorator";
-import {UpdateRoleDto} from "src/common/dto/Role/update.dto";
 
 @Crud({
   model: {
@@ -66,13 +65,11 @@ export class RoleController implements CrudController<Role> {
   @Override("updateOneBase")
   async updateOneOverride(
     @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: UpdateRoleDto,
+    @ParsedBody() dto: Role,
     @CurrentUser() user: User
   ): Promise<Role> {
-    const id: number = req.parsed.paramsFilter[0].value;
-    const entity = await this.service.transferToEntity(dto, user, id);
-    this.service.validateNotUpdateAdminRole(entity);
-    return this.base.updateOneBase(req, entity);
+    await this.service.mapRelationKeysToEntities(dto, user);
+    return this.base.updateOneBase(req, dto);
   };
 
   @Patch(":id/restore")

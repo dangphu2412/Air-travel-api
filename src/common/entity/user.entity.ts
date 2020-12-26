@@ -128,12 +128,10 @@ export class User extends BaseActionDate {
         select: ["id", "password"]
       });
       if (
-        this.password
-        && !BcryptService.compare(this.password, currentUser.password)
+        !BcryptService.compare(this.password, currentUser.password)
         && this.password !== currentUser.password
-      ) {
+      )
         this.password = BcryptService.hash(this.password);
-      }
     }
 
     /**
