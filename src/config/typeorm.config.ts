@@ -1,6 +1,6 @@
 import {TypeOrmModuleOptions} from "@nestjs/typeorm";
 import env from "dotenv";
-import {DB_URI, DB_LOGGING} from "src/env";
+import {DB_URI, DB_LOGGING, ENV} from "src/env";
 
 env.config({path: ".env"});
 export const typeOrmConfig: TypeOrmModuleOptions = {
@@ -8,5 +8,11 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   type: "postgres",
   synchronize: false,
   logging: DB_LOGGING,
-  entities: ["dist/**/*.entity{.ts,.js}"]
+  entities: ["dist/**/*.entity{.ts,.js}"],
+  ssl: true,
+  extra: {
+    ssl: {
+      rejectUnauthorized: ENV === "production"
+    }
+  }
 };
